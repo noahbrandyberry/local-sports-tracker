@@ -1,4 +1,4 @@
-import { School } from '@schools/models';
+import { School } from 'schools/models';
 import { SchoolActionTypes, SchoolsAction } from './models';
 
 export interface SchoolsState {

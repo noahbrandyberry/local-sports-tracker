@@ -1,4 +1,4 @@
-import { School } from '@schools/models';
+import { School } from 'schools/models';
 
 export enum SchoolActionTypes {
   FETCH_SCHOOLS = 'FETCH_SCHOOLS',

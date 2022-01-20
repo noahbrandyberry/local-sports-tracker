@@ -1,5 +1,5 @@
-import { SchoolActionTypes } from '@schools/services/models';
-import { School } from '@schools/models';
+import { SchoolActionTypes } from 'schools/services/models';
+import { School } from 'schools/models';
 
 export const fetchSchools = () => ({
   type: SchoolActionTypes.FETCH_SCHOOLS,

@@ -1,4 +1,4 @@
-import { School } from '@schools/models';
+import { School } from 'schools/models';
 import React from 'react';
 import { Text, View } from 'react-native';
 

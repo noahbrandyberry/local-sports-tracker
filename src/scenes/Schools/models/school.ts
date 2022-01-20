@@ -1,4 +1,4 @@
-import { Location } from '@schools/models';
+import { Location } from 'schools/models';
 
 export interface School {
   id: number;

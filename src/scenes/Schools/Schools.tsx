@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { FlatList } from 'react-native';
 import { fetchSchools } from './services/actions';
 import SchoolRow from './components/SchoolRow';
-import { RootState } from '@store/model';
+import { RootState } from 'store/model';
 
 const Schools = () => {
   const dispatch = useDispatch();
