@@ -1,15 +1,20 @@
-import React, { useEffect } from 'react';
-import {
-  Text,
-  View
-} from 'react-native';
+import { School } from '@schools/models';
+import React from 'react';
+import { Text, View } from 'react-native';
 
-const SchoolRow = ({school}) => {
+interface SchoolRowProps {
+  school: School;
+}
+
+const SchoolRow = ({ school }: SchoolRowProps) => {
+  const distance = 0;
+
   return (
     <View>
       <Text>{school.name}</Text>
+      <Text>{distance}</Text>
     </View>
-  )
-}
+  );
+};
 
 export default SchoolRow;

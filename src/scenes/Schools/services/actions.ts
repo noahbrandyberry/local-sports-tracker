@@ -1,21 +1,16 @@
-import { SchoolActionTypes } from './models'
+import { SchoolActionTypes } from '@schools/services/models';
+import { School } from '@schools/models';
 
-export const fetchSchools = (data) => {
-  return {
-    type: SchoolActionTypes.FETCH_SCHOOLS,
-  }
-}
+export const fetchSchools = () => ({
+  type: SchoolActionTypes.FETCH_SCHOOLS,
+});
 
-export const fetchSchoolsSuccess = (data) => {
-  return {
-    type: SchoolActionTypes.FETCH_SCHOOLS_SUCCESS,
-    payload: data
-  };
-}
+export const fetchSchoolsSuccess = (data: School[]) => ({
+  type: SchoolActionTypes.FETCH_SCHOOLS_SUCCESS,
+  payload: data,
+});
 
-export const fetchSchoolsError = (error) => {
-  return {
-    type: SchoolActionTypes.FETCH_SCHOOLS_ERROR,
-    error: error
-  }
-}
+export const fetchSchoolsError = (error: Error) => ({
+  type: SchoolActionTypes.FETCH_SCHOOLS_ERROR,
+  error: error,
+});

@@ -1,21 +1,16 @@
-import { LocationActionTypes } from './models'
+import { LocationActionTypes } from './models';
+import { Location } from 'react-native-get-location';
 
-export const fetchLocation = (data) => {
-  return {
-    type: LocationActionTypes.FETCH_LOCATION,
-  }
-}
+export const fetchLocation = () => ({
+  type: LocationActionTypes.FETCH_LOCATION,
+});
 
-export const fetchLocationSuccess = (data) => {
-  return {
-    type: LocationActionTypes.FETCH_LOCATION_SUCCESS,
-    payload: data
-  };
-}
+export const fetchLocationSuccess = (data: Location) => ({
+  type: LocationActionTypes.FETCH_LOCATION_SUCCESS,
+  payload: data,
+});
 
-export const fetchLocationError = (error) => {
-  return {
-    type: LocationActionTypes.FETCH_LOCATION_ERROR,
-    error: error
-  }
-}
+export const fetchLocationError = (error: Error) => ({
+  type: LocationActionTypes.FETCH_LOCATION_ERROR,
+  error: error,
+});
