@@ -4,6 +4,7 @@ export interface Location {
   address_1: string;
   address_2: string;
   state: string;
+  city: string;
   zip: string;
   plus_4: string;
   timezone: string;

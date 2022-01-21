@@ -22,6 +22,7 @@ export interface School {
   version: number;
   instagram: string;
   onboarding: string;
+  distance?: number;
   location: Location;
   created_at: string;
   updated_at: string;

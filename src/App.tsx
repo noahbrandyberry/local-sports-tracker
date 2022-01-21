@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
-import Schools from './scenes/Schools/Schools';
-import { fetchLocation } from './services/location/actions';
+import SelectSchool from 'schools/scenes/SelectSchool';
+import SchoolsList from 'schools/scenes/SchoolsList';
+import SchoolDetail from 'schools/scenes/SchoolDetail';
+import { fetchLocation } from 'services/location/actions';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import RootStackParamList from './RootStackParams';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
   const dispatch = useDispatch();
-  const isDarkMode = useColorScheme() === 'dark';
 
   useEffect(() => {
     dispatch(fetchLocation());
@@ -14,10 +19,16 @@ const App = () => {
   }, []);
 
   return (
-    <SafeAreaView>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <Schools />
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen name="SelectSchool" component={SelectSchool} />
+        <Stack.Screen name="SchoolsList" component={SchoolsList} />
+        <Stack.Screen name="SchoolDetail" component={SchoolDetail} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
