@@ -10,10 +10,11 @@ export interface Team {
   created_at: string;
   updated_at: string;
   url: string;
+  school_id: number;
   level?: Level;
   season: Season;
   year: Year;
   program?: Program;
-  gender?: Gender;
-  sport?: Sport;
+  gender: Gender;
+  sport: Sport;
 }

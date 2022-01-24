@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
-import { Text, MenuBar } from 'components';
-import { FlatList, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, MenuBar, InvalidDataError } from 'components';
+import {
+  FlatList,
+  Image,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectSchoolById } from 'schools/services/selectors';
@@ -8,8 +14,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchTeams } from 'teams/services/actions';
-import { selectCurrentTeams } from 'teams/services/selectors';
-import TeamRow from 'teams/components/TeamRow';
+import {
+  selectCurrentSeason,
+  selectCurrentSports,
+  selectTeamsLoading,
+} from 'teams/services/selectors';
+import SportCell from './components/SportCell';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -20,26 +30,41 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   const { schoolId } = route.params;
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const getTeams = () => {
     dispatch(fetchTeams({ schoolId }));
+  };
+
+  useEffect(() => {
+    getTeams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const teams = useSelector(selectCurrentTeams);
+  const teamsLoading = useSelector(selectTeamsLoading);
+  const sports = useSelector(selectCurrentSports);
+  const season = useSelector(selectCurrentSeason);
   const school = useSelector(selectSchoolById(schoolId));
+
+  useEffect(() => {
+    if (!school) navigation.replace('SelectSchool');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [school]);
+
   if (!school) {
-    navigation.replace('SelectSchool');
-    return null;
+    return <InvalidDataError />;
   }
 
-  const onSelectTeam = (teamId: number) => {};
+  const seasonName = season ? season.name : school.name;
+
+  const onSelectSport = (sportId: number) => {
+    navigation.navigate('SportDetail', { sportId, schoolId });
+  };
 
   return (
     <SafeAreaView
       style={{ backgroundColor: school.primary_color, flex: 1 }}
       edges={['top', 'left', 'right']}>
       <MenuBar />
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
         <Text style={styles.header}>Go {school.mascot}!</Text>
 
         <View style={styles.well}>
@@ -62,15 +87,36 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
           </View>
         </View>
 
-        <View style={styles.well}>
-          <FlatList
-            data={teams}
-            renderItem={({ item, index }) => (
-              <TeamRow team={item} index={index} onPress={onSelectTeam} />
-            )}
-          />
+        <View style={styles.sportsContainer}>
+          <View style={styles.well}>
+            <FlatList
+              data={sports}
+              ListHeaderComponent={
+                <View style={styles.sportsHeaderContainer}>
+                  <Text style={styles.subHeader}>{seasonName} Sports</Text>
+                </View>
+              }
+              columnWrapperStyle={styles.sportsScroll}
+              stickyHeaderIndices={[0]}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              refreshControl={
+                <RefreshControl
+                  refreshing={teamsLoading}
+                  onRefresh={getTeams}
+                />
+              }
+              renderItem={({ item }) => (
+                <SportCell
+                  sport={item}
+                  backgroundColor={school.primary_color}
+                  onPress={onSelectSport}
+                />
+              )}
+            />
+          </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -116,6 +162,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
     marginBottom: 4,
+  },
+  sportsContainer: {
+    flex: 1,
+  },
+  sportsHeaderContainer: {
+    padding: 20,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    paddingBottom: 5,
+  },
+  sportsScroll: {
+    paddingHorizontal: 10,
   },
 });
 

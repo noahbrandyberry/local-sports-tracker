@@ -25,7 +25,7 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
 
   const onSelectSchool = (schoolId: number) => {
     navigation.navigate('SchoolDetail', {
-      schoolId: schoolId,
+      schoolId,
     });
   };
 
@@ -37,6 +37,7 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
         <View style={styles.well}>
           <FlatList
             data={schools}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={({ item, index }) => (
               <CloseSchool
                 school={item}

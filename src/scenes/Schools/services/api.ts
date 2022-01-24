@@ -1,4 +1,5 @@
 import axios from 'axios';
+import config from 'src/config/config';
 
 export const constructApiRequest = () =>
-  axios.get('http://localhost:3000/api/v1/schools.json');
+  axios.get(`${config.baseUrl}/schools.json`);

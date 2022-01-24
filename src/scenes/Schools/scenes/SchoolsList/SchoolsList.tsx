@@ -23,6 +23,7 @@ const Schools = ({ navigation }: SchoolsProps) => {
     <FlatList
       data={schools}
       renderItem={({ item }) => <SchoolRow school={item} />}
+      keyExtractor={(item) => item.id.toString()}
     />
   );
 };

@@ -1,7 +1,7 @@
 import { School } from 'schools/models';
 import React from 'react';
 import { Text } from 'components';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface SchoolRowProps {
   school: School;
@@ -16,6 +16,7 @@ const CloseSchool = ({ school, index, onPress }: SchoolRowProps) => {
     <TouchableOpacity
       style={[styles.rowContainer, index > 0 ? styles.rowContainerBorder : {}]}
       onPress={() => onPress(school.id)}>
+      <Image source={{ uri: school.logo_url }} style={styles.logo} />
       <Text style={styles.name}>{school.name}</Text>
       <Text style={styles.distance}>{distance.toPrecision(2)} miles</Text>
     </TouchableOpacity>
@@ -25,8 +26,9 @@ const CloseSchool = ({ school, index, onPress }: SchoolRowProps) => {
 const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     padding: 20,
+    paddingHorizontal: 16,
+    alignItems: 'center',
   },
   rowContainerBorder: {
     borderTopColor: 'lightgray',
@@ -34,10 +36,17 @@ const styles = StyleSheet.create({
   },
   name: {
     fontWeight: '500',
+    flex: 1,
   },
   distance: {
     color: 'gray',
     fontSize: 12,
+  },
+  logo: {
+    width: 30,
+    marginRight: 10,
+    resizeMode: 'cover',
+    height: '100%',
   },
 });
 
