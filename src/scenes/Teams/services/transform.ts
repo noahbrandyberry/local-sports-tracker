@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Team } from 'teams/models';
+import { SortedGenders, SortedLevels } from './models';
 
 export const transformTeams = (teams: Team[]) => {
   teams = teams.map((team) => ({
@@ -15,5 +16,17 @@ export const transformTeams = (teams: Team[]) => {
       end: moment(team.season.end),
     },
   }));
+
+  teams.sort(
+    (a, b) =>
+      SortedLevels.indexOf(a.level?.name ?? '') -
+      SortedLevels.indexOf(b.level?.name ?? ''),
+  );
+
+  teams.sort(
+    (a, b) =>
+      SortedGenders.indexOf(a.gender.name) -
+      SortedGenders.indexOf(b.gender.name),
+  );
   return teams;
 };

@@ -1,43 +1,106 @@
-import React, { useEffect } from 'react';
-import { Text, MenuBar, InvalidDataError } from 'components';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React from 'react';
+import { Text, InvalidDataError } from 'components';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
-import { useDispatch, useSelector } from 'react-redux';
-import { DefaultTheme } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { DefaultTheme, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
+import { selectPosts } from './services/selectors';
+import PostRow from './components';
+import RootStackParamList from 'src/RootStackParams';
 
-type TeamHomeProps = NativeStackScreenProps<TeamsNavigatorParams, 'TeamHome'>;
+type TeamHomeNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'TeamDetail'
+>;
 
-const TeamHome = ({ route, navigation }: TeamHomeProps) => {
+type TeamHomeRouteProp = RouteProp<TeamsNavigatorParams, 'TeamHome'>;
+
+const TeamHome = ({
+  route,
+  navigation,
+}: {
+  route: TeamHomeRouteProp;
+  navigation: TeamHomeNavigationProp;
+}) => {
   const { teamId } = route.params;
-  const dispatch = useDispatch();
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const posts = useSelector(selectPosts);
 
   if (!team || !school) {
     return <InvalidDataError />;
   }
+
+  const onSelectPost = (postId: string) => {
+    navigation.navigate('PostDetail', { postId });
+  };
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
       }}
-      edges={['bottom', 'left', 'right']}>
+      edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
         <Text style={styles.header}>{team.name}</Text>
-        <ScrollView style={styles.scrollContainer}>
+        <View style={styles.contentContainer}>
           <View style={styles.well}>
-            <Text style={styles.subHeader}>{team.name}</Text>
-            <Text>Sport: {team.sport.name}</Text>
-            <Text>Level: {team.level?.name}</Text>
-            <Text>Gender: {team.gender.name}</Text>
+            <Text style={styles.subHeader}>Overview</Text>
+
+            <Text>
+              Overall Record:{' '}
+              {team.record ? `${team.record.win} - ${team.record.win}` : null}
+            </Text>
+            <View style={styles.overviewLabels}>
+              <Text
+                style={[
+                  styles.overviewLabel,
+                  { backgroundColor: school.primary_color },
+                ]}>
+                {team.sport.name}
+              </Text>
+              {team.level ? (
+                <Text
+                  style={[
+                    styles.overviewLabel,
+                    { backgroundColor: school.primary_color },
+                  ]}>
+                  {team.level.name}
+                </Text>
+              ) : null}
+              <Text
+                style={[
+                  styles.overviewLabel,
+                  { backgroundColor: school.primary_color },
+                ]}>
+                {team.gender.name}
+              </Text>
+              <Text
+                style={[
+                  styles.overviewLabel,
+                  { backgroundColor: school.primary_color },
+                ]}>
+                {team.season.name}
+              </Text>
+            </View>
           </View>
-        </ScrollView>
+
+          <Text style={styles.subHeader}>Latest News</Text>
+          <FlatList
+            keyExtractor={(item) => item.id}
+            style={styles.scrollContainer}
+            data={posts}
+            contentInset={{ bottom: 20 }}
+            renderItem={({ item }) => (
+              <PostRow post={item} onPress={onSelectPost} />
+            )}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -57,9 +120,16 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
   },
-  scrollContainer: {
+  contentContainer: {
     padding: 20,
     flex: 1,
+    paddingBottom: 0,
+  },
+  scrollContainer: {
+    flex: 1,
+    marginTop: 8,
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
   },
   well: {
     backgroundColor: 'white',
@@ -86,6 +156,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
     marginBottom: 4,
+  },
+  overviewLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  overviewLabel: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 5,
+    color: 'white',
+    overflow: 'hidden',
+    fontSize: 12,
   },
 });
 

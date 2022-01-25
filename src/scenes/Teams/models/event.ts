@@ -1,5 +1,6 @@
 import { Moment } from 'moment';
 import { Location } from 'schools/models';
+import { Team } from '.';
 
 export interface Event {
   id: number;
@@ -11,16 +12,34 @@ export interface Event {
   conference: boolean;
   scrimmage: boolean;
   location_verified: boolean;
-  private_notes: string;
-  public_notes: string;
-  bus_dismissal_datetime_local: string;
-  bus_departure_datetime_local: string;
-  bus_return_datetime_local: string;
   home: boolean;
   canceled: boolean;
   postponed: boolean;
   location: Location;
-  host_team_id: number;
+  opponents: Team[];
   created_at: string;
   updated_at: string;
+  team_results: TeamResult[];
+  result?: Result;
+  result_status?: ResultStatus;
+}
+
+export interface Result {
+  home: number;
+  away: number;
+}
+
+export interface TeamResult {
+  id: number;
+  team_id: number;
+  name: string;
+  place: number;
+  points: number;
+  event_id: number;
+}
+
+export enum ResultStatus {
+  WIN = 'win',
+  LOSS = 'loss',
+  TIE = 'tie',
 }

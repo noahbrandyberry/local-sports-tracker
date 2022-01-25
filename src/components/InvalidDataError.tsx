@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'components';
-import { StyleSheet, View, StatusBar, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView } from 'react-native';
 
 export const InvalidDataError = () => (
   <SafeAreaView>

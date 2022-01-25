@@ -20,6 +20,7 @@ import {
   selectTeamsLoading,
 } from 'teams/services/selectors';
 import SportCell from './components/SportCell';
+import { formatAddress } from 'src/utils/formattedAddress';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -37,7 +38,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   useEffect(() => {
     getTeams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [schoolId]);
 
   const teamsLoading = useSelector(selectTeamsLoading);
   const sports = useSelector(selectCurrentSports);
@@ -70,15 +71,12 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
         <View style={styles.well}>
           <View style={styles.infoContainer}>
             <View style={styles.locationContainer}>
-              <Text style={styles.subHeader}>{school.location.name}</Text>
-              <Text>{school.location.address_1}</Text>
-              {school.location.address_2 ? (
-                <Text>{school.location.address_2}</Text>
+              {school.location ? (
+                <Text style={styles.subHeader}>{school.location.name}</Text>
               ) : null}
-              <Text>
-                {school.location.city}, {school.location.state}{' '}
-                {school.location.zip}
-              </Text>
+              {school.location ? (
+                <Text>{formatAddress(school.location, '\n')}</Text>
+              ) : null}
               {school.phone ? <Text>Phone: {school.phone}</Text> : null}
               {school.email ? <Text>Email: {school.email}</Text> : null}
             </View>
@@ -100,6 +98,8 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               stickyHeaderIndices={[0]}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
+              contentInset={{ bottom: 20 }}
+              style={styles.sportsPadding}
               refreshControl={
                 <RefreshControl
                   refreshing={teamsLoading}
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 80,
     resizeMode: 'cover',
+    minHeight: 50,
   },
   header: {
     fontSize: 24,
@@ -175,6 +176,9 @@ const styles = StyleSheet.create({
   },
   sportsScroll: {
     paddingHorizontal: 10,
+  },
+  sportsPadding: {
+    paddingBottom: 10,
   },
 });
 

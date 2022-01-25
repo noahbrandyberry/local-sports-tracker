@@ -1,24 +1,32 @@
 import React from 'react';
 import { Text, InvalidDataError } from 'components';
-import { ScrollView, StyleSheet, View, FlatList } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { StyleSheet, View, FlatList } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
-import { useDispatch, useSelector } from 'react-redux';
-import { DefaultTheme } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { DefaultTheme, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 import { selectEvents } from './services/selectors';
 import EventRow from './components/EventRow';
+import RootStackParamList from 'src/RootStackParams';
 
-type TeamScheduleProps = NativeStackScreenProps<
-  TeamsNavigatorParams,
-  'TeamSchedule'
+type TeamScheduleNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'TeamDetail'
 >;
 
-const TeamSchedule = ({ route, navigation }: TeamScheduleProps) => {
+type TeamScheduleRouteProp = RouteProp<TeamsNavigatorParams, 'TeamSchedule'>;
+
+const TeamSchedule = ({
+  route,
+  navigation,
+}: {
+  route: TeamScheduleRouteProp;
+  navigation: TeamScheduleNavigationProp;
+}) => {
   const { teamId } = route.params;
-  const dispatch = useDispatch();
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const events = useSelector(selectEvents);
@@ -27,12 +35,19 @@ const TeamSchedule = ({ route, navigation }: TeamScheduleProps) => {
     return <InvalidDataError />;
   }
 
+  const onSelectEvent = (eventId: number) => {
+    navigation.navigate('EventDetail', {
+      teamId,
+      eventId,
+    });
+  };
+
   return (
     <SafeAreaView
       style={{
         flex: 1,
       }}
-      edges={['bottom', 'left', 'right']}>
+      edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
         <Text style={styles.header}>{team.name}</Text>
@@ -40,12 +55,9 @@ const TeamSchedule = ({ route, navigation }: TeamScheduleProps) => {
           keyExtractor={(item) => item.id.toString()}
           style={styles.scrollContainer}
           data={events}
-          renderItem={({ item, index }) => (
-            <EventRow
-              event={item}
-              index={index}
-              onPress={(id: number) => console.log(id)}
-            />
+          contentInset={{ bottom: 32 }}
+          renderItem={({ item }) => (
+            <EventRow event={item} school={school} onPress={onSelectEvent} />
           )}
         />
       </View>
@@ -69,21 +81,8 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
+    paddingBottom: 0,
     flex: 1,
-  },
-  well: {
-    backgroundColor: 'white',
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    marginBottom: 24,
-    padding: 20,
   },
   header: {
     fontSize: 24,

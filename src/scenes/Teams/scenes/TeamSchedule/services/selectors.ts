@@ -8,7 +8,11 @@ export const selectEventsLoading = createSelector(
   (eventsData) => eventsData.loading,
 );
 
-export const selectEvents = createSelector(
-  selectEventsData,
-  (eventsData) => eventsData.events,
+export const selectEvents = createSelector(selectEventsData, (eventsData) =>
+  eventsData.events.filter((event) => !event.canceled),
 );
+
+export const selectEventById = (id: number) =>
+  createSelector(selectEvents, (events) =>
+    events.find((event) => event.id === id),
+  );

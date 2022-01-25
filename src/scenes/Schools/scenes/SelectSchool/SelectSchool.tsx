@@ -1,13 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { fetchSchools } from 'schools/services/actions';
-import { selectNearestSchools } from 'schools/services/selectors';
-import CloseSchool from './components/CloseSchool';
-import { Text } from 'components';
+import {
+  selectNearestSchools,
+  selectValidSchools,
+} from 'schools/services/selectors';
+import SchoolRow from './components/SchoolRow';
+import { Text, TextField } from 'components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import RootStackParamList from 'src/RootStackParams';
+import {
+  selectCurrentLocationError,
+  selectCurrentLocationLoading,
+} from 'services/location/selectors';
+import { School } from 'schools/models';
 
 type SelectSchoolProps = NativeStackScreenProps<
   RootStackParamList,
@@ -16,7 +31,10 @@ type SelectSchoolProps = NativeStackScreenProps<
 
 const SelectSchool = ({ navigation }: SelectSchoolProps) => {
   const dispatch = useDispatch();
-  const schools = useSelector(selectNearestSchools).slice(0, 5);
+  const schools = useSelector(selectValidSchools);
+  const nearestSchools = useSelector(selectNearestSchools);
+  const currentLocationLoading = useSelector(selectCurrentLocationLoading);
+  const currentLocationError = useSelector(selectCurrentLocationError);
 
   useEffect(() => {
     dispatch(fetchSchools());
@@ -29,27 +47,69 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
     });
   };
 
+  const [searchText, setSearchText] = useState('');
+
+  const schoolResults = schools.filter((school) =>
+    school.name.includes(searchText),
+  );
+
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <Text style={styles.header}>Select Your School</Text>
+    <SafeAreaView style={styles.evenHeight}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.evenHeight}>
+        <View style={styles.container}>
+          {currentLocationLoading || !currentLocationError ? (
+            <View style={styles.evenHeight}>
+              <Text style={styles.header}>Select Your School</Text>
 
-        <View style={styles.well}>
-          <FlatList
-            data={schools}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item, index }) => (
-              <CloseSchool
-                school={item}
-                index={index}
-                onPress={onSelectSchool}
-              />
-            )}
-          />
+              <View style={styles.well}>
+                <FlatList
+                  data={nearestSchools}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item, index }) => (
+                    <SchoolRow
+                      school={item as School}
+                      index={index}
+                      onPress={onSelectSchool}
+                    />
+                  )}
+                />
+              </View>
+            </View>
+          ) : null}
+          <View style={styles.evenHeight}>
+            <Text style={styles.header}>
+              {currentLocationLoading || !currentLocationError
+                ? 'Or Search For One'
+                : 'Search for Your School'}
+            </Text>
+            <TextField
+              icon="search"
+              placeholder="Search"
+              onChangeText={setSearchText}
+              value={searchText}
+            />
+
+            {searchText ? (
+              <View style={[styles.well, styles.searchResults]}>
+                <FlatList
+                  data={schoolResults}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item, index }) => (
+                    <SchoolRow
+                      school={item}
+                      index={index}
+                      showDistance={false}
+                      onPress={onSelectSchool}
+                    />
+                  )}
+                />
+              </View>
+            ) : null}
+          </View>
         </View>
-
-        <Text style={styles.header}>Or Search For One</Text>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -57,6 +117,10 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    flex: 1,
+  },
+  evenHeight: {
+    flex: 1,
   },
   well: {
     backgroundColor: 'white',
@@ -70,6 +134,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     marginBottom: 24,
+    flex: 1,
   },
   header: {
     fontSize: 24,
@@ -78,6 +143,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textTransform: 'uppercase',
     marginBottom: 16,
+  },
+  searchResults: {
+    flex: 0,
+    marginTop: 16,
   },
 });
 

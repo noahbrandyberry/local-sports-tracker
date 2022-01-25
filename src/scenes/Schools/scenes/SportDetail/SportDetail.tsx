@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Text, InvalidDataError } from 'components';
 import { SectionList, StyleSheet, View, TouchableOpacity } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
@@ -39,6 +39,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   };
 
   const sectionsGroup = groupBy(teams, (team) => team.gender.name);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sections: any[] = map(sectionsGroup, (teamsGroup, gender) => ({
     title: gender,
     data: teamsGroup,

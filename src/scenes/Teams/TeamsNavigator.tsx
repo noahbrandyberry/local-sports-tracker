@@ -12,11 +12,15 @@ import { selectTeamById } from './services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSchoolById } from 'schools/services/selectors';
 import { fetchEvents } from './scenes/TeamSchedule/services/actions';
+import TeamRoster from 'teams/scenes/TeamRoster';
+import TeamMedia from 'teams/scenes/TeamMedia';
+import TeamDonate from 'teams/scenes/TeamDonate';
+import { fetchPosts } from './scenes/TeamHome/services/actions';
 
 const Tab = createBottomTabNavigator<TeamsNavigatorParams>();
 type TeamProps = NativeStackScreenProps<RootStackParamList, 'TeamDetail'>;
 
-const TeamsNavigator = ({ navigation, route }: TeamProps) => {
+const TeamsNavigator = ({ route }: TeamProps) => {
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
@@ -25,7 +29,9 @@ const TeamsNavigator = ({ navigation, route }: TeamProps) => {
 
   useEffect(() => {
     dispatch(fetchEvents({ teamId, schoolId: school?.id || 0 }));
-  }, []);
+    dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamId]);
 
   return (
     <Tab.Navigator
@@ -55,7 +61,7 @@ const TeamsNavigator = ({ navigation, route }: TeamProps) => {
       />
       <Tab.Screen
         name="TeamRoster"
-        component={TeamHome}
+        component={TeamRoster}
         initialParams={{ teamId }}
         options={{
           tabBarLabel: 'Roster',
@@ -98,7 +104,7 @@ const TeamsNavigator = ({ navigation, route }: TeamProps) => {
       />
       <Tab.Screen
         name="TeamMedia"
-        component={TeamHome}
+        component={TeamMedia}
         initialParams={{ teamId }}
         options={{
           tabBarLabel: 'Media',
@@ -109,7 +115,7 @@ const TeamsNavigator = ({ navigation, route }: TeamProps) => {
       />
       <Tab.Screen
         name="TeamDonate"
-        component={TeamHome}
+        component={TeamDonate}
         initialParams={{ teamId }}
         options={{
           tabBarLabel: 'Donate',

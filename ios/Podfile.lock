@@ -272,6 +272,10 @@ PODS:
   - React-jsinspector (0.67.0)
   - React-logger (0.67.0):
     - glog
+  - react-native-add-calendar-event (4.0.0):
+    - React-Core
+  - react-native-maps (0.30.1):
+    - React-Core
   - react-native-safe-area-context (3.3.2):
     - React-Core
   - React-perflogger (0.67.0)
@@ -394,6 +398,8 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-add-calendar-event (from `../node_modules/react-native-add-calendar-event`)
+  - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -465,6 +471,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-add-calendar-event:
+    :path: "../node_modules/react-native-add-calendar-event"
+  react-native-maps:
+    :path: "../node_modules/react-native-maps"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-perflogger:
@@ -533,6 +543,8 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 3001f865cfd2c66c1298f427be47b8797ae5843b
   React-jsinspector: c9d1ddf4b1efbcf90323e3581ccff200cf4de346
   React-logger: 5d42caeaf0c31a9b29efb33e10e7f7031f958bfd
+  react-native-add-calendar-event: d7744f983d6770cc9e4f004db22bc4d4b4575f17
+  react-native-maps: d752b0dd0e1951d815b1336332835aab6b4a836f
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   React-perflogger: 9454d63e7027e0830fa3e527628558160684f5dd
   React-RCTActionSheet: 240d798e2f5bd1ba2e85503a00fd390f560e6827

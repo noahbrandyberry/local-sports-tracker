@@ -5,6 +5,8 @@ import SelectSchool from 'schools/scenes/SelectSchool';
 import SchoolsList from 'schools/scenes/SchoolsList';
 import SchoolDetail from 'schools/scenes/SchoolDetail';
 import SportDetail from 'schools/scenes/SportDetail';
+import EventDetail from 'teams/scenes/EventDetail';
+import PostDetail from 'teams/scenes/PostDetail';
 import { fetchLocation } from 'services/location/actions';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -41,6 +43,8 @@ const App = () => {
         </Stack.Group>
         <Stack.Group screenOptions={{ presentation: 'modal' }}>
           <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
+          <Stack.Screen name="EventDetail" component={EventDetail} />
+          <Stack.Screen name="PostDetail" component={PostDetail} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

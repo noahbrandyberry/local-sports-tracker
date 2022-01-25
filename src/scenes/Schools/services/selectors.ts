@@ -12,7 +12,12 @@ export const selectSchools = createSelector(
 );
 
 export const selectValidSchools = createSelector(selectSchools, (schools) =>
-  schools.filter((school) => school.location),
+  schools.filter(
+    (school) =>
+      school.location?.latitude &&
+      school.location?.longitude &&
+      school.logo_url,
+  ),
 );
 
 export const selectSchoolsWithDistance = createSelector(
@@ -22,10 +27,12 @@ export const selectSchoolsWithDistance = createSelector(
     currentLocation
       ? schools.map((school) => ({
           ...school,
-          distance: convertDistance(
-            getDistance(currentLocation, school.location),
-            'mi',
-          ),
+          distance: school.location
+            ? convertDistance(
+                getDistance(currentLocation, school.location),
+                'mi',
+              )
+            : null,
         }))
       : schools,
 );
@@ -37,6 +44,6 @@ export const selectNearestSchools = createSelector(
 );
 
 export const selectSchoolById = (id: number) =>
-  createSelector(selectValidSchools, (schools) =>
+  createSelector(selectSchools, (schools) =>
     schools.find((school) => school.id === id),
   );

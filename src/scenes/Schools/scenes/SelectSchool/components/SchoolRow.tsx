@@ -7,9 +7,15 @@ interface SchoolRowProps {
   school: School;
   index: number;
   onPress: CallableFunction;
+  showDistance?: boolean;
 }
 
-const CloseSchool = ({ school, index, onPress }: SchoolRowProps) => {
+const SchoolRow = ({
+  school,
+  index,
+  onPress,
+  showDistance = true,
+}: SchoolRowProps) => {
   const distance = school.distance ?? 0;
 
   return (
@@ -18,7 +24,9 @@ const CloseSchool = ({ school, index, onPress }: SchoolRowProps) => {
       onPress={() => onPress(school.id)}>
       <Image source={{ uri: school.logo_url }} style={styles.logo} />
       <Text style={styles.name}>{school.name}</Text>
-      <Text style={styles.distance}>{distance.toPrecision(2)} miles</Text>
+      {showDistance ? (
+        <Text style={styles.distance}>{distance.toPrecision(2)} miles</Text>
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -50,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CloseSchool;
+export default SchoolRow;

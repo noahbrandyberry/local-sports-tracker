@@ -17,4 +17,11 @@ export interface Team {
   program?: Program;
   gender: Gender;
   sport: Sport;
+  record?: Record;
+}
+
+export interface Record {
+  tie: number;
+  win: number;
+  loss: number;
 }

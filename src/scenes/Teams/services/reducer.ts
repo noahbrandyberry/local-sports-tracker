@@ -23,7 +23,7 @@ export const teamsReducer = (
     case TeamActionTypes.FETCH_TEAMS_SUCCESS:
       return { ...state, teams: action.payload, loading: false };
     case TeamActionTypes.FETCH_TEAMS_ERROR:
-      return { ...state, error: action.error, loading: false };
+      return { ...state, error: action.error, loading: false, teams: [] };
     default:
       return state;
   }
