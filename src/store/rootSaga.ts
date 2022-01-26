@@ -3,6 +3,7 @@ import schoolsSagas from 'schools/services/sagas';
 import teamsSaga from 'teams/services/sagas';
 import eventsSaga from 'teams/scenes/TeamSchedule/services/sagas';
 import postsSaga from 'teams/scenes/TeamHome/services/sagas';
+import deviceTokenSagas from 'services/deviceToken/sagas';
 import locationSagas from 'services/location/sagas';
 
 export default function* rootSaga() {
@@ -11,6 +12,7 @@ export default function* rootSaga() {
     fork(teamsSaga),
     fork(eventsSaga),
     fork(postsSaga),
+    fork(deviceTokenSagas),
     fork(locationSagas),
   ]);
 }

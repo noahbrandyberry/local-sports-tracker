@@ -12,9 +12,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RootStackParamList from './RootStackParams';
 import TeamsNavigator from 'teams/TeamsNavigator';
-import { StatusBar } from 'react-native';
+import { EmitterSubscription, StatusBar } from 'react-native';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { saveDeviceToken } from './services/deviceToken/actions';
+import {
+  Notification,
+  NotificationCompletion,
+  Notifications,
+  Registered,
+  RegistrationError,
+  NotificationAction,
+  NotificationBackgroundFetchResult,
+} from 'react-native-notifications';
+import { NotificationActionResponse } from 'react-native-notifications/lib/dist/interfaces/NotificationActionResponse';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 library.add(fas);
@@ -23,7 +34,64 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    const events: EmitterSubscription[] = [];
     dispatch(fetchLocation());
+
+    Notifications.registerRemoteNotifications();
+
+    events.push(
+      Notifications.events().registerRemoteNotificationsRegistered(
+        (event: Registered) => {
+          dispatch(saveDeviceToken({ deviceToken: event.deviceToken }));
+        },
+      ),
+    );
+
+    events.push(
+      Notifications.events().registerRemoteNotificationsRegistrationFailed(
+        (event: RegistrationError) => {
+          console.error(event);
+        },
+      ),
+    );
+
+    events.push(
+      Notifications.events().registerNotificationReceivedForeground(
+        (
+          notification: Notification,
+          completion: (response: NotificationCompletion) => void,
+        ) => {
+          completion({ alert: true, sound: true, badge: false });
+        },
+      ),
+    );
+
+    events.push(
+      Notifications.events().registerNotificationOpened(
+        (
+          notification: Notification,
+          completion: () => void,
+          action: NotificationActionResponse | undefined,
+        ) => {
+          completion();
+        },
+      ),
+    );
+
+    events.push(
+      Notifications.events().registerNotificationReceivedBackground(
+        (
+          notification: Notification,
+          completion: (response: NotificationBackgroundFetchResult) => void,
+        ) => {
+          completion(NotificationBackgroundFetchResult.NEW_DATA);
+        },
+      ),
+    );
+
+    return () => {
+      events.forEach((event) => event.remove());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
