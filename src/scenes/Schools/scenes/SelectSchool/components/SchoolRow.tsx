@@ -1,7 +1,8 @@
 import { School } from 'schools/models';
 import React from 'react';
 import { Text } from 'components';
-import { Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 interface SchoolRowProps {
   school: School;
@@ -22,7 +23,7 @@ const SchoolRow = ({
     <TouchableOpacity
       style={[styles.rowContainer, index > 0 ? styles.rowContainerBorder : {}]}
       onPress={() => onPress(school.id)}>
-      <Image source={{ uri: school.logo_url }} style={styles.logo} />
+      <FastImage source={{ uri: school.logo_url }} style={styles.logo} />
       <Text style={styles.name}>{school.name}</Text>
       {showDistance ? (
         <Text style={styles.distance}>{distance.toPrecision(2)} miles</Text>

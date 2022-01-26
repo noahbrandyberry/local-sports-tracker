@@ -37,6 +37,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = LocalSportsTracker/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = LocalSportsTracker/main.m; sourceTree = "<group>"; };
 		24FF4B1A1A4EDE5490357B9A /* Pods-LocalSportsTracker-LocalSportsTrackerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LocalSportsTracker-LocalSportsTrackerTests.debug.xcconfig"; path = "Target Support Files/Pods-LocalSportsTracker-LocalSportsTrackerTests/Pods-LocalSportsTracker-LocalSportsTrackerTests.debug.xcconfig"; sourceTree = "<group>"; };
+		2648663727A11A2C00603E9B /* LocalSportsTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LocalSportsTracker.entitlements; path = LocalSportsTracker/LocalSportsTracker.entitlements; sourceTree = "<group>"; };
 		6C92AFF880C8BE2E89C2A5C4 /* libPods-LocalSportsTracker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LocalSportsTracker.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LocalSportsTracker/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D8D080AFBC06736F0603A25 /* Pods-LocalSportsTracker-LocalSportsTrackerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LocalSportsTracker-LocalSportsTrackerTests.release.xcconfig"; path = "Target Support Files/Pods-LocalSportsTracker-LocalSportsTrackerTests/Pods-LocalSportsTracker-LocalSportsTrackerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -86,6 +87,7 @@
 		13B07FAE1A68108700A75B9A /* LocalSportsTracker */ = {
 			isa = PBXGroup;
 			children = (
+				2648663727A11A2C00603E9B /* LocalSportsTracker.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -484,7 +486,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CODE_SIGN_ENTITLEMENTS = LocalSportsTracker/LocalSportsTracker.entitlements;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = JA4TDX57C8;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LocalSportsTracker/Info.plist;
@@ -513,7 +516,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CODE_SIGN_ENTITLEMENTS = LocalSportsTracker/LocalSportsTracker.entitlements;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = JA4TDX57C8;
 				INFOPLIST_FILE = LocalSportsTracker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

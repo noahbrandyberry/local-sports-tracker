@@ -1,12 +1,6 @@
 import React, { useEffect } from 'react';
 import { Text, MenuBar, InvalidDataError } from 'components';
-import {
-  FlatList,
-  Image,
-  RefreshControl,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectSchoolById } from 'schools/services/selectors';
@@ -21,7 +15,7 @@ import {
 } from 'teams/services/selectors';
 import SportCell from './components/SportCell';
 import { formatAddress } from 'src/utils/formattedAddress';
-import { resetSchools } from 'schools/services/actions';
+import FastImage from 'react-native-fast-image';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -85,7 +79,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               ) : null}
             </View>
 
-            <Image source={{ uri: school.logo_url }} style={styles.logo} />
+            <FastImage source={{ uri: school.logo_url }} style={styles.logo} />
           </View>
         </View>
 
@@ -102,7 +96,9 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                 teamsLoading ? (
                   <View />
                 ) : (
-                  <Text>No {seasonName} sports found.</Text>
+                  <Text style={styles.noSportsFound}>
+                    No {seasonName} sports found.
+                  </Text>
                 )
               }
               columnWrapperStyle={styles.sportsScroll}
@@ -158,6 +154,9 @@ const styles = StyleSheet.create({
   },
   locationContainer: {
     flex: 1,
+  },
+  noSportsFound: {
+    paddingHorizontal: 20,
   },
   logo: {
     width: 80,

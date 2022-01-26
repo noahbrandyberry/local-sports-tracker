@@ -1,7 +1,8 @@
 import { Post } from 'teams/models';
 import React from 'react';
 import { Text } from 'components';
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 interface PostRowProps {
   post: Post;
@@ -13,7 +14,7 @@ const PostRow = ({ post, onPress }: PostRowProps) => (
     style={styles.rowContainer}
     onPress={() => onPress(post.id)}>
     {post.featured_image ? (
-      <Image source={{ uri: post.featured_image }} style={styles.image} />
+      <FastImage source={{ uri: post.featured_image }} style={styles.image} />
     ) : null}
     <Text style={styles.name}>{post.title}</Text>
     <Text>
