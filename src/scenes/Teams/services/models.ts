@@ -4,6 +4,7 @@ export enum TeamActionTypes {
   FETCH_TEAMS = 'FETCH_TEAMS',
   FETCH_TEAMS_SUCCESS = 'FETCH_TEAMS_SUCCESS',
   FETCH_TEAMS_ERROR = 'FETCH_TEAMS_ERROR',
+  RESET_TEAMS = 'RESET_TEAMS',
 }
 
 export interface FetchTeamsRequest {
@@ -25,7 +26,15 @@ export interface GetTeamsError {
   error: Error;
 }
 
-export type TeamsAction = GetTeams | GetTeamsSuccess | GetTeamsError;
+export interface ResetTeams {
+  type: typeof TeamActionTypes.RESET_TEAMS;
+}
+
+export type TeamsAction =
+  | GetTeams
+  | GetTeamsSuccess
+  | GetTeamsError
+  | ResetTeams;
 
 export const SortedGenders = ['Boys', 'Girls', 'Coed'];
 export const SortedLevels = [

@@ -15,3 +15,7 @@ export const fetchTeamsError = (error: Error) => ({
   type: TeamActionTypes.FETCH_TEAMS_ERROR,
   error: error,
 });
+
+export const resetTeams = () => ({
+  type: TeamActionTypes.RESET_TEAMS,
+});

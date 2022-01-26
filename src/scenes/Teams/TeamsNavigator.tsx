@@ -11,11 +11,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { selectTeamById } from './services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSchoolById } from 'schools/services/selectors';
-import { fetchEvents } from './scenes/TeamSchedule/services/actions';
+import {
+  fetchEvents,
+  resetEvents,
+} from './scenes/TeamSchedule/services/actions';
 import TeamRoster from 'teams/scenes/TeamRoster';
 import TeamMedia from 'teams/scenes/TeamMedia';
 import TeamDonate from 'teams/scenes/TeamDonate';
-import { fetchPosts } from './scenes/TeamHome/services/actions';
+import { fetchPosts, resetPosts } from './scenes/TeamHome/services/actions';
 
 const Tab = createBottomTabNavigator<TeamsNavigatorParams>();
 type TeamProps = NativeStackScreenProps<RootStackParamList, 'TeamDetail'>;
@@ -28,6 +31,8 @@ const TeamsNavigator = ({ route }: TeamProps) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(resetEvents());
+    dispatch(resetPosts());
     dispatch(fetchEvents({ teamId, schoolId: school?.id || 0 }));
     dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps

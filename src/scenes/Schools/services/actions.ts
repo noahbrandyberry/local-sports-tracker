@@ -14,3 +14,7 @@ export const fetchSchoolsError = (error: Error) => ({
   type: SchoolActionTypes.FETCH_SCHOOLS_ERROR,
   error: error,
 });
+
+export const resetSchools = () => ({
+  type: SchoolActionTypes.RESET_SCHOOLS,
+});

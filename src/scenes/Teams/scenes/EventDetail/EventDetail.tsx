@@ -73,14 +73,12 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   };
 
   const getDirections = () => {
-    if (school.location) {
-      openMap({
-        latitude: Number(school.location.latitude),
-        longitude: Number(school.location.longitude),
-        query: school.location.name,
-        end: formatAddress(school.location),
-      });
-    }
+    openMap({
+      latitude: Number(event.location.latitude),
+      longitude: Number(event.location.longitude),
+      query: event.location.name,
+      end: formatAddress(event.location),
+    });
   };
 
   const onSelectSchool = (schoolId: number) => {
@@ -97,7 +95,8 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
         <View style={styles.modalDragBar} />
 
         <Text style={styles.header}>
-          {event.name} - {status}
+          {event.name}
+          {status ? ` - ${status}` : ''}
         </Text>
 
         <View style={styles.well}>
@@ -121,19 +120,21 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
           </Button>
         </View>
 
-        <View style={styles.well}>
-          <Text style={styles.subHeader}>Opponents</Text>
-          <View style={styles.opponentsContainer}>
-            {event.opponents.map((opponent, index) => (
-              <OpponentRow
-                key={opponent.id.toString()}
-                index={index}
-                opponent={opponent}
-                onPress={onSelectSchool}
-              />
-            ))}
+        {event.opponents.length > 0 ? (
+          <View style={styles.well}>
+            <Text style={styles.subHeader}>Opponents</Text>
+            <View style={styles.opponentsContainer}>
+              {event.opponents.map((opponent, index) => (
+                <OpponentRow
+                  key={opponent.id.toString()}
+                  index={index}
+                  opponent={opponent}
+                  onPress={onSelectSchool}
+                />
+              ))}
+            </View>
           </View>
-        </View>
+        ) : null}
 
         <View style={[styles.well, styles.mapContainer]}>
           <View style={styles.locationContainer}>
@@ -151,23 +152,25 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
               Get Directions
             </Button>
           </View>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: Number(event.location.latitude),
-              longitude: Number(event.location.longitude),
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            }}>
-            <Marker
-              coordinate={{
+          <View style={styles.map}>
+            <MapView
+              style={{ flex: 1 }}
+              initialRegion={{
                 latitude: Number(event.location.latitude),
                 longitude: Number(event.location.longitude),
-              }}
-              title={event.location.name}
-              description={formatAddress(event.location)}
-            />
-          </MapView>
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }}>
+              <Marker
+                coordinate={{
+                  latitude: Number(event.location.latitude),
+                  longitude: Number(event.location.longitude),
+                }}
+                title={event.location.name}
+                description={formatAddress(event.location)}
+              />
+            </MapView>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -239,6 +242,7 @@ const styles = StyleSheet.create({
     height: 175,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
+    overflow: 'hidden',
   },
 });
 

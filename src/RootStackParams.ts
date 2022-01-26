@@ -5,7 +5,7 @@ type RootStackParamList = {
   SportDetail: { sportId: number; schoolId: number };
   TeamDetail: { teamId: number };
   EventDetail: { teamId: number; eventId: number };
-  PostDetail: { postId: string };
+  PostDetail: { postId: string; teamId: number };
 };
 
 export default RootStackParamList;

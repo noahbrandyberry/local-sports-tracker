@@ -1,16 +1,17 @@
 import React from 'react';
 import { Text, InvalidDataError } from 'components';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DefaultTheme, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
-import { selectPosts } from './services/selectors';
+import { selectPosts, selectPostsLoading } from './services/selectors';
 import PostRow from './components';
 import RootStackParamList from 'src/RootStackParams';
+import { fetchPosts } from './services/actions';
 
 type TeamHomeNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,18 +28,26 @@ const TeamHome = ({
   navigation: TeamHomeNavigationProp;
 }) => {
   const { teamId } = route.params;
+  const postsLoading = useSelector(selectPostsLoading);
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const posts = useSelector(selectPosts);
+
+  const dispatch = useDispatch();
 
   if (!team || !school) {
     return <InvalidDataError />;
   }
 
   const onSelectPost = (postId: string) => {
-    navigation.navigate('PostDetail', { postId });
+    navigation.navigate('PostDetail', { postId, teamId: team.id });
   };
 
+  const refreshPosts = () => {
+    dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
+  };
+
+  console.log(postsLoading);
   return (
     <SafeAreaView
       style={{
@@ -73,13 +82,15 @@ const TeamHome = ({
                   {team.level.name}
                 </Text>
               ) : null}
-              <Text
-                style={[
-                  styles.overviewLabel,
-                  { backgroundColor: school.primary_color },
-                ]}>
-                {team.gender.name}
-              </Text>
+              {!team.hide_gender && team.gender ? (
+                <Text
+                  style={[
+                    styles.overviewLabel,
+                    { backgroundColor: school.primary_color },
+                  ]}>
+                  {team.gender.name}
+                </Text>
+              ) : null}
               <Text
                 style={[
                   styles.overviewLabel,
@@ -96,6 +107,15 @@ const TeamHome = ({
             style={styles.scrollContainer}
             data={posts}
             contentInset={{ bottom: 20 }}
+            ListEmptyComponent={
+              postsLoading ? <View /> : <Text>No news found.</Text>
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={postsLoading}
+                onRefresh={refreshPosts}
+              />
+            }
             renderItem={({ item }) => (
               <PostRow post={item} onPress={onSelectPost} />
             )}

@@ -1,3 +1,3 @@
-import BoxScore from './BoxScore';
-
-export default BoxScore;
+export * from './BoxScore';
+export * from './Result';
+export * from './TeamResults';

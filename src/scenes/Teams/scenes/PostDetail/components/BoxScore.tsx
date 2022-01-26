@@ -7,8 +7,8 @@ interface BoxScoreProps {
   boxscore: BoxScoreType;
 }
 
-const BoxScore = ({ boxscore }: BoxScoreProps) => {
-  if (!boxscore) return null;
+export const BoxScore = ({ boxscore }: BoxScoreProps) => {
+  if (!boxscore || boxscore.headers.length === 0) return null;
 
   return (
     <View style={styles.boxScoreContainer}>
@@ -65,5 +65,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-export default BoxScore;

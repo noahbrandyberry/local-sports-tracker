@@ -15,3 +15,7 @@ export const fetchPostsError = (error: Error) => ({
   type: PostActionTypes.FETCH_POSTS_ERROR,
   error: error,
 });
+
+export const resetPosts = () => ({
+  type: PostActionTypes.RESET_POSTS,
+});

@@ -24,6 +24,8 @@ export const schoolsReducer = (
       return { ...state, schools: action.payload, loading: false };
     case SchoolActionTypes.FETCH_SCHOOLS_ERROR:
       return { ...state, error: action.error, loading: false };
+    case SchoolActionTypes.RESET_SCHOOLS:
+      return initialState;
     default:
       return state;
   }

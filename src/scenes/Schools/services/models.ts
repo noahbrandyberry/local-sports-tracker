@@ -4,6 +4,7 @@ export enum SchoolActionTypes {
   FETCH_SCHOOLS = 'FETCH_SCHOOLS',
   FETCH_SCHOOLS_SUCCESS = 'FETCH_SCHOOLS_SUCCESS',
   FETCH_SCHOOLS_ERROR = 'FETCH_SCHOOLS_ERROR',
+  RESET_SCHOOLS = 'RESET_SCHOOLS',
 }
 
 export interface GetSchools {
@@ -20,4 +21,12 @@ export interface GetSchoolsError {
   error: Error;
 }
 
-export type SchoolsAction = GetSchools | GetSchoolsSuccess | GetSchoolsError;
+export interface ResetSchools {
+  type: typeof SchoolActionTypes.RESET_SCHOOLS;
+}
+
+export type SchoolsAction =
+  | GetSchools
+  | GetSchoolsSuccess
+  | GetSchoolsError
+  | ResetSchools;

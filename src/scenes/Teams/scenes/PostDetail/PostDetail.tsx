@@ -11,14 +11,19 @@ import {
   BoxScore as BoxScoreType,
   Recap as RecapType,
 } from '../../models/post';
-import BoxScore from './components';
+import { BoxScore, Result, TeamResults } from './components';
+import { selectEventById } from '../TeamSchedule/services/selectors';
+import { selectTeamById } from '../../services/selectors';
+import ImageModal from 'react-native-image-modal';
 
 type PostDetailProps = NativeStackScreenProps<RootStackParamList, 'PostDetail'>;
 
 const SportDetail = ({ route }: PostDetailProps) => {
-  const { postId } = route.params;
+  const { postId, teamId } = route.params;
 
   const post = useSelector(selectPostById(postId));
+  const team = useSelector(selectTeamById(teamId));
+  const event = useSelector(selectEventById(post?.event_id || 0));
 
   if (!post) {
     return <InvalidDataError />;
@@ -42,10 +47,17 @@ const SportDetail = ({ route }: PostDetailProps) => {
         </Text>
 
         {post.featured_image ? (
-          <Image source={{ uri: post.featured_image }} style={styles.image} />
+          <ImageModal
+            style={styles.image}
+            source={{
+              uri: post.featured_image,
+            }}
+          />
         ) : null}
 
+        <Result event={event} team={team} />
         <BoxScore boxscore={boxscore} />
+        <TeamResults teamResults={event?.team_results ?? []} />
         <Text>{recap.Summary}</Text>
       </ScrollView>
     </SafeAreaView>
@@ -93,7 +105,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   image: {
-    aspectRatio: 1.5,
+    aspectRatio: 1.75,
     marginBottom: 10,
     width: '100%',
   },

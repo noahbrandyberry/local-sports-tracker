@@ -13,7 +13,7 @@ import { selectSchoolById } from 'schools/services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { fetchTeams } from 'teams/services/actions';
+import { fetchTeams, resetTeams } from 'teams/services/actions';
 import {
   selectCurrentSeason,
   selectCurrentSports,
@@ -21,6 +21,7 @@ import {
 } from 'teams/services/selectors';
 import SportCell from './components/SportCell';
 import { formatAddress } from 'src/utils/formattedAddress';
+import { resetSchools } from 'schools/services/actions';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -36,6 +37,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   };
 
   useEffect(() => {
+    dispatch(resetTeams());
     getTeams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schoolId]);
@@ -78,7 +80,9 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                 <Text>{formatAddress(school.location, '\n')}</Text>
               ) : null}
               {school.phone ? <Text>Phone: {school.phone}</Text> : null}
-              {school.email ? <Text>Email: {school.email}</Text> : null}
+              {school.email ? (
+                <Text numberOfLines={1}>Email: {school.email}</Text>
+              ) : null}
             </View>
 
             <Image source={{ uri: school.logo_url }} style={styles.logo} />
@@ -93,6 +97,13 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                 <View style={styles.sportsHeaderContainer}>
                   <Text style={styles.subHeader}>{seasonName} Sports</Text>
                 </View>
+              }
+              ListEmptyComponent={
+                teamsLoading ? (
+                  <View />
+                ) : (
+                  <Text>No {seasonName} sports found.</Text>
+                )
               }
               columnWrapperStyle={styles.sportsScroll}
               stickyHeaderIndices={[0]}
@@ -145,10 +156,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 20,
   },
-  locationContainer: {},
+  locationContainer: {
+    flex: 1,
+  },
   logo: {
     width: 80,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     minHeight: 50,
   },
   header: {

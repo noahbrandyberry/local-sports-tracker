@@ -71,6 +71,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
                 team={item}
                 index={index}
                 onPress={onSelectTeam}
+                showSectionHeaders={showSectionHeaders}
                 lastIndex={section.data.length - 1}
               />
             )}

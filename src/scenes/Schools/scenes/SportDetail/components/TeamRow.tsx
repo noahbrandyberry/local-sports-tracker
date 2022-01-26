@@ -7,21 +7,31 @@ interface TeamRowProps {
   team: Team;
   index: number;
   lastIndex: number;
+  showSectionHeaders: boolean;
   onPress: CallableFunction;
 }
 
-const TeamRow = ({ team, index, lastIndex, onPress }: TeamRowProps) => {
+const TeamRow = ({
+  team,
+  index,
+  lastIndex,
+  showSectionHeaders,
+  onPress,
+}: TeamRowProps) => {
   const name = `${team.sport.name} (${team.level?.name})`;
 
   return (
     <TouchableOpacity
       style={[
         styles.rowContainer,
+        index === 0 && !showSectionHeaders ? styles.firstRow : {},
         index < lastIndex ? styles.rowContainerBorder : styles.lastRow,
       ]}
       onPress={() => onPress(team.id)}>
       <Text style={styles.name}>{name}</Text>
-      <Text style={styles.gender}>{team.gender.name}</Text>
+      {!team.hide_gender && team.gender ? (
+        <Text style={styles.gender}>{team.gender.name}</Text>
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -43,6 +53,10 @@ const styles = StyleSheet.create({
   gender: {
     color: 'gray',
     fontSize: 12,
+  },
+  firstRow: {
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
   },
   lastRow: {
     borderBottomLeftRadius: 5,

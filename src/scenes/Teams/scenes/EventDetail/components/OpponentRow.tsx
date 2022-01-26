@@ -17,8 +17,11 @@ const OpponentRow = ({ index, opponent, onPress }: OpponentRowProps) => {
   return (
     <TouchableOpacity
       style={[styles.rowContainer, index > 0 ? styles.rowContainerBorder : {}]}
-      onPress={() => onPress(opponent?.school_id)}>
-      <Text style={styles.opponentsText}>{opponentSchool?.name}</Text>
+      onPress={() => onPress(opponent?.school_id)}
+      disabled={opponentSchool ? false : true}>
+      <Text style={styles.opponentsText}>
+        {opponentSchool ? opponentSchool.name : opponent.name}
+      </Text>
     </TouchableOpacity>
   );
 };

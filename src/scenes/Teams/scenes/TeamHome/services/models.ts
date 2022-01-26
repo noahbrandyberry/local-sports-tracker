@@ -4,6 +4,7 @@ export enum PostActionTypes {
   FETCH_POSTS = 'FETCH_POSTS',
   FETCH_POSTS_SUCCESS = 'FETCH_POSTS_SUCCESS',
   FETCH_POSTS_ERROR = 'FETCH_POSTS_ERROR',
+  RESET_POSTS = 'RESET_POSTS',
 }
 
 export interface FetchPostsRequest {
@@ -26,4 +27,12 @@ export interface GetPostsError {
   error: Error;
 }
 
-export type PostsAction = GetPosts | GetPostsSuccess | GetPostsError;
+export interface ResetPosts {
+  type: typeof PostActionTypes.RESET_POSTS;
+}
+
+export type PostsAction =
+  | GetPosts
+  | GetPostsSuccess
+  | GetPostsError
+  | ResetPosts;
