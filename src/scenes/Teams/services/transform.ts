@@ -17,6 +17,28 @@ export const transformTeams = (teams: Team[]) => {
     },
   }));
 
+  teams = teams.map((team) => {
+    team.season.start = team.season.start
+      .clone()
+      .set(
+        'year',
+        team.season.start.month() >= team.year.start.month()
+          ? team.year.start.year()
+          : team.year.end.year(),
+      );
+
+    team.season.end = team.season.end
+      .clone()
+      .set(
+        'year',
+        team.season.end.month() >= team.year.start.month()
+          ? team.year.start.year()
+          : team.year.end.year(),
+      );
+
+    return team;
+  });
+
   teams.sort(
     (a, b) =>
       SortedLevels.indexOf(a.level?.name ?? '') -

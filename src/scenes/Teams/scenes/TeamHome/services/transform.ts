@@ -6,11 +6,18 @@ export const transformPosts = (posts: Post[]) => {
     ...post,
     created: moment(post.created),
     modified: moment(post.modified),
-    submitted: moment(post.submitted),
+    submitted: post.submitted ? moment(post.submitted) : post.submitted,
     boxscore: JSON.parse(post.boxscore as string),
     recap: JSON.parse(post.recap as string),
   }));
 
-  posts.sort((a, b) => a.submitted.valueOf() - b.submitted.valueOf()).reverse();
+  posts
+    .sort(
+      (a, b) =>
+        (a.submitted ? a.submitted.valueOf() : a.created.valueOf()) -
+        (b.submitted ? b.submitted.valueOf() : b.created.valueOf()),
+    )
+    .reverse();
+
   return posts;
 };

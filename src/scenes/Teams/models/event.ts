@@ -36,6 +36,7 @@ export interface TeamResult {
   place: number;
   points: number;
   event_id: number;
+  school_id: number;
 }
 
 export enum ResultStatus {

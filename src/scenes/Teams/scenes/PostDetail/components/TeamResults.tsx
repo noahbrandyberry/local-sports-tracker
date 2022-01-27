@@ -4,7 +4,6 @@ import { Text } from 'components';
 import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { selectSchools } from 'schools/services/selectors';
-import { selectTeams } from 'teams/services/selectors';
 
 interface TeamResultsProps {
   teamResults: TeamResult[];
@@ -12,9 +11,10 @@ interface TeamResultsProps {
 
 export const TeamResults = ({ teamResults }: TeamResultsProps) => {
   const schools = useSelector(selectSchools);
-  const teams = useSelector(selectTeams);
 
   if (teamResults.length === 0) return null;
+
+  console.log(teamResults);
 
   return (
     <View style={styles.boxScoreContainer}>
@@ -22,11 +22,7 @@ export const TeamResults = ({ teamResults }: TeamResultsProps) => {
         <View style={styles.column}>
           <Text style={[styles.headerCell, styles.cell]}>Team</Text>
           {teamResults.map((result, index) => {
-            const school = schools.find(
-              (s) =>
-                s.id ===
-                teams.find((team) => (team.id = result.team_id))?.school_id,
-            );
+            const school = schools.find((s) => s.id === result.school_id);
             return (
               <Text key={index} style={styles.cell}>
                 {school ? school.name : result.name}

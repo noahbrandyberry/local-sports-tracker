@@ -15,6 +15,7 @@ import { BoxScore, Result, TeamResults } from './components';
 import { selectEventById } from '../TeamSchedule/services/selectors';
 import { selectTeamById } from '../../services/selectors';
 import ImageModal from 'react-native-image-modal';
+import isEmpty from 'lodash/isEmpty';
 
 type PostDetailProps = NativeStackScreenProps<RootStackParamList, 'PostDetail'>;
 
@@ -43,7 +44,8 @@ const SportDetail = ({ route }: PostDetailProps) => {
 
         <Text style={styles.header}>{post.title}</Text>
         <Text style={styles.authorDate}>
-          {post.submitted_by} • {post.submitted.format('MMMM D')}
+          {isEmpty(post.submitted_by) ? post.submitted_by : post.created_by} • 
+          {(post.submitted ? post.submitted : post.created).format('MMMM D')}
         </Text>
 
         {post.featured_image ? (

@@ -5,10 +5,8 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { School } from 'schools/models';
 import { useSelector } from 'react-redux';
 import { selectSchoolById } from '../../../../Schools/services/selectors';
-import { DefaultTheme } from '@react-navigation/native';
 import moment from 'moment';
 import capitalize from 'lodash/capitalize';
-import { selectPostByEventId } from '../../TeamHome/services/selectors';
 import { ordinalize } from 'src/utils/ordinalize';
 
 interface EventRowProps {
@@ -33,12 +31,9 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
   const multipleOpponents = event.opponents.length > 1;
   const opponent = event.opponents[0];
   const opponentSchool = useSelector(selectSchoolById(opponent?.school_id));
-  const post = useSelector(selectPostByEventId(event.id));
   const eventLengthHours = 2;
   const isPast = event.start.clone().add(eventLengthHours, 'hours').isBefore();
-  const pastStyles = isPast
-    ? { backgroundColor: DefaultTheme.colors.background }
-    : {};
+  const pastStyles = isPast ? { backgroundColor: 'lightgray' } : {};
   const currentStyles = event.start.isBetween(
     moment().subtract(eventLengthHours, 'hours'),
     moment().add(eventLengthHours, 'hours'),
@@ -53,8 +48,7 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
   return (
     <TouchableOpacity
       style={[styles.rowContainer, pastStyles, currentStyles]}
-      onPress={() => onPress(event.id)}
-      disabled={isPast && !post}>
+      onPress={() => onPress(event.id)}>
       <View style={styles.nameContainer}>
         <Text style={styles.name} numberOfLines={1}>
           {event.name}

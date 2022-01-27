@@ -42,26 +42,16 @@ export const selectCurrentTeams = createSelector(selectTeams, (teams) => {
     });
 });
 
-export const selectCurrentSports = createSelector(selectCurrentTeams, (teams) =>
-  uniqBy(
-    teams.map((team) => team.sport),
+export const selectSeasons = createSelector(selectTeams, (teams) => {
+  const seasons = uniqBy(
+    teams.map((team) => team.season),
     'name',
-  ),
-);
+  );
+  return seasons;
+});
 
-export const selectCurrentSeason = createSelector(
-  selectCurrentTeams,
-  (teams) => {
-    const seasons = uniqBy(
-      teams.map((team) => team.season),
-      'name',
-    );
-    const currentSeason = seasons.find(
-      (season) => season.name !== 'Year-round',
-    );
-
-    return currentSeason ?? seasons[0];
-  },
+export const selectCurrentSeason = createSelector(selectSeasons, (seasons) =>
+  seasons.find((season) => moment().isBetween(season.start, season.end)),
 );
 
 export const selectTeamsBySportId = (sportId: number) =>

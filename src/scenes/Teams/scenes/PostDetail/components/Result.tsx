@@ -26,13 +26,16 @@ export const Result = ({ event, team }: ResultProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.team}>
-        Home ({homeSchool ? homeSchool.name : homeTeam.name}) -{' '}
-        <Text style={styles.score}>{event.result.home}</Text>
+        Home ({homeSchool ? homeSchool.name : homeTeam.name})
       </Text>
-      <Text style={styles.versus}>vs</Text>
-      <Text style={styles.team}>
-        Away ({awaySchool ? awaySchool.name : awayTeam.name}) -{' '}
+
+      <Text style={styles.versus}>
+        <Text style={styles.score}>{event.result.home}</Text> vs{' '}
         <Text style={styles.score}>{event.result.away}</Text>
+      </Text>
+
+      <Text style={styles.team}>
+        Away ({awaySchool ? awaySchool.name : awayTeam.name})
       </Text>
     </View>
   );
@@ -57,10 +60,12 @@ const styles = StyleSheet.create({
   team: {
     fontSize: 16,
     lineHeight: 20,
+    textAlign: 'center',
   },
   score: {
     fontWeight: '500',
     fontSize: 18,
+    lineHeight: 22,
   },
   versus: {
     fontWeight: 'bold',

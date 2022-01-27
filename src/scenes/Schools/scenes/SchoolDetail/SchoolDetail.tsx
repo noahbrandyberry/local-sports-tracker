@@ -1,6 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, MenuBar, InvalidDataError } from 'components';
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Linking,
+} from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectSchoolById } from 'schools/services/selectors';
@@ -10,12 +17,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchTeams, resetTeams } from 'teams/services/actions';
 import {
   selectCurrentSeason,
-  selectCurrentSports,
+  selectTeams,
+  selectSeasons,
   selectTeamsLoading,
 } from 'teams/services/selectors';
 import SportCell from './components/SportCell';
 import { formatAddress } from 'src/utils/formattedAddress';
 import FastImage from 'react-native-fast-image';
+import uniqBy from 'lodash/uniqBy';
+import { Season } from 'teams/models/season';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -30,16 +41,44 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     dispatch(fetchTeams({ schoolId }));
   };
 
+  const storeDefaultSchool = async () => {
+    try {
+      await AsyncStorage.setItem('@defaultSchool', schoolId.toString());
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
   useEffect(() => {
     dispatch(resetTeams());
     getTeams();
+    storeDefaultSchool();
+    setSelectedSeason(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schoolId]);
 
+  const currentSeason = useSelector(selectCurrentSeason);
+  const [selectedSeason, setSelectedSeason] = useState<Season | undefined>(
+    undefined,
+  );
+
   const teamsLoading = useSelector(selectTeamsLoading);
-  const sports = useSelector(selectCurrentSports);
-  const season = useSelector(selectCurrentSeason);
+  const teams = useSelector(selectTeams);
+  const seasons = useSelector(selectSeasons);
   const school = useSelector(selectSchoolById(schoolId));
+  const selectedTeams = teams.filter(
+    (team) => team.season.id === selectedSeason?.id,
+  );
+
+  const sports = uniqBy(
+    selectedTeams.map((team) => team.sport),
+    'name',
+  );
+
+  useEffect(() => {
+    if (!selectedSeason) setSelectedSeason(currentSeason);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSeason]);
 
   useEffect(() => {
     if (!school) navigation.replace('SelectSchool');
@@ -50,7 +89,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     return <InvalidDataError />;
   }
 
-  const seasonName = season ? season.name : school.name;
+  const seasonName = selectedSeason ? selectedSeason.name : school.name;
 
   const onSelectSport = (sportId: number) => {
     navigation.navigate('SportDetail', { sportId, schoolId });
@@ -73,13 +112,25 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               {school.location ? (
                 <Text>{formatAddress(school.location, '\n')}</Text>
               ) : null}
-              {school.phone ? <Text>Phone: {school.phone}</Text> : null}
+              {school.phone ? (
+                <Text onPress={() => Linking.openURL(`tel:${school.phone}`)}>
+                  Phone: {school.phone}
+                </Text>
+              ) : null}
               {school.email ? (
-                <Text numberOfLines={1}>Email: {school.email}</Text>
+                <Text
+                  numberOfLines={1}
+                  onPress={() => Linking.openURL(`mailto:${school.email}`)}>
+                  Email: {school.email}
+                </Text>
               ) : null}
             </View>
 
-            <FastImage source={{ uri: school.logo_url }} style={styles.logo} />
+            <FastImage
+              source={{ uri: school.logo_url }}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
         </View>
 
@@ -88,9 +139,29 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
             <FlatList
               data={sports}
               ListHeaderComponent={
-                <View style={styles.sportsHeaderContainer}>
-                  <Text style={styles.subHeader}>{seasonName} Sports</Text>
-                </View>
+                teams.length > 0 ? (
+                  <View style={styles.sportsHeaderContainer}>
+                    {seasons.map((season) => (
+                      <TouchableOpacity
+                        key={season.id}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        onPress={() => setSelectedSeason(season)}
+                        style={[
+                          styles.seasonButton,
+                          {
+                            backgroundColor:
+                              season.id === selectedSeason?.id
+                                ? school.secondary_color
+                                : school.primary_color,
+                          },
+                        ]}>
+                        <Text style={styles.seasonText}>{season.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                ) : (
+                  <View />
+                )
               }
               ListEmptyComponent={
                 teamsLoading ? (
@@ -156,11 +227,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   noSportsFound: {
+    paddingTop: 22,
     paddingHorizontal: 20,
   },
   logo: {
     width: 80,
-    resizeMode: 'contain',
     minHeight: 50,
   },
   header: {
@@ -184,13 +255,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    paddingBottom: 5,
+    paddingBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   sportsScroll: {
     paddingHorizontal: 10,
   },
   sportsPadding: {
     paddingBottom: 10,
+    minHeight: 60,
+  },
+  seasonButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  seasonText: {
+    fontSize: 12,
+    color: 'white',
+    fontWeight: '500',
   },
 });
 

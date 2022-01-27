@@ -26,7 +26,9 @@ const SchoolRow = ({
       <FastImage source={{ uri: school.logo_url }} style={styles.logo} />
       <Text style={styles.name}>{school.name}</Text>
       {showDistance ? (
-        <Text style={styles.distance}>{distance.toPrecision(2)} miles</Text>
+        <Text style={styles.distance}>
+          {Math.round((distance + Number.EPSILON) * 100) / 100} miles
+        </Text>
       ) : null}
     </TouchableOpacity>
   );

@@ -68,17 +68,17 @@ const TeamSchedule = ({
     if (event?.start.clone().add(2, 'hours').isBefore()) {
       const post = posts.find((p) => p.event_id === eventId);
       if (post) {
-        navigation.navigate('PostDetail', {
+        return navigation.navigate('PostDetail', {
           postId: post.id,
           teamId: team.id,
         });
       }
-    } else {
-      navigation.navigate('EventDetail', {
-        teamId,
-        eventId,
-      });
     }
+
+    navigation.navigate('EventDetail', {
+      teamId,
+      eventId,
+    });
   };
 
   const calculateItemLayout = (

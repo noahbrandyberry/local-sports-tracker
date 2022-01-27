@@ -3,6 +3,7 @@ import React from 'react';
 import { Text } from 'components';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import isEmpty from 'lodash/isEmpty';
 
 interface PostRowProps {
   post: Post;
@@ -18,7 +19,8 @@ const PostRow = ({ post, onPress }: PostRowProps) => (
     ) : null}
     <Text style={styles.name}>{post.title}</Text>
     <Text>
-      By {post.submitted_by} on {post.submitted.format('MMMM D')}
+      By {isEmpty(post.submitted_by) ? post.submitted_by : post.created_by} on{' '}
+      {(post.submitted ? post.submitted : post.created).format('MMMM D')}
     </Text>
   </TouchableOpacity>
 );

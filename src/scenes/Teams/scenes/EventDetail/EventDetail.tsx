@@ -31,6 +31,8 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
     return <InvalidDataError />;
   }
 
+  const isPast = event.start.clone().add(2, 'hours').isBefore();
+
   let status = '';
   if (event.canceled) {
     status = 'Canceled';
@@ -113,11 +115,16 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
             • {event.tba ? 'Time TBA' : event.start.format('LT')}
           </Text>
 
-          <Button
-            onPress={addToCalendar}
-            style={{ backgroundColor: school.primary_color }}>
-            Add to Calendar
-          </Button>
+          {isPast ? null : (
+            <Button
+              onPress={addToCalendar}
+              style={{
+                backgroundColor: school.primary_color,
+                marginTop: 12,
+              }}>
+              Add to Calendar
+            </Button>
+          )}
         </View>
 
         {event.opponents.length > 0 ? (
@@ -146,11 +153,13 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
               {formatAddress(event.location, '\n')}
             </Text>
 
-            <Button
-              onPress={getDirections}
-              style={{ backgroundColor: school.primary_color }}>
-              Get Directions
-            </Button>
+            {isPast ? null : (
+              <Button
+                onPress={getDirections}
+                style={{ backgroundColor: school.primary_color }}>
+                Get Directions
+              </Button>
+            )}
           </View>
           <View style={styles.map}>
             <MapView
@@ -220,7 +229,6 @@ const styles = StyleSheet.create({
   },
   startTime: {
     alignSelf: 'flex-start',
-    marginBottom: 12,
   },
   opponentsContainer: {
     marginTop: 0,

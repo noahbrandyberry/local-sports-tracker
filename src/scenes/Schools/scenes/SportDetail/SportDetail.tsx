@@ -45,9 +45,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
     data: teamsGroup,
   }));
 
-  const showSectionHeaders = sections.some(
-    (section) => section.data.length > 1,
-  );
+  const showSectionHeaders = true;
 
   return (
     <SafeAreaView

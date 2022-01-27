@@ -9,6 +9,7 @@ function* fetchTeams(action: GetTeams) {
     const { data } = yield call(constructApiRequest, action.data);
     yield put(fetchTeamsSuccess(transformTeams(data)));
   } catch (e) {
+    console.log(e);
     yield put(fetchTeamsError(e));
   }
 }

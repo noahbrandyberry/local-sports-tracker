@@ -22,7 +22,6 @@ import {
   Notifications,
   Registered,
   RegistrationError,
-  NotificationAction,
   NotificationBackgroundFetchResult,
 } from 'react-native-notifications';
 import { NotificationActionResponse } from 'react-native-notifications/lib/dist/interfaces/NotificationActionResponse';
@@ -106,7 +105,11 @@ const App = () => {
         <Stack.Group>
           <Stack.Screen name="SelectSchool" component={SelectSchool} />
           <Stack.Screen name="SchoolsList" component={SchoolsList} />
-          <Stack.Screen name="SchoolDetail" component={SchoolDetail} />
+          <Stack.Screen
+            name="SchoolDetail"
+            component={SchoolDetail}
+            options={{ animation: 'none' }}
+          />
           <Stack.Screen name="SportDetail" component={SportDetail} />
         </Stack.Group>
         <Stack.Group screenOptions={{ presentation: 'modal' }}>

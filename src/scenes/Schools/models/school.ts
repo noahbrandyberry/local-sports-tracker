@@ -26,4 +26,5 @@ export interface School {
   location?: Location;
   created_at: string;
   updated_at: string;
+  visible: boolean;
 }

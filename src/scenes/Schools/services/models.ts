@@ -14,6 +14,7 @@ export interface GetSchools {
 export interface GetSchoolsSuccess {
   type: typeof SchoolActionTypes.FETCH_SCHOOLS_SUCCESS;
   payload: School[];
+  defaultSchool: number | null;
 }
 
 export interface GetSchoolsError {

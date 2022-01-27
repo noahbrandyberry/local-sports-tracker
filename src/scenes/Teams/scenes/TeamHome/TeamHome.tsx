@@ -1,6 +1,12 @@
 import React from 'react';
 import { Text, InvalidDataError } from 'components';
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +18,8 @@ import { selectPosts, selectPostsLoading } from './services/selectors';
 import PostRow from './components';
 import RootStackParamList from 'src/RootStackParams';
 import { fetchPosts } from './services/actions';
+import ImageModal from 'react-native-image-modal';
+import RenderHtml from 'react-native-render-html';
 
 type TeamHomeNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -47,7 +55,9 @@ const TeamHome = ({
     dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
   };
 
-  console.log(postsLoading);
+  const { width } = useWindowDimensions();
+  const contentWidth = width - 40;
+
   return (
     <SafeAreaView
       style={{
@@ -58,51 +68,80 @@ const TeamHome = ({
         <View style={styles.modalDragBar} />
         <Text style={styles.header}>{team.name}</Text>
         <View style={styles.contentContainer}>
-          <View style={styles.well}>
-            <Text style={styles.subHeader}>Overview</Text>
-
-            <Text>
-              Overall Record:{' '}
-              {team.record ? `${team.record.win} - ${team.record.win}` : null}
-            </Text>
-            <View style={styles.overviewLabels}>
-              <Text
-                style={[
-                  styles.overviewLabel,
-                  { backgroundColor: school.primary_color },
-                ]}>
-                {team.sport.name}
-              </Text>
-              {team.level ? (
-                <Text
-                  style={[
-                    styles.overviewLabel,
-                    { backgroundColor: school.primary_color },
-                  ]}>
-                  {team.level.name}
-                </Text>
-              ) : null}
-              {!team.hide_gender && team.gender ? (
-                <Text
-                  style={[
-                    styles.overviewLabel,
-                    { backgroundColor: school.primary_color },
-                  ]}>
-                  {team.gender.name}
-                </Text>
-              ) : null}
-              <Text
-                style={[
-                  styles.overviewLabel,
-                  { backgroundColor: school.primary_color },
-                ]}>
-                {team.season.name}
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.subHeader}>Latest News</Text>
           <FlatList
+            ListHeaderComponent={
+              <View>
+                <View style={styles.well}>
+                  <Text style={styles.subHeader}>Overview</Text>
+
+                  <Text>
+                    Overall Record:{' '}
+                    {team.record
+                      ? `${team.record.win} - ${team.record.win}${
+                          team.record.tie ? `- ${team.record.tie}` : ''
+                        }`
+                      : 'N/A'}
+                  </Text>
+                  <View style={styles.overviewLabels}>
+                    <Text
+                      style={[
+                        styles.overviewLabel,
+                        { backgroundColor: school.primary_color },
+                      ]}>
+                      {team.sport.name}
+                    </Text>
+                    {team.level ? (
+                      <Text
+                        style={[
+                          styles.overviewLabel,
+                          { backgroundColor: school.primary_color },
+                        ]}>
+                        {team.level.name}
+                      </Text>
+                    ) : null}
+                    {!team.hide_gender && team.gender ? (
+                      <Text
+                        style={[
+                          styles.overviewLabel,
+                          { backgroundColor: school.primary_color },
+                        ]}>
+                        {team.gender.name}
+                      </Text>
+                    ) : null}
+                    <Text
+                      style={[
+                        styles.overviewLabel,
+                        { backgroundColor: school.primary_color },
+                      ]}>
+                      {team.season.name}
+                    </Text>
+                  </View>
+                </View>
+
+                {team.photo_url ? (
+                  <ImageModal
+                    style={styles.image}
+                    resizeMode="contain"
+                    source={{
+                      uri: team.photo_url,
+                    }}
+                  />
+                ) : null}
+
+                {team.home_description ? (
+                  <View style={styles.htmlContainer}>
+                    <RenderHtml
+                      contentWidth={contentWidth}
+                      source={{ html: team.home_description }}
+                    />
+                  </View>
+                ) : null}
+
+                <Text style={[styles.subHeader, styles.newsSubHeader]}>
+                  Latest News
+                </Text>
+              </View>
+            }
             keyExtractor={(item) => item.id}
             style={styles.scrollContainer}
             data={posts}
@@ -147,7 +186,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginTop: 8,
     marginHorizontal: -20,
     paddingHorizontal: 20,
   },
@@ -189,6 +227,17 @@ const styles = StyleSheet.create({
     color: 'white',
     overflow: 'hidden',
     fontSize: 12,
+  },
+  image: {
+    aspectRatio: 1.75,
+    marginBottom: 10,
+    width: '100%',
+  },
+  htmlContainer: {
+    marginBottom: 12,
+  },
+  newsSubHeader: {
+    marginBottom: 8,
   },
 });
 

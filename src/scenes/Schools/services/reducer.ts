@@ -3,12 +3,14 @@ import { SchoolActionTypes, SchoolsAction } from './models';
 
 export interface SchoolsState {
   schools: School[];
+  defaultSchool: number | null;
   loading: boolean;
   error: Error | null;
 }
 
 const initialState = {
   schools: [],
+  defaultSchool: null,
   loading: true,
   error: null,
 };
@@ -21,7 +23,12 @@ export const schoolsReducer = (
     case SchoolActionTypes.FETCH_SCHOOLS:
       return { ...state, error: null, loading: true };
     case SchoolActionTypes.FETCH_SCHOOLS_SUCCESS:
-      return { ...state, schools: action.payload, loading: false };
+      return {
+        ...state,
+        schools: action.payload,
+        loading: false,
+        defaultSchool: action.defaultSchool,
+      };
     case SchoolActionTypes.FETCH_SCHOOLS_ERROR:
       return { ...state, error: action.error, loading: false };
     case SchoolActionTypes.RESET_SCHOOLS:

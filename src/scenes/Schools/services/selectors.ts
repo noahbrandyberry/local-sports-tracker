@@ -11,13 +11,21 @@ export const selectSchools = createSelector(
   (schoolsData) => schoolsData.schools,
 );
 
+export const selectSchoolsLoading = createSelector(
+  selectSchoolsData,
+  (schoolsData) => schoolsData.loading,
+);
+
+export const selectDefaultSchool = createSelector(
+  selectSchoolsData,
+  (schoolsData) =>
+    schoolsData.schools.find(
+      (school) => school.id === schoolsData.defaultSchool,
+    ),
+);
+
 export const selectValidSchools = createSelector(selectSchools, (schools) =>
-  schools.filter(
-    (school) =>
-      school.location?.latitude &&
-      school.location?.longitude &&
-      school.logo_url,
-  ),
+  schools.filter((school) => school.visible),
 );
 
 export const selectSchoolsWithDistance = createSelector(

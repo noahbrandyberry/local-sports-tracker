@@ -5,9 +5,13 @@ export const fetchSchools = () => ({
   type: SchoolActionTypes.FETCH_SCHOOLS,
 });
 
-export const fetchSchoolsSuccess = (data: School[]) => ({
+export const fetchSchoolsSuccess = (
+  data: School[],
+  defaultSchool: number | null,
+) => ({
   type: SchoolActionTypes.FETCH_SCHOOLS_SUCCESS,
   payload: data,
+  defaultSchool,
 });
 
 export const fetchSchoolsError = (error: Error) => ({

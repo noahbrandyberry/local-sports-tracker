@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
+  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -11,7 +12,9 @@ import {
 } from 'react-native';
 import { fetchSchools } from 'schools/services/actions';
 import {
+  selectDefaultSchool,
   selectNearestSchools,
+  selectSchoolsLoading,
   selectValidSchools,
 } from 'schools/services/selectors';
 import SchoolRow from './components/SchoolRow';
@@ -32,14 +35,23 @@ type SelectSchoolProps = NativeStackScreenProps<
 const SelectSchool = ({ navigation }: SelectSchoolProps) => {
   const dispatch = useDispatch();
   const schools = useSelector(selectValidSchools);
-  const nearestSchools = useSelector(selectNearestSchools);
+  const loading = useSelector(selectSchoolsLoading);
+  const nearestSchools = useSelector(selectNearestSchools).slice(0, 15);
   const currentLocationLoading = useSelector(selectCurrentLocationLoading);
   const currentLocationError = useSelector(selectCurrentLocationError);
+  const defaultSchool = useSelector(selectDefaultSchool);
 
   useEffect(() => {
     dispatch(fetchSchools());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (defaultSchool) {
+      navigation.navigate('SchoolDetail', { schoolId: defaultSchool.id });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultSchool]);
 
   const onSelectSchool = (schoolId: number) => {
     navigation.navigate('SchoolDetail', {
@@ -52,6 +64,13 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
   const schoolResults = schools.filter((school) =>
     school.name.includes(searchText),
   );
+
+  if (loading)
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator />
+      </View>
+    );
 
   return (
     <SafeAreaView style={styles.evenHeight}>
@@ -147,6 +166,11 @@ const styles = StyleSheet.create({
   searchResults: {
     flex: 0,
     marginTop: 16,
+  },
+  loadingScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
