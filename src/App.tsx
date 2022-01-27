@@ -24,7 +24,6 @@ import {
   RegistrationError,
   NotificationBackgroundFetchResult,
 } from 'react-native-notifications';
-import { NotificationActionResponse } from 'react-native-notifications/lib/dist/interfaces/NotificationActionResponse';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 library.add(fas);
@@ -70,7 +69,7 @@ const App = () => {
         (
           notification: Notification,
           completion: () => void,
-          action: NotificationActionResponse | undefined,
+          // action: NotificationActionResponse | undefined,
         ) => {
           completion();
         },

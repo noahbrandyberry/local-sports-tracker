@@ -41,6 +41,9 @@ const TeamHome = ({
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const posts = useSelector(selectPosts);
 
+  const { width } = useWindowDimensions();
+  const contentWidth = width - 40;
+
   const dispatch = useDispatch();
 
   if (!team || !school) {
@@ -54,9 +57,6 @@ const TeamHome = ({
   const refreshPosts = () => {
     dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
   };
-
-  const { width } = useWindowDimensions();
-  const contentWidth = width - 40;
 
   return (
     <SafeAreaView
