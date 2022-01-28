@@ -12,6 +12,7 @@ import TeamRow from 'schools/scenes/SportDetail/components/TeamRow';
 import groupBy from 'lodash/groupBy';
 import map from 'lodash/map';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { getColorByBackground } from 'src/utils/getColorByBackground';
 
 type SportDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -38,7 +39,9 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
     navigation.navigate('TeamDetail', { teamId });
   };
 
-  const sectionsGroup = groupBy(teams, (team) => team.gender.name);
+  const sectionsGroup = groupBy(teams, (team) =>
+    team.hide_gender ? team.sport.name : team.gender.name,
+  );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sections: any[] = map(sectionsGroup, (teamsGroup, gender) => ({
     title: gender,
@@ -46,6 +49,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   }));
 
   const showSectionHeaders = true;
+  const color = getColorByBackground(school.primary_color);
 
   return (
     <SafeAreaView
@@ -53,10 +57,10 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
       edges={['top', 'left', 'right']}>
       <View style={styles.titleContainer}>
         <TouchableOpacity style={styles.backContainer} onPress={goBack}>
-          <FontAwesomeIcon icon="angle-left" size={15} color="white" />
-          <Text style={styles.backText}>Back</Text>
+          <FontAwesomeIcon icon="angle-left" size={15} color={color} />
+          <Text style={[styles.backText, { color }]}>Back</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{sport.name} Teams</Text>
+        <Text style={[styles.title, { color }]}>{sport.name} Teams</Text>
         <View style={styles.backContainer} />
       </View>
       <View style={styles.container}>
@@ -109,7 +113,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: {
-    color: 'white',
     paddingLeft: 5,
   },
   title: {
@@ -117,7 +120,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: 'white',
   },
   well: {
     borderRadius: 5,

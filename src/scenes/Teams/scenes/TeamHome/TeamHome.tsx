@@ -20,6 +20,8 @@ import RootStackParamList from 'src/RootStackParams';
 import { fetchPosts } from './services/actions';
 import ImageModal from 'react-native-image-modal';
 import RenderHtml from 'react-native-render-html';
+import { getColorByBackground } from 'src/utils/getColorByBackground';
+import FastImage from 'react-native-fast-image';
 
 type TeamHomeNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -58,6 +60,8 @@ const TeamHome = ({
     dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
   };
 
+  const color = getColorByBackground(school.primary_color);
+
   return (
     <SafeAreaView
       style={{
@@ -77,7 +81,7 @@ const TeamHome = ({
                   <Text>
                     Overall Record:{' '}
                     {team.record
-                      ? `${team.record.win} - ${team.record.win}${
+                      ? `${team.record.win} - ${team.record.loss}${
                           team.record.tie ? `- ${team.record.tie}` : ''
                         }`
                       : 'N/A'}
@@ -86,7 +90,7 @@ const TeamHome = ({
                     <Text
                       style={[
                         styles.overviewLabel,
-                        { backgroundColor: school.primary_color },
+                        { backgroundColor: school.primary_color, color },
                       ]}>
                       {team.sport.name}
                     </Text>
@@ -94,7 +98,7 @@ const TeamHome = ({
                       <Text
                         style={[
                           styles.overviewLabel,
-                          { backgroundColor: school.primary_color },
+                          { backgroundColor: school.primary_color, color },
                         ]}>
                         {team.level.name}
                       </Text>
@@ -103,7 +107,7 @@ const TeamHome = ({
                       <Text
                         style={[
                           styles.overviewLabel,
-                          { backgroundColor: school.primary_color },
+                          { backgroundColor: school.primary_color, color },
                         ]}>
                         {team.gender.name}
                       </Text>
@@ -111,7 +115,7 @@ const TeamHome = ({
                     <Text
                       style={[
                         styles.overviewLabel,
-                        { backgroundColor: school.primary_color },
+                        { backgroundColor: school.primary_color, color },
                       ]}>
                       {team.season.name}
                     </Text>
@@ -119,13 +123,20 @@ const TeamHome = ({
                 </View>
 
                 {team.photo_url ? (
-                  <ImageModal
-                    style={styles.image}
-                    resizeMode="contain"
-                    source={{
-                      uri: team.photo_url,
-                    }}
-                  />
+                  <View style={styles.imageContainer}>
+                    <View style={styles.imageLoadingContainer}>
+                      <Text style={styles.imageLoadingText}>
+                        Image Loading...
+                      </Text>
+                    </View>
+                    <ImageModal
+                      style={styles.image}
+                      resizeMode="contain"
+                      source={{
+                        uri: team.photo_url,
+                      }}
+                    />
+                  </View>
                 ) : null}
 
                 {team.home_description ? (
@@ -219,6 +230,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   overviewLabel: {
     paddingHorizontal: 8,
@@ -228,10 +247,23 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     fontSize: 12,
   },
+  imageContainer: {
+    marginBottom: 10,
+    position: 'relative',
+  },
   image: {
     aspectRatio: 1.75,
-    marginBottom: 10,
     width: '100%',
+  },
+  imageLoadingContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageLoadingText: {
+    fontWeight: '500',
   },
   htmlContainer: {
     marginBottom: 12,

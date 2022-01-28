@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -27,6 +28,7 @@ import FastImage from 'react-native-fast-image';
 import uniqBy from 'lodash/uniqBy';
 import { Season } from 'teams/models/season';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getColorByBackground } from 'src/utils/getColorByBackground';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -99,10 +101,12 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     <SafeAreaView
       style={{ backgroundColor: school.primary_color, flex: 1 }}
       edges={['top', 'left', 'right']}>
-      <MenuBar />
+      <MenuBar
+        color={getColorByBackground(school.primary_color)}
+        navigation={navigation}
+        title={`Go ${school.mascot}!`}
+      />
       <View style={styles.container}>
-        <Text style={styles.header}>Go {school.mascot}!</Text>
-
         <View style={styles.well}>
           <View style={styles.infoContainer}>
             <View style={styles.locationContainer}>
@@ -136,62 +140,83 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
 
         <View style={styles.sportsContainer}>
           <View style={styles.well}>
-            <FlatList
-              data={sports}
-              ListHeaderComponent={
-                teams.length > 0 ? (
-                  <View style={styles.sportsHeaderContainer}>
-                    {seasons.map((season) => (
-                      <TouchableOpacity
-                        key={season.id}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                        onPress={() => setSelectedSeason(season)}
-                        style={[
-                          styles.seasonButton,
-                          {
-                            backgroundColor:
-                              season.id === selectedSeason?.id
-                                ? school.secondary_color
-                                : school.primary_color,
-                          },
-                        ]}>
-                        <Text style={styles.seasonText}>{season.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                ) : (
-                  <View />
-                )
-              }
-              ListEmptyComponent={
-                teamsLoading ? (
-                  <View />
-                ) : (
-                  <Text style={styles.noSportsFound}>
-                    No {seasonName} sports found.
-                  </Text>
-                )
-              }
-              columnWrapperStyle={styles.sportsScroll}
-              stickyHeaderIndices={[0]}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              contentInset={{ bottom: 20 }}
-              style={styles.sportsPadding}
-              refreshControl={
-                <RefreshControl
-                  refreshing={teamsLoading}
-                  onRefresh={getTeams}
-                />
-              }
-              renderItem={({ item }) => (
-                <SportCell
-                  sport={item}
-                  backgroundColor={school.primary_color}
-                  onPress={onSelectSport}
-                />
-              )}
-            />
+            {teamsLoading && teams.length === 0 ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size={'large'} />
+              </View>
+            ) : (
+              <FlatList
+                data={sports}
+                ListHeaderComponent={
+                  teams.length > 0 ? (
+                    <View style={styles.sportsHeaderContainer}>
+                      {seasons.map((season) => (
+                        <TouchableOpacity
+                          key={season.id}
+                          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                          onPress={() => setSelectedSeason(season)}
+                          style={[
+                            styles.seasonButton,
+                            {
+                              backgroundColor:
+                                season.id === selectedSeason?.id
+                                  ? school.secondary_color
+                                  : school.primary_color,
+                            },
+                          ]}>
+                          <Text
+                            style={[
+                              styles.seasonText,
+                              {
+                                color:
+                                  season.id === selectedSeason?.id
+                                    ? getColorByBackground(
+                                        school.secondary_color,
+                                      )
+                                    : getColorByBackground(
+                                        school.primary_color,
+                                      ),
+                              },
+                            ]}>
+                            {season.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  ) : (
+                    <View />
+                  )
+                }
+                ListEmptyComponent={
+                  teamsLoading ? (
+                    <View />
+                  ) : (
+                    <Text style={styles.noSportsFound}>
+                      No {seasonName} sports found.
+                    </Text>
+                  )
+                }
+                columnWrapperStyle={styles.sportsScroll}
+                stickyHeaderIndices={[0]}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                contentInset={{ bottom: 20 }}
+                style={styles.sportsPadding}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={teamsLoading}
+                    onRefresh={getTeams}
+                  />
+                }
+                renderItem={({ item }) => (
+                  <SportCell
+                    sport={item}
+                    backgroundColor={school.primary_color}
+                    onPress={onSelectSport}
+                  />
+                )}
+              />
+            )}
           </View>
         </View>
       </View>
@@ -270,11 +295,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   seasonText: {
     fontSize: 12,
-    color: 'white',
     fontWeight: '500',
+  },
+  loadingContainer: {
+    padding: 12,
   },
 });
 

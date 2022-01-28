@@ -19,7 +19,7 @@ import isEmpty from 'lodash/isEmpty';
 
 type PostDetailProps = NativeStackScreenProps<RootStackParamList, 'PostDetail'>;
 
-const SportDetail = ({ route }: PostDetailProps) => {
+const SportDetail = ({ route, navigation }: PostDetailProps) => {
   const { postId, teamId } = route.params;
 
   const post = useSelector(selectPostById(postId));
@@ -39,18 +39,37 @@ const SportDetail = ({ route }: PostDetailProps) => {
         flex: 1,
       }}
       edges={['left', 'right']}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} contentInset={{ bottom: 32 }}>
         <View style={styles.modalDragBar} />
 
         <Text style={styles.header}>{post.title}</Text>
         <Text style={styles.authorDate}>
           {isEmpty(post.submitted_by) ? post.submitted_by : post.created_by} • 
           {(post.submitted ? post.submitted : post.created).format('MMMM D')}
+          {event ? (
+            <Text>
+              {' '}
+              • 
+              <Text
+                style={styles.viewEvent}
+                onPress={() =>
+                  navigation.navigate('EventDetail', {
+                    teamId,
+                    eventId: event.id,
+                  })
+                }>
+                View Event
+              </Text>
+            </Text>
+          ) : (
+            ''
+          )}
         </Text>
 
         {post.featured_image ? (
           <ImageModal
             style={styles.image}
+            modalImageResizeMode={'contain'}
             source={{
               uri: post.featured_image,
             }}
@@ -60,7 +79,7 @@ const SportDetail = ({ route }: PostDetailProps) => {
         <Result event={event} team={team} />
         <BoxScore boxscore={boxscore} />
         <TeamResults teamResults={event?.team_results ?? []} />
-        <Text>{recap.Summary}</Text>
+        <Text>{recap?.Summary}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -110,6 +129,9 @@ const styles = StyleSheet.create({
     aspectRatio: 1.75,
     marginBottom: 10,
     width: '100%',
+  },
+  viewEvent: {
+    textDecorationLine: 'underline',
   },
 });
 

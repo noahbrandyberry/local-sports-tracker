@@ -19,6 +19,7 @@ import TeamRoster from 'teams/scenes/TeamRoster';
 import TeamMedia from 'teams/scenes/TeamMedia';
 import TeamDonate from 'teams/scenes/TeamDonate';
 import { fetchPosts, resetPosts } from './scenes/TeamHome/services/actions';
+import { getColorByBackground } from 'src/utils/getColorByBackground';
 
 const Tab = createBottomTabNavigator<TeamsNavigatorParams>();
 type TeamProps = NativeStackScreenProps<RootStackParamList, 'TeamDetail'>;
@@ -28,6 +29,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const schoolColor = school ? school.primary_color : 'black';
+  const schoolTextColor = getColorByBackground(schoolColor);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -44,13 +46,13 @@ const TeamsNavigator = ({ route }: TeamProps) => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: 'white',
+          backgroundColor: schoolTextColor,
         },
         tabBarActiveTintColor: schoolColor,
         tabBarActiveBackgroundColor: schoolColor,
         tabBarInactiveBackgroundColor: '#B9B9B9',
         tabBarItemStyle: {
-          backgroundColor: 'white',
+          backgroundColor: schoolTextColor,
         },
       }}>
       <Tab.Screen
@@ -99,7 +101,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
           tabBarIcon: ({ size }) => (
             <FontAwesomeIcon
               icon="school"
-              color={'white'}
+              color={schoolTextColor}
               size={size}
               style={{ marginBottom: 2 }}
             />

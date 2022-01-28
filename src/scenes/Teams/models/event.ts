@@ -22,6 +22,7 @@ export interface Event {
   team_results: TeamResult[];
   result?: Result;
   result_status?: ResultStatus;
+  opponent_name: string;
 }
 
 export interface Result {

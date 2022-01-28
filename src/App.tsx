@@ -15,6 +15,7 @@ import TeamsNavigator from 'teams/TeamsNavigator';
 import { EmitterSubscription, StatusBar } from 'react-native';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { fab } from '@fortawesome/free-brands-svg-icons';
 import { saveDeviceToken } from './services/deviceToken/actions';
 import {
   Notification,
@@ -24,9 +25,11 @@ import {
   RegistrationError,
   NotificationBackgroundFetchResult,
 } from 'react-native-notifications';
+import { fetchSchools } from 'schools/services/actions';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 library.add(fas);
+library.add(fab);
 
 const App = () => {
   const dispatch = useDispatch();
@@ -34,6 +37,7 @@ const App = () => {
   useEffect(() => {
     const events: EmitterSubscription[] = [];
     dispatch(fetchLocation());
+    dispatch(fetchSchools());
 
     Notifications.registerRemoteNotifications();
 
@@ -102,7 +106,11 @@ const App = () => {
           gestureEnabled: true,
         }}>
         <Stack.Group>
-          <Stack.Screen name="SelectSchool" component={SelectSchool} />
+          <Stack.Screen
+            name="SelectSchool"
+            component={SelectSchool}
+            options={{ animation: 'fade' }}
+          />
           <Stack.Screen name="SchoolsList" component={SchoolsList} />
           <Stack.Screen
             name="SchoolDetail"

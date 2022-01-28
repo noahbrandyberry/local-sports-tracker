@@ -34,6 +34,13 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
   const eventLengthHours = 2;
   const isPast = event.start.clone().add(eventLengthHours, 'hours').isBefore();
   const pastStyles = isPast ? { backgroundColor: 'lightgray' } : {};
+  const name = event.name
+    ? event.name
+    : opponentSchool
+    ? opponentSchool.name
+    : opponent
+    ? opponent.name
+    : event.opponent_name;
   const currentStyles = event.start.isBetween(
     moment().subtract(eventLengthHours, 'hours'),
     moment().add(eventLengthHours, 'hours'),
@@ -51,9 +58,9 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
       onPress={() => onPress(event.id)}>
       <View style={styles.nameContainer}>
         <Text style={styles.name} numberOfLines={1}>
-          {event.name}
+          {name}
         </Text>
-        <Text style={{ color: school.primary_color }}>{status}</Text>
+        <Text>{status}</Text>
       </View>
       <View style={styles.dateTimeLocationContainer}>
         <Text style={styles.dateTimeLocationText}>
@@ -70,10 +77,16 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
       </View>
       <View style={styles.dateTimeLocationContainer}>
         <Text style={styles.dateTimeLocationText} numberOfLines={1}>
-          <Text style={styles.homeAwayText}>
-            {event.home ? 'Home' : 'Away'}
-          </Text>{' '}
-          - {event.location.name}
+          {event.location ? (
+            <Text>
+              <Text style={styles.homeAwayText}>
+                {event.home ? 'Home' : 'Away'}
+              </Text>{' '}
+              - {event.location?.name}
+            </Text>
+          ) : (
+            <Text>Location TBA</Text>
+          )}
         </Text>
       </View>
       {opponent ? (

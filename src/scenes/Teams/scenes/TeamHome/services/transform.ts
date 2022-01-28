@@ -19,5 +19,7 @@ export const transformPosts = (posts: Post[]) => {
     )
     .reverse();
 
+  posts = posts.filter((post) => post.title);
+
   return posts;
 };

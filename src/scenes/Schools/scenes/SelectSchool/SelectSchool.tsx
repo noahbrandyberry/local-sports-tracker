@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
   ActivityIndicator,
@@ -10,7 +9,6 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { fetchSchools } from 'schools/services/actions';
 import {
   selectDefaultSchool,
   selectNearestSchools,
@@ -26,6 +24,7 @@ import {
   selectCurrentLocationLoading,
 } from 'services/location/selectors';
 import { School } from 'schools/models';
+import { usePrevious } from 'src/utils/usePrevious';
 
 type SelectSchoolProps = NativeStackScreenProps<
   RootStackParamList,
@@ -33,25 +32,21 @@ type SelectSchoolProps = NativeStackScreenProps<
 >;
 
 const SelectSchool = ({ navigation }: SelectSchoolProps) => {
-  const dispatch = useDispatch();
   const schools = useSelector(selectValidSchools);
   const loading = useSelector(selectSchoolsLoading);
   const nearestSchools = useSelector(selectNearestSchools).slice(0, 15);
   const currentLocationLoading = useSelector(selectCurrentLocationLoading);
   const currentLocationError = useSelector(selectCurrentLocationError);
   const defaultSchool = useSelector(selectDefaultSchool);
+  const defaultSchoolId = defaultSchool?.id;
+  const previousLoading = usePrevious(loading);
 
   useEffect(() => {
-    dispatch(fetchSchools());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (defaultSchool) {
-      navigation.navigate('SchoolDetail', { schoolId: defaultSchool.id });
+    if (previousLoading && !loading && defaultSchoolId) {
+      navigation.replace('SchoolDetail', { schoolId: defaultSchoolId });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultSchool]);
+  }, [defaultSchoolId]);
 
   const onSelectSchool = (schoolId: number) => {
     navigation.navigate('SchoolDetail', {
@@ -171,6 +166,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
   },
 });
 
