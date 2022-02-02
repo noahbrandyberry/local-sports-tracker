@@ -99,30 +99,31 @@ const App = () => {
     completion: () => void,
     action: NotificationActionResponse | undefined,
   ) => {
-    console.log('opened');
-    const data = notification.payload.aps.data;
-    if (data) {
+    const eventId = notification.payload.event_id;
+    const schoolId = notification.payload.school_id;
+    const teamId = notification.payload.team_id;
+    if (eventId && schoolId && teamId) {
       RootNavigation.reset([
         {
           name: 'SchoolDetail',
           params: {
-            schoolId: data.school_id,
+            schoolId,
           },
         },
         {
           name: 'TeamDetail',
           params: {
-            teamId: data.team_id,
-            schoolId: data.school_id,
+            teamId,
+            schoolId,
             initialRouteName: 'TeamSchedule',
           },
         },
         {
           name: 'EventDetail',
           params: {
-            teamId: data.team_id,
-            eventId: data.event_id,
-            schoolId: data.school_id,
+            teamId,
+            eventId,
+            schoolId,
             openDirections: action?.identifier === 'GET_DIRECTIONS',
           },
         },
