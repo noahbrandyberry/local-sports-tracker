@@ -2,7 +2,6 @@ import { Event, Team } from 'teams/models';
 import React from 'react';
 import { Text } from 'components';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { School } from 'schools/models';
 import { useSelector } from 'react-redux';
 import { selectSchoolById } from '../../../../Schools/services/selectors';
 import moment from 'moment';
@@ -12,11 +11,10 @@ import { ordinalize } from 'src/utils/ordinalize';
 interface EventRowProps {
   team: Team;
   event: Event;
-  school: School;
   onPress: CallableFunction;
 }
 
-const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
+const EventRow = ({ team, event, onPress }: EventRowProps) => {
   let status = '';
   if (event.canceled) {
     status = 'Canceled';
@@ -40,6 +38,11 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
     ? opponentSchool.name
     : opponent
     ? opponent.name
+    : event.opponent_name;
+  const opponentName = opponent
+    ? opponentSchool
+      ? opponentSchool.name
+      : opponent.name
     : event.opponent_name;
   const currentStyles = event.start.isBetween(
     moment().subtract(eventLengthHours, 'hours'),
@@ -89,11 +92,11 @@ const EventRow = ({ team, event, school, onPress }: EventRowProps) => {
           )}
         </Text>
       </View>
-      {opponent ? (
+      {opponentName ? (
         <Text style={styles.opponentsText}>
           {multipleOpponents
             ? `${event.opponents.length} Opponents`
-            : `${opponentSchool ? opponentSchool.name : opponent.name}`}
+            : opponentName}
         </Text>
       ) : null}
       {event.result ? (

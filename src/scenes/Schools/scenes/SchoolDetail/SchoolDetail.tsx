@@ -8,6 +8,8 @@ import {
   View,
   Linking,
   ActivityIndicator,
+  Switch,
+  ScrollView,
 } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -29,6 +31,11 @@ import uniqBy from 'lodash/uniqBy';
 import { Season } from 'teams/models/season';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
+import {
+  selectDeviceSubscriptionBySchoolId,
+  selectDeviceToken,
+} from 'services/deviceToken/selectors';
+import { saveDeviceToken } from 'services/deviceToken/actions';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -64,6 +71,14 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     undefined,
   );
 
+  const deviceToken = useSelector(selectDeviceToken);
+  const schoolSubscription = useSelector(
+    selectDeviceSubscriptionBySchoolId(schoolId),
+  );
+  const [deviceSubscribed, setDeviceSubscribed] = useState(
+    !!schoolSubscription,
+  );
+
   const teamsLoading = useSelector(selectTeamsLoading);
   const teams = useSelector(selectTeams);
   const seasons = useSelector(selectSeasons);
@@ -83,6 +98,10 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   }, [currentSeason]);
 
   useEffect(() => {
+    setDeviceSubscribed(!!schoolSubscription);
+  }, [schoolSubscription]);
+
+  useEffect(() => {
     if (!school) navigation.replace('SelectSchool');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [school]);
@@ -97,16 +116,45 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     navigation.navigate('SportDetail', { sportId, schoolId });
   };
 
+  const onChangeDeviceSubscription = (flag: boolean) => {
+    setDeviceSubscribed(flag);
+
+    if (deviceToken) {
+      if (flag) {
+        dispatch(
+          saveDeviceToken({
+            device_token: deviceToken,
+            device_subscriptions_attributes: [
+              { subscribable_type: 'School', subscribable_id: schoolId },
+            ],
+          }),
+        );
+      } else {
+        if (schoolSubscription) {
+          dispatch(
+            saveDeviceToken({
+              device_token: deviceToken,
+              device_subscriptions_attributes: [
+                { id: schoolSubscription, _destroy: true },
+              ],
+            }),
+          );
+        }
+      }
+    }
+  };
+
   return (
     <SafeAreaView
       style={{ backgroundColor: school.primary_color, flex: 1 }}
       edges={['top', 'left', 'right']}>
       <MenuBar
+        backgroundColor={school.primary_color}
         color={getColorByBackground(school.primary_color)}
         navigation={navigation}
         title={`Go ${school.mascot}!`}
       />
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentInset={{ bottom: 20 }}>
         <View style={styles.well}>
           <View style={styles.infoContainer}>
             <View style={styles.locationContainer}>
@@ -138,6 +186,25 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
           </View>
         </View>
 
+        <View style={[styles.well, styles.notificationsContainer]}>
+          <Text style={styles.subHeader}>Notifications</Text>
+          <View style={styles.notificationsRow}>
+            <Text style={styles.notificationRowText}>
+              Subscribe to Push Notifications
+            </Text>
+            <Switch
+              onValueChange={onChangeDeviceSubscription}
+              style={styles.boxShadow}
+              trackColor={{
+                true: school.primary_color,
+                false: school.primary_color,
+              }}
+              thumbColor={getColorByBackground(school.primary_color)}
+              value={deviceSubscribed}
+            />
+          </View>
+        </View>
+
         <View style={styles.sportsContainer}>
           <View style={styles.well}>
             {teamsLoading && teams.length === 0 ? (
@@ -146,6 +213,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               </View>
             ) : (
               <FlatList
+                scrollEnabled={false}
                 data={sports}
                 ListHeaderComponent={
                   teams.length > 0 ? (
@@ -219,7 +287,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
             )}
           </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -229,6 +297,17 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
     backgroundColor: DefaultTheme.colors.background,
+    position: 'relative',
+  },
+  boxShadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   well: {
     backgroundColor: 'white',
@@ -310,6 +389,17 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     padding: 12,
+  },
+  notificationsContainer: {
+    padding: 20,
+  },
+  notificationsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  notificationRowText: {
+    fontWeight: 'bold',
   },
 });
 

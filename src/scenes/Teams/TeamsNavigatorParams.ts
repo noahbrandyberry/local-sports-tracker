@@ -3,7 +3,7 @@ type TeamsNavigatorParams = {
   TeamRoster: { teamId: number };
   TeamHome: { teamId: number };
   TeamMedia: { teamId: number };
-  TeamDonate: { teamId: number };
+  TeamNotify: { teamId: number };
 };
 
 export default TeamsNavigatorParams;

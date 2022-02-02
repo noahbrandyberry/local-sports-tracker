@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, InvalidDataError } from 'components';
+import { Text, InvalidDataError, Button } from 'components';
 import {
   FlatList,
   RefreshControl,
@@ -21,11 +21,16 @@ import { fetchPosts } from './services/actions';
 import ImageModal from 'react-native-image-modal';
 import RenderHtml from 'react-native-render-html';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
-import FastImage from 'react-native-fast-image';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
-type TeamHomeNavigationProp = NativeStackNavigationProp<
+type TeamDetailNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'TeamDetail'
+>;
+
+type TeamHomeNavigationProp = BottomTabNavigationProp<
+  TeamsNavigatorParams,
+  'TeamHome'
 >;
 
 type TeamHomeRouteProp = RouteProp<TeamsNavigatorParams, 'TeamHome'>;
@@ -53,7 +58,12 @@ const TeamHome = ({
   }
 
   const onSelectPost = (postId: string) => {
-    navigation.navigate('PostDetail', { postId, teamId: team.id });
+    const nav = navigation as unknown as TeamDetailNavigationProp;
+    nav.navigate('PostDetail', { postId, teamId: team.id });
+  };
+
+  const goToSchedule = () => {
+    navigation.navigate('TeamSchedule', { teamId });
   };
 
   const refreshPosts = () => {
@@ -158,7 +168,25 @@ const TeamHome = ({
             data={posts}
             contentInset={{ bottom: 20 }}
             ListEmptyComponent={
-              postsLoading ? <View /> : <Text>No news found.</Text>
+              postsLoading ? (
+                <View />
+              ) : (
+                <View>
+                  <Text>No news found.</Text>
+
+                  <Button
+                    onPress={goToSchedule}
+                    textStyle={{
+                      color: getColorByBackground(school.primary_color),
+                    }}
+                    style={{
+                      backgroundColor: school.primary_color,
+                      marginTop: 12,
+                    }}>
+                    View Schedule
+                  </Button>
+                </View>
+              )
             }
             refreshControl={
               <RefreshControl

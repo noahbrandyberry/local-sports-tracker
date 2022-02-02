@@ -39,6 +39,8 @@ export const transformTeams = (teams: Team[]) => {
     return team;
   });
 
+  teams.sort((a, b) => a.name.localeCompare(b.name));
+
   teams.sort(
     (a, b) =>
       SortedLevels.indexOf(a.level?.name ?? '') -
@@ -50,5 +52,6 @@ export const transformTeams = (teams: Team[]) => {
       SortedGenders.indexOf(a.gender.name) -
       SortedGenders.indexOf(b.gender.name),
   );
+
   return teams;
 };

@@ -44,7 +44,7 @@ const App = () => {
     events.push(
       Notifications.events().registerRemoteNotificationsRegistered(
         (event: Registered) => {
-          dispatch(saveDeviceToken({ deviceToken: event.deviceToken }));
+          dispatch(saveDeviceToken({ device_token: event.deviceToken }));
         },
       ),
     );

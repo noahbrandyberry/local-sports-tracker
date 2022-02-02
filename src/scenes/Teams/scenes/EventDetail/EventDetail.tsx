@@ -27,8 +27,10 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const event = useSelector(selectEventById(eventId));
-  const opponent = event.opponents[0];
-  const opponentSchool = useSelector(selectSchoolById(opponent?.school_id));
+  const opponent = event?.opponents[0];
+  const opponentSchool = useSelector(
+    selectSchoolById(opponent?.school_id ?? 0),
+  );
 
   if (!event || !team || !school) {
     return <InvalidDataError />;
@@ -143,11 +145,11 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
           <View style={styles.well}>
             <Text style={styles.subHeader}>Opponents</Text>
             <View style={styles.opponentsContainer}>
-              {event.opponents.map((opponent, index) => (
+              {event.opponents.map((o, index) => (
                 <OpponentRow
-                  key={opponent.id.toString()}
+                  key={o.id.toString()}
                   index={index}
-                  opponent={opponent}
+                  opponent={o}
                   onPress={onSelectSchool}
                 />
               ))}

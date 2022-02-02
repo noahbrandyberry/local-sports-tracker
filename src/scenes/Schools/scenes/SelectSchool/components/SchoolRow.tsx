@@ -17,7 +17,14 @@ const SchoolRow = ({
   onPress,
   showDistance = true,
 }: SchoolRowProps) => {
-  const distance = school.distance ?? 0;
+  let distance = school.distance ?? 0;
+  if (distance < 1) {
+    distance = Math.round((distance + Number.EPSILON) * 100) / 100;
+  } else if (distance < 10) {
+    distance = Math.round((distance + Number.EPSILON) * 10) / 10;
+  } else {
+    distance = Math.round((distance + Number.EPSILON) * 1) / 1;
+  }
 
   return (
     <TouchableOpacity
@@ -26,9 +33,7 @@ const SchoolRow = ({
       <FastImage source={{ uri: school.logo_url }} style={styles.logo} />
       <Text style={styles.name}>{school.name}</Text>
       {showDistance ? (
-        <Text style={styles.distance}>
-          {Math.round((distance + Number.EPSILON) * 100) / 100} miles
-        </Text>
+        <Text style={styles.distance}>{distance} miles</Text>
       ) : null}
     </TouchableOpacity>
   );

@@ -18,7 +18,10 @@ const TeamRow = ({
   showSectionHeaders,
   onPress,
 }: TeamRowProps) => {
-  const name = `${team.sport.name} (${team.level?.name})`;
+  console.log(team);
+  const name = `${team.sport.name} (${team.level?.name}${
+    team.label ? ` ${team.label}` : ''
+  })`;
 
   return (
     <TouchableOpacity

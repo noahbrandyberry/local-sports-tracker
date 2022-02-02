@@ -5,7 +5,12 @@ export enum DeviceTokenActionTypes {
 }
 
 export interface SaveDeviceTokenRequest {
-  deviceToken: string;
+  device_token: string;
+  device_subscriptions_attributes?: DeviceSubscriptionRequest[];
+}
+
+export interface DeviceSubscriptionRequest extends DeviceSubscription {
+  _destroy?: boolean;
 }
 
 export interface SaveDeviceToken {
@@ -24,8 +29,14 @@ export interface SaveDeviceTokenError {
 }
 
 export interface DeviceToken {
-  id: number;
   device_token: string;
+  device_subscriptions: DeviceSubscription[];
+}
+
+export interface DeviceSubscription {
+  id?: number;
+  subscribable_id?: number;
+  subscribable_type?: string;
 }
 
 export type DeviceTokenAction =

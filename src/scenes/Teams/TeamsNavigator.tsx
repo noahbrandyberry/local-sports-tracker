@@ -17,7 +17,7 @@ import {
 } from './scenes/TeamSchedule/services/actions';
 import TeamRoster from 'teams/scenes/TeamRoster';
 import TeamMedia from 'teams/scenes/TeamMedia';
-import TeamDonate from 'teams/scenes/TeamDonate';
+import TeamNotify from 'teams/scenes/TeamNotify';
 import { fetchPosts, resetPosts } from './scenes/TeamHome/services/actions';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 
@@ -121,13 +121,13 @@ const TeamsNavigator = ({ route }: TeamProps) => {
         }}
       />
       <Tab.Screen
-        name="TeamDonate"
-        component={TeamDonate}
+        name="TeamNotify"
+        component={TeamNotify}
         initialParams={{ teamId }}
         options={{
-          tabBarLabel: 'Donate',
+          tabBarLabel: 'Notify',
           tabBarIcon: ({ color, size }) => (
-            <FontAwesomeIcon icon="donate" color={color} size={size} />
+            <FontAwesomeIcon icon="bell" color={color} size={size} />
           ),
         }}
       />
