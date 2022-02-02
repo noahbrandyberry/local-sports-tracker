@@ -36,7 +36,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   };
 
   const onSelectTeam = (teamId: number) => {
-    navigation.navigate('TeamDetail', { teamId });
+    navigation.navigate('TeamDetail', { teamId, schoolId });
   };
 
   const sectionsGroup = groupBy(teams, (team) =>
@@ -56,7 +56,10 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
       style={{ backgroundColor: school.primary_color, flex: 1 }}
       edges={['top', 'left', 'right']}>
       <View style={styles.titleContainer}>
-        <TouchableOpacity style={styles.backContainer} onPress={goBack}>
+        <TouchableOpacity
+          style={styles.backContainer}
+          onPress={goBack}
+          hitSlop={{ top: 15, bottom: 15, left: 15 }}>
           <FontAwesomeIcon icon="angle-left" size={15} color={color} />
           <Text style={[styles.backText, { color }]}>Back</Text>
         </TouchableOpacity>

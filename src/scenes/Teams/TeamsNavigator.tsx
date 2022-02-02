@@ -8,7 +8,6 @@ import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { selectTeamById } from './services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSchoolById } from 'schools/services/selectors';
 import {
@@ -25,9 +24,8 @@ const Tab = createBottomTabNavigator<TeamsNavigatorParams>();
 type TeamProps = NativeStackScreenProps<RootStackParamList, 'TeamDetail'>;
 
 const TeamsNavigator = ({ route }: TeamProps) => {
-  const { teamId } = route.params;
-  const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const { teamId, schoolId, initialRouteName } = route.params;
+  const school = useSelector(selectSchoolById(schoolId));
   const schoolColor = school ? school.primary_color : 'black';
   const schoolTextColor = getColorByBackground(schoolColor);
   const dispatch = useDispatch();
@@ -35,14 +33,14 @@ const TeamsNavigator = ({ route }: TeamProps) => {
   useEffect(() => {
     dispatch(resetEvents());
     dispatch(resetPosts());
-    dispatch(fetchEvents({ teamId, schoolId: school?.id || 0 }));
-    dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
+    dispatch(fetchEvents({ teamId, schoolId }));
+    dispatch(fetchPosts({ teamId, schoolId }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamId]);
 
   return (
     <Tab.Navigator
-      initialRouteName="TeamHome"
+      initialRouteName={initialRouteName ?? 'TeamHome'}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -58,7 +56,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
       <Tab.Screen
         name="TeamSchedule"
         component={TeamSchedule}
-        initialParams={{ teamId }}
+        initialParams={{ teamId, schoolId }}
         options={{
           tabBarLabel: 'Schedule',
           tabBarIcon: ({ color, size }) => (
@@ -69,7 +67,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
       <Tab.Screen
         name="TeamRoster"
         component={TeamRoster}
-        initialParams={{ teamId }}
+        initialParams={{ teamId, schoolId }}
         options={{
           tabBarLabel: 'Roster',
           tabBarIcon: ({ color, size }) => (
@@ -80,7 +78,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
       <Tab.Screen
         name="TeamHome"
         component={TeamHome}
-        initialParams={{ teamId }}
+        initialParams={{ teamId, schoolId }}
         options={{
           tabBarItemStyle: {
             borderRadius: 30,
@@ -112,7 +110,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
       <Tab.Screen
         name="TeamMedia"
         component={TeamMedia}
-        initialParams={{ teamId }}
+        initialParams={{ teamId, schoolId }}
         options={{
           tabBarLabel: 'Media',
           tabBarIcon: ({ color, size }) => (
@@ -123,7 +121,7 @@ const TeamsNavigator = ({ route }: TeamProps) => {
       <Tab.Screen
         name="TeamNotify"
         component={TeamNotify}
-        initialParams={{ teamId }}
+        initialParams={{ teamId, schoolId }}
         options={{
           tabBarLabel: 'Notify',
           tabBarIcon: ({ color, size }) => (

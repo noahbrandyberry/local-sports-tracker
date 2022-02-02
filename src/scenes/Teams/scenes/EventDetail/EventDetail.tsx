@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, InvalidDataError, Button } from 'components';
+import React, { useEffect } from 'react';
+import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -9,21 +9,27 @@ import { DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import MapView, { Marker } from 'react-native-maps';
-import { selectEventById } from '../TeamSchedule/services/selectors';
+import {
+  selectEventById,
+  selectEventsLoading,
+} from '../TeamSchedule/services/selectors';
 import { formatAddress } from 'src/utils/formattedAddress';
 import openMap from 'react-native-open-maps';
 import OpponentRow from './components/OpponentRow';
 import * as AddCalendarEvent from 'react-native-add-calendar-event';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
+import { selectDataLoading } from 'store/selectors';
 
-type SportDetailProps = NativeStackScreenProps<
+type EventDetailProps = NativeStackScreenProps<
   RootStackParamList,
   'EventDetail'
 >;
 
-const SportDetail = ({ route, navigation }: SportDetailProps) => {
-  const { teamId, eventId } = route.params;
+const EventDetail = ({ route, navigation }: EventDetailProps) => {
+  const { teamId, eventId, openDirections } = route.params;
 
+  const loading = useSelector(selectDataLoading);
+  const eventsLoading = useSelector(selectEventsLoading);
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const event = useSelector(selectEventById(eventId));
@@ -31,6 +37,17 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   const opponentSchool = useSelector(
     selectSchoolById(opponent?.school_id ?? 0),
   );
+
+  useEffect(() => {
+    if (!eventsLoading && event && team && school && openDirections) {
+      getDirections();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventsLoading]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (!event || !team || !school) {
     return <InvalidDataError />;
@@ -280,4 +297,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SportDetail;
+export default EventDetail;

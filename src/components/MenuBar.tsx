@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
   Modal,
   SafeAreaView,
+  FlatList,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import RootStackParamList from 'src/RootStackParams';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { FlatList } from 'react-native-gesture-handler';
 import { hexToRgb } from '@check-light-or-dark/utils';
 
 interface MenuBarProps {

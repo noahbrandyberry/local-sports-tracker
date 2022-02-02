@@ -26,8 +26,12 @@ import {
   NotificationBackgroundFetchResult,
 } from 'react-native-notifications';
 import { fetchSchools } from 'schools/services/actions';
+import { NotificationActionResponse } from 'react-native-notifications/lib/dist/interfaces/NotificationActionResponse';
+import * as RootNavigation from './RootNavigation';
+import { upcomingEventCategory } from './notifications/categories';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
 library.add(fas);
 library.add(fab);
 
@@ -41,18 +45,19 @@ const App = () => {
 
     Notifications.registerRemoteNotifications();
 
+    Notifications.setCategories([upcomingEventCategory]);
+    Notifications.ios.setBadgeCount(0);
+
+    Notifications.getInitialNotification()
+      .then((notification) => {
+        if (notification) notificationOpened(notification, () => {}, undefined);
+      })
+      .catch();
+
     events.push(
       Notifications.events().registerRemoteNotificationsRegistered(
         (event: Registered) => {
           dispatch(saveDeviceToken({ device_token: event.deviceToken }));
-        },
-      ),
-    );
-
-    events.push(
-      Notifications.events().registerRemoteNotificationsRegistrationFailed(
-        (event: RegistrationError) => {
-          console.error(event);
         },
       ),
     );
@@ -69,15 +74,7 @@ const App = () => {
     );
 
     events.push(
-      Notifications.events().registerNotificationOpened(
-        (
-          notification: Notification,
-          completion: () => void,
-          // action: NotificationActionResponse | undefined,
-        ) => {
-          completion();
-        },
-      ),
+      Notifications.events().registerNotificationOpened(notificationOpened),
     );
 
     events.push(
@@ -97,8 +94,45 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const notificationOpened = (
+    notification: Notification,
+    completion: () => void,
+    action: NotificationActionResponse | undefined,
+  ) => {
+    console.log('opened');
+    const data = notification.payload.aps.data;
+    if (data) {
+      RootNavigation.reset([
+        {
+          name: 'SchoolDetail',
+          params: {
+            schoolId: data.school_id,
+          },
+        },
+        {
+          name: 'TeamDetail',
+          params: {
+            teamId: data.team_id,
+            schoolId: data.school_id,
+            initialRouteName: 'TeamSchedule',
+          },
+        },
+        {
+          name: 'EventDetail',
+          params: {
+            teamId: data.team_id,
+            eventId: data.event_id,
+            schoolId: data.school_id,
+            openDirections: action?.identifier === 'GET_DIRECTIONS',
+          },
+        },
+      ]);
+    }
+    completion();
+  };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={RootNavigation.navigationRef}>
       <StatusBar barStyle="dark-content" />
       <Stack.Navigator
         screenOptions={{

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, InvalidDataError } from 'components';
+import React, { useEffect, useState } from 'react';
+import { Text, InvalidDataError, LoadingScreen } from 'components';
 import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
@@ -10,10 +10,12 @@ import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import {
+  selectDeviceSubscriptionBySchoolId,
   selectDeviceSubscriptionByTeamId,
   selectDeviceToken,
 } from 'services/deviceToken/selectors';
 import { saveDeviceToken } from 'services/deviceToken/actions';
+import { selectSchoolTeamsLoading } from 'store/selectors';
 
 type TeamNotifyProps = NativeStackScreenProps<
   TeamsNavigatorParams,
@@ -24,14 +26,28 @@ const TeamDonate = ({ route }: TeamNotifyProps) => {
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const loading = useSelector(selectSchoolTeamsLoading);
 
   const deviceToken = useSelector(selectDeviceToken);
   const teamSubscription = useSelector(
     selectDeviceSubscriptionByTeamId(teamId),
   );
-  const [deviceSubscribed, setDeviceSubscribed] = useState(!!teamSubscription);
+  const schoolSubscription = useSelector(
+    selectDeviceSubscriptionBySchoolId(school?.id ?? 0),
+  );
+  const [deviceSubscribed, setDeviceSubscribed] = useState(
+    !!teamSubscription || !!schoolSubscription,
+  );
+
+  useEffect(() => {
+    setDeviceSubscribed(!!teamSubscription || !!schoolSubscription);
+  }, [schoolSubscription, teamSubscription]);
 
   const dispatch = useDispatch();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (!team || !school) {
     return <InvalidDataError />;
@@ -88,6 +104,7 @@ const TeamDonate = ({ route }: TeamNotifyProps) => {
                   true: school.primary_color,
                   false: school.primary_color,
                 }}
+                disabled={!!schoolSubscription}
                 thumbColor={getColorByBackground(school.primary_color)}
                 value={deviceSubscribed}
               />

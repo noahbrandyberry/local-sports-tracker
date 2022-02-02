@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Text, MenuBar, InvalidDataError } from 'components';
 import {
-  FlatList,
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
@@ -34,6 +33,7 @@ import { getColorByBackground } from 'src/utils/getColorByBackground';
 import {
   selectDeviceSubscriptionBySchoolId,
   selectDeviceToken,
+  selectTeamDeviceSubscriptions,
 } from 'services/deviceToken/selectors';
 import { saveDeviceToken } from 'services/deviceToken/actions';
 
@@ -85,6 +85,13 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   const school = useSelector(selectSchoolById(schoolId));
   const selectedTeams = teams.filter(
     (team) => team.season.id === selectedSeason?.id,
+  );
+
+  const subscribedTeamDevices = useSelector(selectTeamDeviceSubscriptions);
+  const subscribedTeams = teams.filter((team) =>
+    subscribedTeamDevices.find(
+      (deviceSubscription) => deviceSubscription.subscribable_id === team.id,
+    ),
   );
 
   const sports = uniqBy(
@@ -154,7 +161,12 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
         navigation={navigation}
         title={`Go ${school.mascot}!`}
       />
-      <ScrollView style={styles.container} contentInset={{ bottom: 20 }}>
+      <ScrollView
+        style={styles.container}
+        contentInset={{ bottom: 20 }}
+        refreshControl={
+          <RefreshControl refreshing={teamsLoading} onRefresh={getTeams} />
+        }>
         <View style={styles.well}>
           <View style={styles.infoContainer}>
             <View style={styles.locationContainer}>
@@ -203,6 +215,14 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               value={deviceSubscribed}
             />
           </View>
+          {deviceSubscribed || subscribedTeams.length === 0 ? null : (
+            <Text>
+              <Text style={styles.alreadySubscribed}>
+                Teams Subscribed:{'\n'}
+              </Text>
+              {subscribedTeams.map((team) => team.name).join('\n')}
+            </Text>
+          )}
         </View>
 
         <View style={styles.sportsContainer}>
@@ -212,11 +232,9 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                 <ActivityIndicator size={'large'} />
               </View>
             ) : (
-              <FlatList
-                scrollEnabled={false}
-                data={sports}
-                ListHeaderComponent={
-                  teams.length > 0 ? (
+              <View style={styles.sportsPadding}>
+                {sports.length > 0 ? (
+                  <View>
                     <View style={styles.sportsHeaderContainer}>
                       {seasons.map((season) => (
                         <TouchableOpacity
@@ -251,39 +269,23 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                         </TouchableOpacity>
                       ))}
                     </View>
-                  ) : (
-                    <View />
-                  )
-                }
-                ListEmptyComponent={
-                  teamsLoading ? (
-                    <View />
-                  ) : (
-                    <Text style={styles.noSportsFound}>
-                      No {seasonName} sports found.
-                    </Text>
-                  )
-                }
-                columnWrapperStyle={styles.sportsScroll}
-                stickyHeaderIndices={[0]}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                contentInset={{ bottom: 20 }}
-                style={styles.sportsPadding}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={teamsLoading}
-                    onRefresh={getTeams}
-                  />
-                }
-                renderItem={({ item }) => (
-                  <SportCell
-                    sport={item}
-                    backgroundColor={school.primary_color}
-                    onPress={onSelectSport}
-                  />
+                    <View style={styles.sportsContentContainer}>
+                      {sports.map((sport) => (
+                        <SportCell
+                          key={sport.id.toString()}
+                          sport={sport}
+                          backgroundColor={school.primary_color}
+                          onPress={onSelectSport}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                ) : (
+                  <Text style={styles.noSportsFound}>
+                    No {seasonName} sports found.
+                  </Text>
                 )}
-              />
+              </View>
             )}
           </View>
         </View>
@@ -354,6 +356,15 @@ const styles = StyleSheet.create({
   sportsContainer: {
     flex: 1,
   },
+  sportsContentContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 10,
+  },
+  sportsPadding: {
+    paddingBottom: 10,
+    minHeight: 60,
+  },
   sportsHeaderContainer: {
     padding: 20,
     backgroundColor: 'white',
@@ -362,13 +373,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  sportsScroll: {
-    paddingHorizontal: 10,
-  },
-  sportsPadding: {
-    paddingBottom: 10,
-    minHeight: 60,
   },
   seasonButton: {
     paddingHorizontal: 10,
@@ -400,6 +404,10 @@ const styles = StyleSheet.create({
   },
   notificationRowText: {
     fontWeight: 'bold',
+  },
+  alreadySubscribed: {
+    fontSize: 15,
+    fontWeight: '500',
   },
 });
 

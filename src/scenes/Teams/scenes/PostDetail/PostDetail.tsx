@@ -16,6 +16,7 @@ import { selectEventById } from '../TeamSchedule/services/selectors';
 import { selectTeamById } from '../../services/selectors';
 import ImageModal from 'react-native-image-modal';
 import isEmpty from 'lodash/isEmpty';
+import { selectSchoolById } from '../../../Schools/services/selectors';
 
 type PostDetailProps = NativeStackScreenProps<RootStackParamList, 'PostDetail'>;
 
@@ -24,6 +25,7 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
 
   const post = useSelector(selectPostById(postId));
   const team = useSelector(selectTeamById(teamId));
+  const school = useSelector(selectSchoolById(team?.school_id ?? 0));
   const event = useSelector(selectEventById(post?.event_id || 0));
 
   if (!post) {
@@ -56,6 +58,7 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
                   navigation.navigate('EventDetail', {
                     teamId,
                     eventId: event.id,
+                    schoolId: school?.id ?? 0,
                   })
                 }>
                 View Event

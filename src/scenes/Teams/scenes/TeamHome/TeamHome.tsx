@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, InvalidDataError, Button } from 'components';
+import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
 import {
   FlatList,
   RefreshControl,
@@ -22,6 +22,7 @@ import ImageModal from 'react-native-image-modal';
 import RenderHtml from 'react-native-render-html';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { selectSchoolTeamsLoading } from 'store/selectors';
 
 type TeamDetailNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -47,11 +48,16 @@ const TeamHome = ({
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const posts = useSelector(selectPosts);
+  const loading = useSelector(selectSchoolTeamsLoading);
 
   const { width } = useWindowDimensions();
   const contentWidth = width - 40;
 
   const dispatch = useDispatch();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (!team || !school) {
     return <InvalidDataError />;

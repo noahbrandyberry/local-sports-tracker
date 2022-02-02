@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Text, InvalidDataError } from 'components';
+import { Text, InvalidDataError, LoadingScreen } from 'components';
 import { StyleSheet, View, FlatList, RefreshControl } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
@@ -14,6 +14,7 @@ import RootStackParamList from 'src/RootStackParams';
 import { fetchEvents } from './services/actions';
 import { Event } from 'teams/models';
 import { selectPosts } from '../TeamHome/services/selectors';
+import { selectSchoolTeamsLoading } from 'store/selectors';
 
 type TeamScheduleNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,7 +30,8 @@ const TeamSchedule = ({
   route: TeamScheduleRouteProp;
   navigation: TeamScheduleNavigationProp;
 }) => {
-  const { teamId } = route.params;
+  const { teamId, schoolId } = route.params;
+  const loading = useSelector(selectSchoolTeamsLoading);
   const scheduleLoading = useSelector(selectEventsLoading);
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
@@ -55,6 +57,10 @@ const TeamSchedule = ({
     }
   }, [events]);
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   if (!team || !school) {
     return <InvalidDataError />;
   }
@@ -78,6 +84,7 @@ const TeamSchedule = ({
     navigation.navigate('EventDetail', {
       teamId,
       eventId,
+      schoolId,
     });
   };
 

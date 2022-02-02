@@ -45,3 +45,11 @@ export const selectDeviceSubscriptionByTeamId = (id: number) =>
           subscription.subscribable_id === id,
       )?.id,
   );
+
+export const selectTeamDeviceSubscriptions = createSelector(
+  selectDevice,
+  (deviceToken) =>
+    deviceToken?.device_subscriptions.filter(
+      (subscription) => subscription.subscribable_type === 'Team',
+    ) ?? [],
+);

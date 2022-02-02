@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, InvalidDataError } from 'components';
+import { Text, InvalidDataError, LoadingScreen } from 'components';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
@@ -8,6 +8,7 @@ import { DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
+import { selectSchoolTeamsLoading } from 'store/selectors';
 
 type TeamMediaProps = NativeStackScreenProps<TeamsNavigatorParams, 'TeamMedia'>;
 
@@ -15,6 +16,11 @@ const TeamMedia = ({ route }: TeamMediaProps) => {
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const loading = useSelector(selectSchoolTeamsLoading);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (!team || !school) {
     return <InvalidDataError />;

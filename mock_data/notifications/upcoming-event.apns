@@ -1,0 +1,16 @@
+{
+    "aps": {
+        "alert": {
+            "title": "Upcoming Event",
+            "body": "Boys Varsity Basketball - Senior Night/Red Out is starting at 7:30pm"
+        },
+        "category": "UPCOMING_EVENT",
+        "sound": "default",
+        "badge": 1,
+        "data": {
+            "school_id": 2136,
+            "team_id": 3154577,
+            "event_id": 16896670
+        }
+    }
+}
