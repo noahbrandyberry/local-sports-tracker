@@ -18,7 +18,6 @@ const TeamRow = ({
   showSectionHeaders,
   onPress,
 }: TeamRowProps) => {
-  console.log(team);
   const name = `${team.sport.name} (${team.level?.name}${
     team.label ? ` ${team.label}` : ''
   })`;

@@ -1,6 +1,7 @@
 import { fork, all } from 'redux-saga/effects';
 import schoolsSagas from 'schools/services/sagas';
 import teamsSaga from 'teams/services/sagas';
+import upcomingEventsSaga from 'schools/scenes/UpcomingEvents/services/sagas';
 import eventsSaga from 'teams/scenes/TeamSchedule/services/sagas';
 import postsSaga from 'teams/scenes/TeamHome/services/sagas';
 import deviceTokenSagas from 'services/deviceToken/sagas';
@@ -10,6 +11,7 @@ export default function* rootSaga() {
   yield all([
     fork(schoolsSagas),
     fork(teamsSaga),
+    fork(upcomingEventsSaga),
     fork(eventsSaga),
     fork(postsSaga),
     fork(deviceTokenSagas),

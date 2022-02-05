@@ -38,12 +38,12 @@ export const MenuBar = ({
   const [isVisible, setIsVisible] = useState(false);
   const menuItems: MenuItemProps[] = [
     { screenId: 'SelectSchool', label: 'Change School' },
-    {
-      screenId: 'PushNotificationsSubscriptions',
-      label: 'Push Notification Subscriptions',
-    },
-    { screenId: 'CalendarSubscriptions', label: 'Calendar Subscriptions' },
-    { screenId: 'Settings', label: 'Settings' },
+    // {
+    //   screenId: 'PushNotificationsSubscriptions',
+    //   label: 'Push Notification Subscriptions',
+    // },
+    // { screenId: 'CalendarSubscriptions', label: 'Calendar Subscriptions' },
+    // { screenId: 'Settings', label: 'Settings' },
   ];
 
   const goToScreen = (screenId: keyof RootStackParamList) => {

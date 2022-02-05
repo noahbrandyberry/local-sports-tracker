@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, MenuBar, InvalidDataError } from 'components';
+import { Text, MenuBar, InvalidDataError, Button } from 'components';
 import {
   RefreshControl,
   StyleSheet,
@@ -52,7 +52,10 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
 
   const storeDefaultSchool = async () => {
     try {
-      await AsyncStorage.setItem('@defaultSchool', schoolId.toString());
+      const defaultSchool = await AsyncStorage.getItem('@defaultSchool');
+
+      if (!defaultSchool)
+        await AsyncStorage.setItem('@defaultSchool', schoolId.toString());
     } catch (error) {
       // Error saving data
     }
@@ -121,6 +124,10 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
 
   const onSelectSport = (sportId: number) => {
     navigation.navigate('SportDetail', { sportId, schoolId });
+  };
+
+  const goToUpcomingEvents = () => {
+    navigation.navigate('UpcomingEvents', { schoolId });
   };
 
   const onChangeDeviceSubscription = (flag: boolean) => {
@@ -224,6 +231,18 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
             </Text>
           )}
         </View>
+
+        <Button
+          onPress={goToUpcomingEvents}
+          textStyle={{
+            color: getColorByBackground(school.primary_color),
+          }}
+          style={{
+            backgroundColor: school.primary_color,
+            marginBottom: 24,
+          }}>
+          View Schedule
+        </Button>
 
         <View style={styles.sportsContainer}>
           <View style={styles.well}>

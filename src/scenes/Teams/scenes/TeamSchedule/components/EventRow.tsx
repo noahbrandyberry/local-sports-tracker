@@ -1,7 +1,7 @@
-import { Event, Team } from 'teams/models';
+import { Event } from 'teams/models';
 import React from 'react';
 import { Text } from 'components';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useSelector } from 'react-redux';
 import { selectSchoolById } from '../../../../Schools/services/selectors';
 import moment from 'moment';
@@ -9,12 +9,12 @@ import capitalize from 'lodash/capitalize';
 import { ordinalize } from 'src/utils/ordinalize';
 
 interface EventRowProps {
-  team: Team;
   event: Event;
   onPress: CallableFunction;
+  itemStyles?: ViewStyle;
 }
 
-const EventRow = ({ team, event, onPress }: EventRowProps) => {
+const EventRow = ({ event, onPress, itemStyles = {} }: EventRowProps) => {
   let status = '';
   if (event.canceled) {
     status = 'Canceled';
@@ -52,12 +52,12 @@ const EventRow = ({ team, event, onPress }: EventRowProps) => {
     : {};
 
   const teamResult = event.team_results.find(
-    (result) => result.team_id === team.id,
+    (result) => result.team_id === event.selected_team_id,
   );
 
   return (
     <TouchableOpacity
-      style={[styles.rowContainer, pastStyles, currentStyles]}
+      style={[styles.rowContainer, pastStyles, currentStyles, itemStyles]}
       onPress={() => onPress(event.id)}>
       <View style={styles.nameContainer}>
         <Text style={styles.name} numberOfLines={1}>

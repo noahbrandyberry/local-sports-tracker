@@ -9,7 +9,7 @@ export interface EventsState {
 
 const initialState = {
   events: [],
-  loading: true,
+  loading: false,
   error: null,
 };
 

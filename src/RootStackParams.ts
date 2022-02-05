@@ -17,6 +17,7 @@ type RootStackParamList = {
     openDirections?: boolean;
   };
   PostDetail: { postId: string; teamId: number };
+  UpcomingEvents: { schoolId: number };
 };
 
 export default RootStackParamList;

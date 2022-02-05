@@ -23,6 +23,7 @@ export interface Event {
   result?: Result;
   result_status?: ResultStatus;
   opponent_name: string;
+  selected_team_id: number;
 }
 
 export interface Result {

@@ -5,6 +5,7 @@ import SelectSchool from 'schools/scenes/SelectSchool';
 import SchoolsList from 'schools/scenes/SchoolsList';
 import SchoolDetail from 'schools/scenes/SchoolDetail';
 import SportDetail from 'schools/scenes/SportDetail';
+import UpcomingEvents from 'schools/scenes/UpcomingEvents';
 import EventDetail from 'teams/scenes/EventDetail';
 import PostDetail from 'teams/scenes/PostDetail';
 import { fetchLocation } from 'services/location/actions';
@@ -22,7 +23,6 @@ import {
   NotificationCompletion,
   Notifications,
   Registered,
-  RegistrationError,
   NotificationBackgroundFetchResult,
 } from 'react-native-notifications';
 import { fetchSchools } from 'schools/services/actions';
@@ -158,6 +158,7 @@ const App = () => {
           <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
           <Stack.Screen name="EventDetail" component={EventDetail} />
           <Stack.Screen name="PostDetail" component={PostDetail} />
+          <Stack.Screen name="UpcomingEvents" component={UpcomingEvents} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

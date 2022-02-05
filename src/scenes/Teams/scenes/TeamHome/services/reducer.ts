@@ -9,7 +9,7 @@ export interface PostsState {
 
 const initialState = {
   posts: [],
-  loading: true,
+  loading: false,
   error: null,
 };
 

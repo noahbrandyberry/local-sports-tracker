@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-calendars/src/agenda/index.js b/node_modules/react-native-calendars/src/agenda/index.js
+index 3d344c6..2dc7e59 100644
+--- a/node_modules/react-native-calendars/src/agenda/index.js
++++ b/node_modules/react-native-calendars/src/agenda/index.js
+@@ -143,7 +143,7 @@ export default class Agenda extends Component {
+         }
+     }
+     onDayPress = (d) => {
+-        this.chooseDay(d, !this.state.calendarScrollable);
++        this.chooseDay(d, false);
+     };
+     chooseDay(d, optimisticScroll) {
+         const day = parseDate(d);

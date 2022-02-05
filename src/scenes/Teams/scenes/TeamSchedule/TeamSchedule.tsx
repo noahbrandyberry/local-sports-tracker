@@ -145,7 +145,7 @@ const TeamSchedule = ({
             />
           }
           renderItem={({ item }) => (
-            <EventRow event={item} team={team} onPress={onSelectEvent} />
+            <EventRow event={item} onPress={onSelectEvent} />
           )}
         />
       </View>

@@ -14,8 +14,6 @@ export const TeamResults = ({ teamResults }: TeamResultsProps) => {
 
   if (teamResults.length === 0) return null;
 
-  console.log(teamResults);
-
   return (
     <View style={styles.boxScoreContainer}>
       <View style={styles.row}>
