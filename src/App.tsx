@@ -13,7 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RootStackParamList from './RootStackParams';
 import TeamsNavigator from 'teams/TeamsNavigator';
-import { EmitterSubscription, StatusBar } from 'react-native';
+import { EmitterSubscription } from 'react-native';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
@@ -134,7 +134,6 @@ const App = () => {
 
   return (
     <NavigationContainer ref={RootNavigation.navigationRef}>
-      <StatusBar barStyle="dark-content" />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,

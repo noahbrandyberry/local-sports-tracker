@@ -1,6 +1,12 @@
 import React from 'react';
 import { Text, InvalidDataError } from 'components';
-import { SectionList, StyleSheet, View, TouchableOpacity } from 'react-native';
+import {
+  SectionList,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  StatusBar,
+} from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectTeamsBySportId } from 'teams/services/selectors';
@@ -55,6 +61,9 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
     <SafeAreaView
       style={{ backgroundColor: school.primary_color, flex: 1 }}
       edges={['top', 'left', 'right']}>
+      <StatusBar
+        barStyle={color === 'white' ? 'light-content' : 'dark-content'}
+      />
       <View style={styles.titleContainer}>
         <TouchableOpacity
           style={styles.backContainer}

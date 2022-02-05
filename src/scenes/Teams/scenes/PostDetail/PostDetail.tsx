@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, InvalidDataError } from 'components';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSelector } from 'react-redux';
@@ -41,6 +41,7 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
         flex: 1,
       }}
       edges={['left', 'right']}>
+      <StatusBar barStyle="light-content" />
       <ScrollView style={styles.container} contentInset={{ bottom: 32 }}>
         <View style={styles.modalDragBar} />
 

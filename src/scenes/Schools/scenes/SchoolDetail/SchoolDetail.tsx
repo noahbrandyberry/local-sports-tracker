@@ -246,7 +246,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
 
         <View style={styles.sportsContainer}>
           <View style={styles.well}>
-            {teamsLoading && teams.length === 0 ? (
+            {teamsLoading && sports.length === 0 ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size={'large'} />
               </View>

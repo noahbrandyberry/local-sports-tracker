@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  StatusBar,
   StyleSheet,
   View,
 } from 'react-native';
@@ -69,6 +70,7 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
 
   return (
     <SafeAreaView style={styles.evenHeight}>
+      <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.evenHeight}>

@@ -53,7 +53,9 @@ export const MenuBar = ({
 
   return (
     <View style={styles.menuBar}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar
+        barStyle={color === 'white' ? 'light-content' : 'dark-content'}
+      />
       <TouchableOpacity
         style={styles.spacer}
         hitSlop={{ top: 15, bottom: 15, left: 15 }}
@@ -72,6 +74,7 @@ export const MenuBar = ({
         animationType="slide"
         onDismiss={() => setIsVisible(false)}>
         <SafeAreaView style={styles.menuContainer}>
+          {isVisible ? <StatusBar barStyle="light-content" /> : null}
           <View style={styles.menuHeader}>
             <Text style={styles.menuHeaderText}>Menu</Text>
 

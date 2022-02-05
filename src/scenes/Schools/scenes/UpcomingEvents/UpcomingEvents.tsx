@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, StatusBar, StyleSheet, View } from 'react-native';
 import { Text } from 'components';
 import { Agenda } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -96,6 +96,8 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
         flex: 1,
       }}
       edges={['left', 'right']}>
+      <StatusBar barStyle="light-content" />
+
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
         <Agenda

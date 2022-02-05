@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
@@ -123,6 +123,7 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
         flex: 1,
       }}
       edges={['left', 'right']}>
+      <StatusBar barStyle="light-content" />
       <ScrollView style={styles.container} contentInset={{ bottom: 32 }}>
         <View style={styles.modalDragBar} />
 
