@@ -19,6 +19,7 @@ import OpponentRow from './components/OpponentRow';
 import * as AddCalendarEvent from 'react-native-add-calendar-event';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { selectDataLoading } from 'store/selectors';
+import isEmpty from 'lodash/isEmpty';
 
 type EventDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -72,6 +73,12 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
     ? opponentSchool.name
     : opponent
     ? opponent.name
+    : event.opponent_name;
+
+  const opponentName = opponent
+    ? opponentSchool
+      ? opponentSchool.name
+      : opponent.name
     : event.opponent_name;
 
   interface CalendarSuccessAction {
@@ -159,18 +166,26 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
           )}
         </View>
 
-        {event.opponents.length > 0 ? (
+        {event.opponents.length > 0 || opponentName ? (
           <View style={styles.well}>
             <Text style={styles.subHeader}>Opponents</Text>
             <View style={styles.opponentsContainer}>
-              {event.opponents.map((o, index) => (
+              {event.opponents.length > 0 ? (
+                event.opponents.map((o, index) => (
+                  <OpponentRow
+                    key={o.id.toString()}
+                    index={index}
+                    opponent={o}
+                    onPress={onSelectSchool}
+                  />
+                ))
+              ) : (
                 <OpponentRow
-                  key={o.id.toString()}
-                  index={index}
-                  opponent={o}
+                  index={0}
+                  opponentName={opponentName}
                   onPress={onSelectSchool}
                 />
-              ))}
+              )}
             </View>
           </View>
         ) : null}
@@ -182,8 +197,9 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
               <Text>{event.home ? 'Home' : 'Away'} Game</Text>
               <Text selectable style={styles.addressText}>
                 {event.location.name}
-                {'\n'}
-                {formatAddress(event.location, '\n')}
+                {isEmpty(event.location)
+                  ? `\n${formatAddress(event.location, '\n')}`
+                  : ''}
               </Text>
 
               {isPast ? null : (
@@ -197,25 +213,27 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
                 </Button>
               )}
             </View>
-            <View style={styles.map}>
-              <MapView
-                style={{ flex: 1 }}
-                initialRegion={{
-                  latitude: Number(event.location.latitude),
-                  longitude: Number(event.location.longitude),
-                  latitudeDelta: 0.05,
-                  longitudeDelta: 0.05,
-                }}>
-                <Marker
-                  coordinate={{
+            {event.location.latitude || event.location.longitude ? (
+              <View style={styles.map}>
+                <MapView
+                  style={{ flex: 1 }}
+                  initialRegion={{
                     latitude: Number(event.location.latitude),
                     longitude: Number(event.location.longitude),
-                  }}
-                  title={event.location.name}
-                  description={formatAddress(event.location)}
-                />
-              </MapView>
-            </View>
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                  }}>
+                  <Marker
+                    coordinate={{
+                      latitude: Number(event.location.latitude),
+                      longitude: Number(event.location.longitude),
+                    }}
+                    title={event.location.name}
+                    description={formatAddress(event.location)}
+                  />
+                </MapView>
+              </View>
+            ) : null}
           </View>
         ) : (
           <View style={[styles.well, styles.mapContainer]}>

@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { Alert, StatusBar, StyleSheet, View } from 'react-native';
-import { Text } from 'components';
+import { Linking, StatusBar, StyleSheet, View } from 'react-native';
+import { Button, LoadingScreen, Text } from 'components';
 import { Agenda } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DefaultTheme } from '@react-navigation/native';
@@ -24,6 +24,12 @@ import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { SportIcons } from 'src/enums/sportIcons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Level } from '../../../Teams/enums/level';
+import { typedKeys } from 'src/utils/typedKeys';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Gender } from 'teams/enums/gender';
+import config from 'src/config/config';
+import qs from 'qs';
 
 type UpcomingEventsProps = NativeStackScreenProps<
   RootStackParamList,
@@ -34,6 +40,9 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   const { schoolId } = route.params;
   const dispatch = useDispatch();
   const eventsLoading = useSelector(selectUpcomingEventsLoading);
+  const [filter, setFilter] = useState<string>();
+  const [levels, setLevels] = useState<number[]>();
+  const [genders, setGenders] = useState<number[]>();
   const events = useSelector(selectUpcomingEvents);
   const teams = useSelector(selectTeams);
   const school = useSelector(selectSchoolById(schoolId));
@@ -57,6 +66,28 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   const maxDate = moment().add(8, 'months');
   const date = minDate.clone();
 
+  const toggleLevel = (id: number) => {
+    let newLevels = levels ? [...levels] : [];
+    if (newLevels.find((level) => level === id)) {
+      newLevels = newLevels.filter((level) => level !== id);
+    } else {
+      newLevels.push(id);
+    }
+
+    setLevels(newLevels.length > 0 ? newLevels : undefined);
+  };
+
+  const toggleGender = (id: number) => {
+    let newGenders = genders ? [...genders] : [];
+    if (newGenders.find((gender) => gender === id)) {
+      newGenders = newGenders.filter((gender) => gender !== id);
+    } else {
+      newGenders.push(id);
+    }
+
+    setGenders(newGenders.length > 0 ? newGenders : undefined);
+  };
+
   if (!eventsLoading) {
     while (date < maxDate) {
       if (!groupedEvents[date.format(format)]) {
@@ -66,10 +97,45 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     }
   }
 
+  const initialRequest = async () => {
+    const filters = await AsyncStorage.getItem('@filters');
+    const parsedFilters = filters ? JSON.parse(filters) : {};
+
+    dispatch(
+      fetchUpcomingEvents({
+        schoolId,
+        level_id: parsedFilters.levels,
+        gender_id: parsedFilters.genders,
+      }),
+    );
+    setLevels(parsedFilters.levels);
+    setGenders(parsedFilters.genders);
+  };
+
   useEffect(() => {
-    dispatch(fetchUpcomingEvents({ schoolId }));
+    initialRequest();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onFilter = () => {
+    dispatch(
+      fetchUpcomingEvents({ schoolId, level_id: levels, gender_id: genders }),
+    );
+    AsyncStorage.setItem('@filters', JSON.stringify({ levels, genders }));
+    setFilter(undefined);
+  };
+
+  const subscribeToCalendar = async () => {
+    Linking.openURL(
+      `${config.baseUrl}/schools/${schoolId}/upcoming_events.ics?${qs.stringify(
+        {
+          level_id: levels,
+          gender_id: genders,
+        },
+        { arrayFormat: 'brackets' },
+      )}`,
+    );
+  };
 
   const renderEmptyDate = () => (
     <View style={styles.emptyDate}>
@@ -90,6 +156,10 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     }
   };
 
+  if (!school) return <LoadingScreen />;
+
+  const color = getColorByBackground(school.primary_color);
+
   return (
     <SafeAreaView
       style={{
@@ -100,6 +170,84 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
 
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
+        <View style={styles.filtersLabelContainer}>
+          <View style={styles.divider} />
+          <TouchableOpacity
+            onPress={() => setFilter(filter === 'level' ? undefined : 'level')}
+            style={[
+              styles.filterLabel,
+              { backgroundColor: school?.primary_color },
+            ]}>
+            <Text style={{ color }}>{levels ? 'Levels' : 'All Levels'}</Text>
+            {levels ? (
+              <View style={[styles.badge, { backgroundColor: color }]}>
+                <Text
+                  style={[styles.badgeText, { color: school?.primary_color }]}>
+                  {levels.length}
+                </Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              setFilter(filter === 'gender' ? undefined : 'gender')
+            }
+            style={[
+              styles.filterLabel,
+              { backgroundColor: school?.primary_color },
+            ]}>
+            <Text style={{ color }}>{genders ? 'Genders' : 'All Genders'}</Text>
+            {genders ? (
+              <View style={[styles.badge, { backgroundColor: color }]}>
+                <Text
+                  style={[styles.badgeText, { color: school?.primary_color }]}>
+                  {genders.length}
+                </Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <TouchableOpacity onPress={subscribeToCalendar}>
+              <FontAwesomeIcon
+                icon="calendar-plus"
+                color={school.primary_color}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        {filter ? (
+          <View style={styles.filterContainer}>
+            {typedKeys(filter === 'level' ? Level : Gender).map((label) => (
+              <TouchableOpacity
+                key={filter === 'level' ? Level[label] : Gender[label]}
+                style={styles.filter}
+                onPress={() =>
+                  filter === 'level'
+                    ? toggleLevel(Number(Level[label]))
+                    : toggleGender(Number(Gender[label]))
+                }>
+                <Text>{label}</Text>
+                {(
+                  filter === 'level'
+                    ? levels?.find((l) => l === Number(Level[label]))
+                    : genders?.find((g) => g === Number(Gender[label]))
+                ) ? (
+                  <FontAwesomeIcon icon="check" />
+                ) : null}
+              </TouchableOpacity>
+            ))}
+            <Button
+              onPress={onFilter}
+              style={{
+                backgroundColor: school.primary_color,
+                marginTop: 8,
+              }}>
+              Filter
+            </Button>
+          </View>
+        ) : null}
         <Agenda
           items={groupedEvents}
           selected={moment().format(format)}
@@ -226,6 +374,66 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 18,
+  },
+  filtersLabelContainer: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterLabel: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 5,
+    color: 'white',
+    fontSize: 12,
+    marginHorizontal: 5,
+    position: 'relative',
+  },
+  filterContainer: {
+    padding: 20,
+  },
+  filter: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    marginVertical: 5,
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  badge: {
+    width: 20,
+    height: 20,
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  badgeText: {
+    fontSize: 12,
+  },
+  divider: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
 });
 

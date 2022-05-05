@@ -69,7 +69,7 @@ const TeamHome = ({
   };
 
   const goToSchedule = () => {
-    navigation.navigate('TeamSchedule', { teamId });
+    navigation.navigate('TeamSchedule', { teamId, schoolId: school.id });
   };
 
   const refreshPosts = () => {

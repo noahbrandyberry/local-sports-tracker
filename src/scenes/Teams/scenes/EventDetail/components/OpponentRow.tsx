@@ -7,12 +7,20 @@ import { selectSchoolById } from '../../../../Schools/services/selectors';
 
 interface OpponentRowProps {
   index: number;
-  opponent: Team;
-  onPress: CallableFunction;
+  opponent?: Team;
+  opponentName?: string;
+  onPress?: CallableFunction;
 }
 
-const OpponentRow = ({ index, opponent, onPress }: OpponentRowProps) => {
-  const opponentSchool = useSelector(selectSchoolById(opponent?.school_id));
+const OpponentRow = ({
+  index,
+  opponent,
+  onPress = () => {},
+  opponentName,
+}: OpponentRowProps) => {
+  const opponentSchool = useSelector(
+    selectSchoolById(opponent?.school_id ?? 0),
+  );
 
   return (
     <TouchableOpacity
@@ -20,7 +28,11 @@ const OpponentRow = ({ index, opponent, onPress }: OpponentRowProps) => {
       onPress={() => onPress(opponent?.school_id)}
       disabled={opponentSchool?.visible ? false : true}>
       <Text style={styles.opponentsText}>
-        {opponentSchool ? opponentSchool.name : opponent.name}
+        {opponentSchool
+          ? opponentSchool.name
+          : opponent
+          ? opponent.name
+          : opponentName}
       </Text>
     </TouchableOpacity>
   );

@@ -9,6 +9,8 @@ export enum UpcomingEventActionTypes {
 
 export interface FetchUpcomingEventsRequest {
   schoolId: number;
+  level_id?: number[];
+  gender_id?: number[];
 }
 
 export interface GetUpcomingEvents {

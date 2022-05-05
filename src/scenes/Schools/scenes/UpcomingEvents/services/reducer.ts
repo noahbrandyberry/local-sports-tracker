@@ -19,7 +19,7 @@ export const upcomingEventsReducer = (
 ): UpcomingEventsState => {
   switch (action.type) {
     case UpcomingEventActionTypes.FETCH_UPCOMING_EVENTS:
-      return { ...state, error: null, loading: true };
+      return { ...state, error: null, loading: true, upcomingEvents: [] };
     case UpcomingEventActionTypes.FETCH_UPCOMING_EVENTS_SUCCESS:
       return { ...state, upcomingEvents: action.payload, loading: false };
     case UpcomingEventActionTypes.FETCH_UPCOMING_EVENTS_ERROR:

@@ -32,7 +32,7 @@ export const transformTeams = (teams: Team[]) => {
       .set(
         'year',
         team.season.end.month() >= team.year.start.month()
-          ? team.year.start.year()
+          ? team.season.start.year()
           : team.year.end.year(),
       );
 
