@@ -7,7 +7,7 @@ export const fetchSchools = () => ({
 
 export const fetchSchoolsSuccess = (
   data: School[],
-  defaultSchool: number | null,
+  defaultSchool: string | null,
 ) => ({
   type: SchoolActionTypes.FETCH_SCHOOLS_SUCCESS,
   payload: data,

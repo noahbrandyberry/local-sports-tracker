@@ -9,7 +9,7 @@ function* fetchSchools() {
     const { data } = yield call(constructApiRequest);
     const schoolId: string = yield call(AsyncStorage.getItem, '@defaultSchool');
 
-    yield put(fetchSchoolsSuccess(data, schoolId ? Number(schoolId) : null));
+    yield put(fetchSchoolsSuccess(data, schoolId || null));
   } catch (e) {
     yield put(fetchSchoolsError(e));
   }
