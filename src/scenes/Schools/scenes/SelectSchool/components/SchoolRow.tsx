@@ -30,7 +30,11 @@ const SchoolRow = ({
     <TouchableOpacity
       style={[styles.rowContainer, index > 0 ? styles.rowContainerBorder : {}]}
       onPress={() => onPress(school.id)}>
-      <FastImage source={{ uri: school.logo_url }} style={styles.logo} />
+      <FastImage
+        source={{ uri: school.logo_url }}
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <Text style={styles.name}>{school.name}</Text>
       {showDistance ? (
         <Text style={styles.distance}>{distance} miles</Text>
@@ -61,8 +65,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 30,
     marginRight: 10,
-    resizeMode: 'cover',
-    height: '100%',
+    height: 30,
   },
 });
 

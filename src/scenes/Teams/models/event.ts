@@ -15,6 +15,7 @@ export interface Event {
   home: boolean;
   canceled: boolean;
   postponed: boolean;
+  location_name?: string;
   location: Location;
   opponents: Team[];
   created_at: string;

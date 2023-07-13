@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Switch,
   ScrollView,
+  Alert,
 } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -212,7 +213,27 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               Subscribe to Push Notifications
             </Text>
             <Switch
-              onValueChange={onChangeDeviceSubscription}
+              onValueChange={(value) => {
+                if (value) {
+                  Alert.alert(
+                    `Subscribe to push notifications for all events?`,
+                    'If you only want to receive push notifications for a single team, you can do so under Team > Notify',
+                    [
+                      {
+                        text: 'No',
+                        style: 'destructive',
+                      },
+                      {
+                        text: 'Yes',
+                        style: 'default',
+                        onPress: () => onChangeDeviceSubscription(value),
+                      },
+                    ],
+                  );
+                } else {
+                  onChangeDeviceSubscription(value);
+                }
+              }}
               style={styles.boxShadow}
               trackColor={{
                 true: school.primary_color,

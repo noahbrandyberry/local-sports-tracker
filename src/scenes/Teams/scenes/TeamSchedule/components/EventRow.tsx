@@ -80,12 +80,12 @@ const EventRow = ({ event, onPress, itemStyles = {} }: EventRowProps) => {
       </View>
       <View style={styles.dateTimeLocationContainer}>
         <Text style={styles.dateTimeLocationText} numberOfLines={1}>
-          {event.location ? (
+          {event.location || event.location_name ? (
             <Text>
               <Text style={styles.homeAwayText}>
                 {event.home ? 'Home' : 'Away'}
               </Text>{' '}
-              - {event.location?.name}
+              - {event.location?.name || event.location_name}
             </Text>
           ) : (
             <Text>Location TBA</Text>

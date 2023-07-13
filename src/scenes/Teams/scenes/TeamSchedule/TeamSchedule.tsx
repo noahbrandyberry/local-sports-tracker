@@ -1,6 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, InvalidDataError, LoadingScreen } from 'components';
-import { StyleSheet, View, FlatList, RefreshControl } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  RefreshControl,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,6 +22,9 @@ import { fetchEvents } from './services/actions';
 import { Event } from 'teams/models';
 import { selectPosts } from '../TeamHome/services/selectors';
 import { selectSchoolTeamsLoading } from 'store/selectors';
+import config from 'src/config/config';
+import qs from 'qs';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 type TeamScheduleNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -40,6 +50,19 @@ const TeamSchedule = ({
 
   const dispatch = useDispatch();
   const listRef = useRef<FlatList>(null);
+
+  const subscribeToCalendar = async () => {
+    Linking.openURL(
+      `${config.baseUrl}/schools/${
+        team?.school_id
+      }/upcoming_events.ics?${qs.stringify(
+        {
+          team_id: teamId,
+        },
+        { arrayFormat: 'brackets' },
+      )}`,
+    );
+  };
 
   useEffect(() => {
     if (events.length > 0) {
@@ -127,7 +150,18 @@ const TeamSchedule = ({
       edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <Text style={styles.header}>{team.name}</Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>{team.name}</Text>
+          <View style={styles.divider}>
+            <TouchableOpacity onPress={subscribeToCalendar}>
+              <FontAwesomeIcon
+                icon="calendar-plus"
+                color={school.primary_color}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
         <FlatList
           keyExtractor={(item) => item.id.toString()}
           style={styles.scrollContainer}
@@ -178,6 +212,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 12,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+  },
+  divider: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   subHeader: {
     fontWeight: '500',

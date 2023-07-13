@@ -95,7 +95,9 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
         .clone()
         .add(2, 'hours')
         .format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
-      location: formatAddress(event.location),
+      location: event.location
+        ? formatAddress(event.location)
+        : event.location_name,
     };
 
     AddCalendarEvent.presentEventCreatingDialog(eventConfig)
@@ -239,7 +241,11 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
           <View style={[styles.well, styles.mapContainer]}>
             <View style={styles.locationContainer}>
               <Text style={styles.subHeader}>Location</Text>
-              <Text>No Location Found</Text>
+              {event.location_name ? (
+                <Text>{event.location_name}</Text>
+              ) : (
+                <Text>No Location Found</Text>
+              )}
             </View>
           </View>
         )}

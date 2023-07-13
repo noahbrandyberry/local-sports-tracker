@@ -2,8 +2,10 @@ import React from 'react';
 import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
 import {
   FlatList,
+  Linking,
   RefreshControl,
   StyleSheet,
+  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -23,6 +25,9 @@ import RenderHtml from 'react-native-render-html';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { selectSchoolTeamsLoading } from 'store/selectors';
+import config from 'src/config/config';
+import qs from 'qs';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 type TeamDetailNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -68,6 +73,19 @@ const TeamHome = ({
     nav.navigate('PostDetail', { postId, teamId: team.id });
   };
 
+  const subscribeToCalendar = async () => {
+    Linking.openURL(
+      `${config.baseUrl}/schools/${
+        school.id
+      }/upcoming_events.ics?${qs.stringify(
+        {
+          team_id: team.id,
+        },
+        { arrayFormat: 'brackets' },
+      )}`,
+    );
+  };
+
   const goToSchedule = () => {
     navigation.navigate('TeamSchedule', { teamId, schoolId: school.id });
   };
@@ -86,7 +104,19 @@ const TeamHome = ({
       edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <Text style={styles.header}>{team.name}</Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>{team.name}</Text>
+          <View style={styles.divider}>
+            <TouchableOpacity onPress={subscribeToCalendar}>
+              <FontAwesomeIcon
+                icon="calendar-plus"
+                color={school.primary_color}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={styles.contentContainer}>
           <FlatList
             ListHeaderComponent={
@@ -247,6 +277,15 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 24,
     padding: 20,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+  },
+  divider: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   header: {
     fontSize: 24,

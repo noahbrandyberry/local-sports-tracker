@@ -30,8 +30,11 @@ export const selectSeasons = createSelector(selectTeams, (teams) => {
   return seasons;
 });
 
-export const selectCurrentSeason = createSelector(selectSeasons, (seasons) =>
-  seasons.find((season) => moment().isBetween(season.start, season.end)),
+export const selectCurrentSeason = createSelector(
+  selectSeasons,
+  (seasons) =>
+    seasons.find((season) => moment().isBetween(season.start, season.end)) ??
+    seasons[0],
 );
 
 export const selectTeamsBySportId = (sportId: number) =>

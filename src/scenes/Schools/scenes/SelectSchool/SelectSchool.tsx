@@ -14,7 +14,7 @@ import {
   selectDefaultSchool,
   selectNearestSchools,
   selectSchoolsLoading,
-  selectValidSchools,
+  selectSchoolsWithDistance,
 } from 'schools/services/selectors';
 import SchoolRow from './components/SchoolRow';
 import { Text, TextField } from 'components';
@@ -33,7 +33,7 @@ type SelectSchoolProps = NativeStackScreenProps<
 >;
 
 const SelectSchool = ({ navigation }: SelectSchoolProps) => {
-  const schools = useSelector(selectValidSchools);
+  const schools = useSelector(selectSchoolsWithDistance);
   const loading = useSelector(selectSchoolsLoading);
   const nearestSchools = useSelector(selectNearestSchools).slice(0, 15);
   const currentLocationLoading = useSelector(selectCurrentLocationLoading);
@@ -116,7 +116,6 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
                     <SchoolRow
                       school={item}
                       index={index}
-                      showDistance={false}
                       onPress={onSelectSchool}
                     />
                   )}

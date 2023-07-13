@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Text, InvalidDataError, LoadingScreen } from 'components';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Text, InvalidDataError, LoadingScreen, Button } from 'components';
+import { Linking, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,6 +16,8 @@ import {
 } from 'services/deviceToken/selectors';
 import { saveDeviceToken } from 'services/deviceToken/actions';
 import { selectSchoolTeamsLoading } from 'store/selectors';
+import qs from 'qs';
+import config from 'src/config/config';
 
 type TeamNotifyProps = NativeStackScreenProps<
   TeamsNavigatorParams,
@@ -52,6 +54,19 @@ const TeamDonate = ({ route }: TeamNotifyProps) => {
   if (!team || !school) {
     return <InvalidDataError />;
   }
+
+  const subscribeToCalendar = async () => {
+    Linking.openURL(
+      `${config.baseUrl}/schools/${
+        school.id
+      }/upcoming_events.ics?${qs.stringify(
+        {
+          team_id: team.id,
+        },
+        { arrayFormat: 'brackets' },
+      )}`,
+    );
+  };
 
   const onChangeDeviceSubscription = (flag: boolean) => {
     setDeviceSubscribed(flag);
@@ -109,6 +124,21 @@ const TeamDonate = ({ route }: TeamNotifyProps) => {
                 value={deviceSubscribed}
               />
             </View>
+          </View>
+          <View style={styles.well}>
+            <Text style={styles.subHeader}>Calendar</Text>
+
+            <Button
+              onPress={subscribeToCalendar}
+              textStyle={{
+                color: getColorByBackground(school.primary_color),
+              }}
+              style={{
+                backgroundColor: school.primary_color,
+                marginTop: 12,
+              }}>
+              Subscribe to Team Calendar
+            </Button>
           </View>
         </ScrollView>
       </View>
