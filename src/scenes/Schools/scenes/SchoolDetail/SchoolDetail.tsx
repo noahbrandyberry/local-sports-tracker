@@ -37,6 +37,7 @@ import {
   selectTeamDeviceSubscriptions,
 } from 'services/deviceToken/selectors';
 import { saveDeviceToken } from 'services/deviceToken/actions';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -196,6 +197,39 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                   Email: {school.email}
                 </Text>
               ) : null}
+
+              <View style={styles.socialRow}>
+                {school.instagram_url && (
+                  <TouchableOpacity
+                    style={styles.socialIconContainer}
+                    onPress={() => Linking.openURL(school.instagram_url)}>
+                    <FontAwesomeIcon
+                      icon={['fab', 'instagram']}
+                      color={school.primary_color}
+                    />
+                  </TouchableOpacity>
+                )}
+                {school.twitter_url && (
+                  <TouchableOpacity
+                    style={styles.socialIconContainer}
+                    onPress={() => Linking.openURL(school.twitter_url)}>
+                    <FontAwesomeIcon
+                      icon={['fab', 'twitter']}
+                      color={school.primary_color}
+                    />
+                  </TouchableOpacity>
+                )}
+                {school.facebook_url && (
+                  <TouchableOpacity
+                    style={styles.socialIconContainer}
+                    onPress={() => Linking.openURL(school.facebook_url)}>
+                    <FontAwesomeIcon
+                      icon={['fab', 'facebook']}
+                      color={school.primary_color}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
 
             <FastImage
@@ -448,6 +482,14 @@ const styles = StyleSheet.create({
   alreadySubscribed: {
     fontSize: 15,
     fontWeight: '500',
+  },
+  socialRow: {
+    marginTop: 20,
+    flexDirection: 'row',
+    marginHorizontal: -10,
+  },
+  socialIconContainer: {
+    paddingHorizontal: 8,
   },
 });
 

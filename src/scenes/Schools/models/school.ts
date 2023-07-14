@@ -20,7 +20,9 @@ export interface School {
   blog: number;
   sportshub_version: number;
   version: number;
-  instagram: string;
+  instagram_url: string;
+  facebook_url: string;
+  twitter_url: string;
   onboarding: string;
   distance?: number;
   location?: Location;
