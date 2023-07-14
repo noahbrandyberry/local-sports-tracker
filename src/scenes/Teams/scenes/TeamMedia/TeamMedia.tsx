@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 import { selectSchoolTeamsLoading } from 'store/selectors';
+import ImageModal from 'react-native-image-modal';
 
 type TeamMediaProps = NativeStackScreenProps<TeamsNavigatorParams, 'TeamMedia'>;
 
@@ -38,7 +39,24 @@ const TeamMedia = ({ route }: TeamMediaProps) => {
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.well}>
             <Text style={styles.subHeader}>Media</Text>
-            <Text>No results found.</Text>
+
+            {team.images?.length ? (
+              <View style={styles.imagesRow}>
+                {team.images.map((image) => (
+                  <View style={styles.imageContainer} key={image.id}>
+                    <ImageModal
+                      style={styles.image}
+                      modalImageResizeMode={'contain'}
+                      source={{
+                        uri: image.url,
+                      }}
+                    />
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text>No results found.</Text>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -89,6 +107,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
     marginBottom: 4,
+  },
+  imagesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -10,
+  },
+  imageContainer: {
+    width: '50%',
+    padding: 10,
+  },
+  image: {
+    aspectRatio: 1,
+    width: '100%',
   },
 });
 

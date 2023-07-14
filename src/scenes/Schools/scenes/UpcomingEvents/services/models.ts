@@ -11,6 +11,7 @@ export interface FetchUpcomingEventsRequest {
   schoolId: number;
   level_id?: number[];
   gender_id?: number[];
+  sport_id?: number[];
 }
 
 export interface GetUpcomingEvents {

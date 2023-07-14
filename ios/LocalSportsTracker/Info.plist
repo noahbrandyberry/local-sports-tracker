@@ -41,6 +41,8 @@
 	<string>This app needs access to your calendar to add events</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs to get your location to find the nearest school</string>
+	<key>CodePushDeploymentKey</key>
+	<string>HhA2iJqFOAu_leHWal7Zc7mjMw8s8qwnkOFgt</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

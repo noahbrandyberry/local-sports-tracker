@@ -30,6 +30,7 @@
     "react-native": "0.67.0",
     "react-native-add-calendar-event": "^4.0.0",
     "react-native-calendars": "^1.1277.0",
+    "react-native-code-push": "^8.0.2",
     "react-native-fast-image": "^8.5.11",
     "react-native-gesture-handler": "^2.2.0",
     "react-native-get-location": "^2.2.1",

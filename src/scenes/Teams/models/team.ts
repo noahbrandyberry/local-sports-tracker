@@ -18,6 +18,16 @@ export interface Team {
   gender: Gender;
   sport: Sport;
   record?: Record;
+  images?: Image[];
+}
+
+interface Image {
+  id: string;
+  url: string;
+  description: string;
+  team_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Record {

@@ -4,6 +4,7 @@ import {
   FlatList,
   Linking,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
@@ -28,6 +29,8 @@ import { selectSchoolTeamsLoading } from 'store/selectors';
 import config from 'src/config/config';
 import qs from 'qs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { selectEvents } from '../TeamSchedule/services/selectors';
+import EventRow from '../TeamSchedule/components/EventRow';
 
 type TeamDetailNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -54,6 +57,10 @@ const TeamHome = ({
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const posts = useSelector(selectPosts);
   const loading = useSelector(selectSchoolTeamsLoading);
+  const events = useSelector(selectEvents);
+  const upcomingEvents = events.filter(
+    (event) => !event.start.clone().add(2, 'hours').isBefore(),
+  );
 
   const { width } = useWindowDimensions();
   const contentWidth = width - 40;
@@ -73,19 +80,6 @@ const TeamHome = ({
     nav.navigate('PostDetail', { postId, teamId: team.id });
   };
 
-  const subscribeToCalendar = async () => {
-    Linking.openURL(
-      `${config.baseUrl}/schools/${
-        school.id
-      }/upcoming_events.ics?${qs.stringify(
-        {
-          team_id: team.id,
-        },
-        { arrayFormat: 'brackets' },
-      )}`,
-    );
-  };
-
   const goToSchedule = () => {
     navigation.navigate('TeamSchedule', { teamId, schoolId: school.id });
   };
@@ -94,7 +88,24 @@ const TeamHome = ({
     dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
   };
 
-  const color = getColorByBackground(school.primary_color);
+  const onSelectEvent = (eventId: number) => {
+    const event = events.find((e) => e.id === eventId);
+    if (event?.start.clone().add(2, 'hours').isBefore()) {
+      const post = posts.find((p) => p.event_id === eventId);
+      if (post) {
+        return navigation.navigate('PostDetail', {
+          postId: post.id,
+          teamId: team.id,
+        });
+      }
+    }
+
+    navigation.navigate('EventDetail', {
+      teamId,
+      eventId,
+      schoolId: school?.id,
+    });
+  };
 
   return (
     <SafeAreaView
@@ -104,136 +115,79 @@ const TeamHome = ({
       edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <View style={styles.headerContainer}>
-          <Text style={styles.header}>{team.name}</Text>
-          <View style={styles.divider}>
-            <TouchableOpacity onPress={subscribeToCalendar}>
-              <FontAwesomeIcon
-                icon="calendar-plus"
-                color={school.primary_color}
-                size={20}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Text style={styles.header}>{team.name}</Text>
 
         <View style={styles.contentContainer}>
-          <FlatList
-            ListHeaderComponent={
-              <View>
-                <View style={styles.well}>
-                  <Text style={styles.subHeader}>Overview</Text>
-
-                  <Text>
-                    Overall Record:{' '}
-                    {team.record
-                      ? `${team.record.win} - ${team.record.loss}${
-                          team.record.tie ? `- ${team.record.tie}` : ''
-                        }`
-                      : 'N/A'}
-                  </Text>
-                  <View style={styles.overviewLabels}>
-                    <Text
-                      style={[
-                        styles.overviewLabel,
-                        { backgroundColor: school.primary_color, color },
-                      ]}>
-                      {team.sport.name}
-                    </Text>
-                    {team.level ? (
-                      <Text
-                        style={[
-                          styles.overviewLabel,
-                          { backgroundColor: school.primary_color, color },
-                        ]}>
-                        {team.level.name}
-                      </Text>
-                    ) : null}
-                    {!team.hide_gender && team.gender ? (
-                      <Text
-                        style={[
-                          styles.overviewLabel,
-                          { backgroundColor: school.primary_color, color },
-                        ]}>
-                        {team.gender.name}
-                      </Text>
-                    ) : null}
-                    <Text
-                      style={[
-                        styles.overviewLabel,
-                        { backgroundColor: school.primary_color, color },
-                      ]}>
-                      {team.season.name}
-                    </Text>
-                  </View>
-                </View>
-
-                {team.photo_url ? (
-                  <View style={styles.imageContainer}>
-                    <View style={styles.imageLoadingContainer}>
-                      <Text style={styles.imageLoadingText}>
-                        Image Loading...
-                      </Text>
-                    </View>
-                    <ImageModal
-                      style={styles.image}
-                      resizeMode="contain"
-                      source={{
-                        uri: team.photo_url,
-                      }}
-                    />
-                  </View>
-                ) : null}
-
-                {team.home_description ? (
-                  <View style={styles.htmlContainer}>
-                    <RenderHtml
-                      contentWidth={contentWidth}
-                      source={{ html: team.home_description }}
-                    />
-                  </View>
-                ) : null}
-
-                <Text style={[styles.subHeader, styles.newsSubHeader]}>
-                  Latest News
-                </Text>
-              </View>
-            }
-            keyExtractor={(item) => item.id}
+          <ScrollView
             style={styles.scrollContainer}
-            data={posts}
             contentInset={{ bottom: 20 }}
-            ListEmptyComponent={
-              postsLoading ? (
-                <View />
-              ) : (
-                <View>
-                  <Text>No news found.</Text>
-
-                  <Button
-                    onPress={goToSchedule}
-                    textStyle={{
-                      color: getColorByBackground(school.primary_color),
-                    }}
-                    style={{
-                      backgroundColor: school.primary_color,
-                      marginTop: 12,
-                    }}>
-                    View Schedule
-                  </Button>
-                </View>
-              )
-            }
             refreshControl={
               <RefreshControl
                 refreshing={postsLoading}
                 onRefresh={refreshPosts}
               />
-            }
-            renderItem={({ item }) => (
-              <PostRow post={item} onPress={onSelectPost} />
-            )}
-          />
+            }>
+            {team.record ? (
+              <Text>
+                Overall Record:{' '}
+                {`${team.record.win} - ${team.record.loss}${
+                  team.record.tie ? `- ${team.record.tie}` : ''
+                }`}
+              </Text>
+            ) : null}
+
+            {team.photo_url ? (
+              <View style={styles.imageContainer}>
+                <View style={styles.imageLoadingContainer}>
+                  <Text style={styles.imageLoadingText}>Image Loading...</Text>
+                </View>
+                <ImageModal
+                  style={styles.image}
+                  resizeMode="contain"
+                  source={{
+                    uri: team.photo_url,
+                  }}
+                />
+              </View>
+            ) : null}
+
+            {team.home_description ? (
+              <View style={styles.htmlContainer}>
+                <RenderHtml
+                  contentWidth={contentWidth}
+                  source={{ html: team.home_description }}
+                />
+              </View>
+            ) : null}
+            {posts.length > 0 ? (
+              <>
+                <Text style={[styles.subHeader, styles.newsSubHeader]}>
+                  Latest News
+                </Text>
+                <PostRow post={posts[0]} onPress={onSelectPost} />
+              </>
+            ) : null}
+
+            {upcomingEvents.length > 0 ? (
+              <>
+                <Text style={[styles.subHeader, styles.newsSubHeader]}>
+                  Next Event
+                </Text>
+                <EventRow event={upcomingEvents[0]} onPress={onSelectEvent} />
+                <Button
+                  onPress={goToSchedule}
+                  textStyle={{
+                    color: getColorByBackground(school.primary_color),
+                  }}
+                  style={{
+                    backgroundColor: school.primary_color,
+                    marginTop: 12,
+                  }}>
+                  View Full Schedule
+                </Button>
+              </>
+            ) : null}
+          </ScrollView>
         </View>
       </View>
     </SafeAreaView>

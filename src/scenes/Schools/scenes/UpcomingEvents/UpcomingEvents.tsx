@@ -15,7 +15,7 @@ import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import groupBy from 'lodash/groupBy';
 import moment from 'moment';
-import { Event } from 'teams/models';
+import { Event, Sport } from 'teams/models';
 import EventRow from 'teams/scenes/TeamSchedule/components/EventRow';
 import { fetchEvents } from 'teams/scenes/TeamSchedule/services/actions';
 import { selectTeams } from 'teams/services/selectors';
@@ -30,6 +30,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Gender } from 'teams/enums/gender';
 import config from 'src/config/config';
 import qs from 'qs';
+import uniqBy from 'lodash/uniqBy';
 
 type UpcomingEventsProps = NativeStackScreenProps<
   RootStackParamList,
@@ -43,8 +44,13 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   const [filter, setFilter] = useState<string>();
   const [levels, setLevels] = useState<number[]>();
   const [genders, setGenders] = useState<number[]>();
+  const [sports, setSports] = useState<number[]>();
   const events = useSelector(selectUpcomingEvents);
   const teams = useSelector(selectTeams);
+  const availableSports = uniqBy(
+    teams.map((team) => team.sport),
+    'name',
+  );
   const school = useSelector(selectSchoolById(schoolId));
   const calendarColor =
     school && getColorByBackground(school.primary_color) === 'white'
@@ -61,6 +67,9 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     })),
     (event) => event.start.format(format),
   );
+  const firstDate = Object.entries(groupedEvents).filter(
+    (e) => e[1].length > 0,
+  )[0]?.[0];
 
   const minDate = moment().subtract(8, 'months');
   const maxDate = moment().add(8, 'months');
@@ -88,6 +97,17 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     setGenders(newGenders.length > 0 ? newGenders : undefined);
   };
 
+  const toggleSport = (id: number) => {
+    let newSports = sports ? [...sports] : [];
+    if (newSports.find((sport) => sport === id)) {
+      newSports = newSports.filter((sport) => sport !== id);
+    } else {
+      newSports.push(id);
+    }
+
+    setSports(newSports.length > 0 ? newSports : undefined);
+  };
+
   if (!eventsLoading) {
     while (date < maxDate) {
       if (!groupedEvents[date.format(format)]) {
@@ -106,10 +126,12 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
         schoolId,
         level_id: parsedFilters.levels,
         gender_id: parsedFilters.genders,
+        sport_id: parsedFilters.sports,
       }),
     );
     setLevels(parsedFilters.levels);
     setGenders(parsedFilters.genders);
+    setSports(parsedFilters.sports);
   };
 
   useEffect(() => {
@@ -119,9 +141,17 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
 
   const onFilter = () => {
     dispatch(
-      fetchUpcomingEvents({ schoolId, level_id: levels, gender_id: genders }),
+      fetchUpcomingEvents({
+        schoolId,
+        level_id: levels,
+        gender_id: genders,
+        sport_id: sports,
+      }),
     );
-    AsyncStorage.setItem('@filters', JSON.stringify({ levels, genders }));
+    AsyncStorage.setItem(
+      '@filters',
+      JSON.stringify({ levels, genders, sports }),
+    );
     setFilter(undefined);
   };
 
@@ -131,6 +161,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
         {
           level_id: levels,
           gender_id: genders,
+          sport_id: sports,
         },
         { arrayFormat: 'brackets' },
       )}`,
@@ -206,6 +237,22 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
               </View>
             ) : null}
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setFilter(filter === 'sport' ? undefined : 'sport')}
+            style={[
+              styles.filterLabel,
+              { backgroundColor: school?.primary_color },
+            ]}>
+            <Text style={{ color }}>{sports ? 'Sports' : 'All Sports'}</Text>
+            {sports ? (
+              <View style={[styles.badge, { backgroundColor: color }]}>
+                <Text
+                  style={[styles.badgeText, { color: school?.primary_color }]}>
+                  {sports.length}
+                </Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
 
           <View style={styles.divider}>
             <TouchableOpacity onPress={subscribeToCalendar}>
@@ -219,27 +266,64 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
         </View>
         {filter ? (
           <View style={styles.filterContainer}>
-            {typedKeys(filter === 'level' ? Level : Gender).map((label) => (
-              <TouchableOpacity
-                key={filter === 'level' ? Level[label] : Gender[label]}
-                style={styles.filter}
-                onPress={() =>
-                  filter === 'level'
-                    ? toggleLevel(Number(Level[label]))
-                    : toggleGender(Number(Gender[label]))
-                }>
-                <Text>{label}</Text>
-                {(
-                  filter === 'level'
-                    ? levels?.find((l) => l === Number(Level[label]))
-                    : genders?.find((g) => g === Number(Gender[label]))
-                ) ? (
-                  <FontAwesomeIcon icon="check" />
-                ) : null}
-              </TouchableOpacity>
-            ))}
+            <View style={styles.filters}>
+              {(filter === 'sport'
+                ? availableSports
+                : typedKeys(filter === 'level' ? Level : Gender)
+              ).map((item: Sport) => {
+                let label = item as unknown as string;
+                let setter = toggleSport;
+                let value = 0;
+                let data = sports;
+
+                switch (filter) {
+                  case 'level':
+                    setter = toggleLevel;
+                    value = Number(Level[label as never]);
+                    data = levels;
+                    break;
+                  case 'gender':
+                    setter = toggleGender;
+                    value = Number(Gender[label as never]);
+                    data = genders;
+                    break;
+                  case 'sport':
+                  default:
+                    value = item.id;
+                    setter = toggleSport;
+                    label = item.name;
+                    data = sports;
+                }
+                const selected = data?.find((x) => x === value);
+
+                return (
+                  <TouchableOpacity
+                    key={value}
+                    style={[
+                      styles.filter,
+                      selected
+                        ? {
+                            borderColor: school.primary_color,
+                          }
+                        : {},
+                    ]}
+                    onPress={() => setter(value)}>
+                    <Text
+                      style={[
+                        styles.filterText,
+                        selected ? { fontWeight: 'bold' } : {},
+                      ]}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
             <Button
               onPress={onFilter}
+              textStyle={{
+                color: getColorByBackground(school.primary_color),
+              }}
               style={{
                 backgroundColor: school.primary_color,
                 marginTop: 8,
@@ -248,104 +332,107 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
             </Button>
           </View>
         ) : null}
-        <Agenda
-          items={groupedEvents}
-          selected={moment().format(format)}
-          renderItem={(event: unknown) => {
-            const e = event as Event;
-            const team = teams.find((t) => t.id === e.selected_team_id);
-            const name: keyof typeof SportIcons | undefined = team?.sport.name;
-            const icon =
-              team?.sport.name && team?.sport.name in SportIcons && name
-                ? SportIcons[name]
-                : null;
-            return (
-              <View
-                style={{
-                  marginTop: 12,
-                  marginBottom: -12,
-                  marginRight: 20,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 4,
-                  elevation: 5,
-                }}>
-                {team && school ? (
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate({
-                        name: 'TeamDetail',
-                        params: {
-                          teamId: team.id,
-                          schoolId,
-                          initialRouteName: 'TeamSchedule',
-                        },
-                      })
-                    }
-                    style={{
-                      backgroundColor: school.primary_color,
-                      paddingHorizontal: 15,
-                      paddingVertical: 10,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      borderBottomColor: getColorByBackground(
-                        school.primary_color,
-                      ),
-                      borderBottomWidth: 1,
-                    }}>
-                    <Text
+        {firstDate && (
+          <Agenda
+            items={groupedEvents}
+            selected={firstDate}
+            renderItem={(event: unknown) => {
+              const e = event as Event;
+              const team = teams.find((t) => t.id === e.selected_team_id);
+              const name: keyof typeof SportIcons | undefined =
+                team?.sport.name;
+              const icon =
+                team?.sport.name && team?.sport.name in SportIcons && name
+                  ? SportIcons[name]
+                  : null;
+              return (
+                <View
+                  style={{
+                    marginTop: 12,
+                    marginBottom: -12,
+                    marginRight: 20,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}>
+                  {team && school ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate({
+                          name: 'TeamDetail',
+                          params: {
+                            teamId: team.id,
+                            schoolId,
+                            initialRouteName: 'TeamSchedule',
+                          },
+                        })
+                      }
                       style={{
-                        color: getColorByBackground(school.primary_color),
-                        fontWeight: 'bold',
+                        backgroundColor: school.primary_color,
+                        paddingHorizontal: 15,
+                        paddingVertical: 10,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        borderBottomColor: getColorByBackground(
+                          school.primary_color,
+                        ),
+                        borderBottomWidth: 1,
                       }}>
-                      {team.name}
-                    </Text>
-                    {icon ? (
-                      <FontAwesomeIcon
-                        icon={icon}
-                        color={getColorByBackground(school.primary_color)}
-                      />
-                    ) : null}
-                  </TouchableOpacity>
-                ) : null}
-                <EventRow
-                  itemStyles={{
-                    borderRadius: 0,
-                    paddingTop: 8,
-                    shadowColor: 'transparent',
-                  }}
-                  event={event as Event}
-                  onPress={(id: number) => goToEventDetail(id)}
-                  key={(event as Event).id}
-                />
-              </View>
-            );
-          }}
-          renderEmptyDate={renderEmptyDate}
-          rowHasChanged={(a: unknown, b: unknown) =>
-            (a as Event).id !== (b as Event).id
-          }
-          pastScrollRange={8}
-          futureScrollRange={8}
-          showClosingKnob={true}
-          minDate={minDate.format(format)}
-          maxDate={maxDate.format(format)}
-          renderKnob={() => <View style={styles.modalDragBar} />}
-          contentContainerStyle={{ paddingTop: 20 }}
-          theme={{
-            calendarBackground: DefaultTheme.colors.background,
-            textDisabledColor: 'darkgray',
-            textColor: 'black',
-            dotColor: calendarColor,
-            selectedDayBackgroundColor: calendarColor,
-            todayTextColor: calendarColor,
-            agendaTodayColor: calendarColor,
-          }}
-        />
+                      <Text
+                        style={{
+                          color: getColorByBackground(school.primary_color),
+                          fontWeight: 'bold',
+                        }}>
+                        {team.name}
+                      </Text>
+                      {icon ? (
+                        <FontAwesomeIcon
+                          icon={icon}
+                          color={getColorByBackground(school.primary_color)}
+                        />
+                      ) : null}
+                    </TouchableOpacity>
+                  ) : null}
+                  <EventRow
+                    itemStyles={{
+                      borderRadius: 0,
+                      paddingTop: 8,
+                      shadowColor: 'transparent',
+                    }}
+                    event={event as Event}
+                    onPress={(id: number) => goToEventDetail(id)}
+                    key={(event as Event).id}
+                  />
+                </View>
+              );
+            }}
+            renderEmptyDate={renderEmptyDate}
+            rowHasChanged={(a: unknown, b: unknown) =>
+              (a as Event).id !== (b as Event).id
+            }
+            pastScrollRange={8}
+            futureScrollRange={8}
+            showClosingKnob={true}
+            minDate={minDate.format(format)}
+            maxDate={maxDate.format(format)}
+            renderKnob={() => <View style={styles.modalDragBar} />}
+            contentContainerStyle={{ paddingTop: 20 }}
+            theme={{
+              calendarBackground: DefaultTheme.colors.background,
+              textDisabledColor: 'darkgray',
+              textColor: 'black',
+              dotColor: calendarColor,
+              selectedDayBackgroundColor: calendarColor,
+              todayTextColor: calendarColor,
+              agendaTodayColor: calendarColor,
+            }}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -392,8 +479,13 @@ const styles = StyleSheet.create({
   filterContainer: {
     padding: 20,
   },
+  filters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
   filter: {
     backgroundColor: 'white',
+    marginRight: 10,
     borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: {
@@ -404,11 +496,15 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     marginVertical: 5,
-    padding: 15,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderWidth: 2,
+    borderColor: 'white',
   },
+  filterText: {},
   badge: {
     width: 20,
     height: 20,
