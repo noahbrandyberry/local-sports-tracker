@@ -35,7 +35,9 @@ const TeamMedia = ({ route }: TeamMediaProps) => {
       edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <Text style={styles.header}>{team.name}</Text>
+        <Text style={styles.header} numberOfLines={1}>
+          {team.name}
+        </Text>
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.well}>
             <Text style={styles.subHeader}>Media</Text>
@@ -102,6 +104,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 12,
+    paddingHorizontal: 20,
   },
   subHeader: {
     fontWeight: '500',

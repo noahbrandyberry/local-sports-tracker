@@ -4,13 +4,12 @@ import {
   StyleSheet,
   View,
   FlatList,
-  RefreshControl,
   Linking,
   TouchableOpacity,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { DefaultTheme, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
@@ -18,7 +17,6 @@ import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 import { selectEvents, selectEventsLoading } from './services/selectors';
 import EventRow from './components/EventRow';
 import RootStackParamList from 'src/RootStackParams';
-import { fetchEvents } from './services/actions';
 import { Event } from 'teams/models';
 import { selectPosts } from '../TeamHome/services/selectors';
 import { selectSchoolTeamsLoading } from 'store/selectors';
@@ -48,7 +46,6 @@ const TeamSchedule = ({
   const events = useSelector(selectEvents);
   const posts = useSelector(selectPosts);
 
-  const dispatch = useDispatch();
   const listRef = useRef<FlatList>(null);
 
   const subscribeToCalendar = async () => {
@@ -87,10 +84,6 @@ const TeamSchedule = ({
   if (!team || !school) {
     return <InvalidDataError />;
   }
-
-  const refreshSchedule = () => {
-    dispatch(fetchEvents({ teamId, schoolId: school?.id || 0 }));
-  };
 
   const onSelectEvent = (eventId: number) => {
     const event = events.find((e) => e.id === eventId);
@@ -151,7 +144,9 @@ const TeamSchedule = ({
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
         <View style={styles.headerContainer}>
-          <Text style={styles.header}>{team.name}</Text>
+          <Text style={styles.header} numberOfLines={1}>
+            {team.name}
+          </Text>
           <View style={styles.divider}>
             <TouchableOpacity onPress={subscribeToCalendar}>
               <FontAwesomeIcon
@@ -166,18 +161,11 @@ const TeamSchedule = ({
           keyExtractor={(item) => item.id.toString()}
           style={styles.scrollContainer}
           data={events}
-          contentInset={{ bottom: 32 }}
           ref={listRef}
           ListEmptyComponent={
             scheduleLoading ? <View /> : <Text>No events found.</Text>
           }
           getItemLayout={calculateItemLayout}
-          refreshControl={
-            <RefreshControl
-              refreshing={scheduleLoading}
-              onRefresh={refreshSchedule}
-            />
-          }
           renderItem={({ item }) => (
             <EventRow event={item} onPress={onSelectEvent} />
           )}
@@ -211,16 +199,18 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 12,
+    flex: 1,
   },
   headerContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
+    marginBottom: 12,
   },
   divider: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    paddingLeft: 10,
   },
   subHeader: {
     fontWeight: '500',

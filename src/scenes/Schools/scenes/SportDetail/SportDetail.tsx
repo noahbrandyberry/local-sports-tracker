@@ -68,9 +68,8 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
         <TouchableOpacity
           style={styles.backContainer}
           onPress={goBack}
-          hitSlop={{ top: 15, bottom: 15, left: 15 }}>
+          hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
           <FontAwesomeIcon icon="angle-left" size={15} color={color} />
-          <Text style={[styles.backText, { color }]}>Back</Text>
         </TouchableOpacity>
         <Text style={[styles.title, { color }]}>{sport.name} Teams</Text>
         <View style={styles.backContainer} />

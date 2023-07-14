@@ -1,34 +1,31 @@
 import React from 'react';
 import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
 import {
-  FlatList,
-  Linking,
-  RefreshControl,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
-import { useDispatch, useSelector } from 'react-redux';
-import { DefaultTheme, RouteProp } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import {
+  DefaultTheme,
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
-import { selectPosts, selectPostsLoading } from './services/selectors';
+import { selectPosts } from './services/selectors';
 import PostRow from './components';
 import RootStackParamList from 'src/RootStackParams';
-import { fetchPosts } from './services/actions';
 import ImageModal from 'react-native-image-modal';
 import RenderHtml from 'react-native-render-html';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { selectSchoolTeamsLoading } from 'store/selectors';
-import config from 'src/config/config';
-import qs from 'qs';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { selectEvents } from '../TeamSchedule/services/selectors';
 import EventRow from '../TeamSchedule/components/EventRow';
 
@@ -51,8 +48,8 @@ const TeamHome = ({
   route: TeamHomeRouteProp;
   navigation: TeamHomeNavigationProp;
 }) => {
+  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
   const { teamId } = route.params;
-  const postsLoading = useSelector(selectPostsLoading);
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || 0));
   const posts = useSelector(selectPosts);
@@ -65,8 +62,6 @@ const TeamHome = ({
   const { width } = useWindowDimensions();
   const contentWidth = width - 40;
 
-  const dispatch = useDispatch();
-
   if (loading) {
     return <LoadingScreen />;
   }
@@ -76,16 +71,11 @@ const TeamHome = ({
   }
 
   const onSelectPost = (postId: string) => {
-    const nav = navigation as unknown as TeamDetailNavigationProp;
-    nav.navigate('PostDetail', { postId, teamId: team.id });
+    navigate('PostDetail', { postId, teamId: team.id });
   };
 
   const goToSchedule = () => {
     navigation.navigate('TeamSchedule', { teamId, schoolId: school.id });
-  };
-
-  const refreshPosts = () => {
-    dispatch(fetchPosts({ teamId, schoolId: school?.id || 0 }));
   };
 
   const onSelectEvent = (eventId: number) => {
@@ -93,14 +83,14 @@ const TeamHome = ({
     if (event?.start.clone().add(2, 'hours').isBefore()) {
       const post = posts.find((p) => p.event_id === eventId);
       if (post) {
-        return navigation.navigate('PostDetail', {
+        return navigate('PostDetail', {
           postId: post.id,
           teamId: team.id,
         });
       }
     }
 
-    navigation.navigate('EventDetail', {
+    navigate('EventDetail', {
       teamId,
       eventId,
       schoolId: school?.id,
@@ -115,18 +105,14 @@ const TeamHome = ({
       edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <Text style={styles.header}>{team.name}</Text>
+        <Text style={styles.header} numberOfLines={1}>
+          {team.name}
+        </Text>
 
         <View style={styles.contentContainer}>
           <ScrollView
             style={styles.scrollContainer}
-            contentInset={{ bottom: 20 }}
-            refreshControl={
-              <RefreshControl
-                refreshing={postsLoading}
-                onRefresh={refreshPosts}
-              />
-            }>
+            contentInset={{ bottom: 20 }}>
             {team.record ? (
               <Text>
                 Overall Record:{' '}
@@ -234,21 +220,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     padding: 20,
   },
-  headerContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-  },
-  divider: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
   header: {
     fontSize: 24,
     lineHeight: 32,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 12,
+    paddingHorizontal: 20,
   },
   subHeader: {
     fontWeight: '500',
