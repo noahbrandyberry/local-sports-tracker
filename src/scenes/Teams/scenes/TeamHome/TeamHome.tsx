@@ -186,7 +186,9 @@ const TeamHome = ({
                   View Full Schedule
                 </Button>
               </>
-            ) : null}
+            ) : (
+              <Text style={styles.center}>No Upcoming Events</Text>
+            )}
           </ScrollView>
         </View>
       </View>
@@ -275,7 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   imageContainer: {
-    marginBottom: 10,
+    marginBottom: 20,
     position: 'relative',
   },
   image: {
@@ -297,6 +299,9 @@ const styles = StyleSheet.create({
   },
   newsSubHeader: {
     marginBottom: 8,
+  },
+  center: {
+    textAlign: 'center',
   },
 });
 
