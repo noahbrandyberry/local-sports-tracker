@@ -38,13 +38,3 @@ export type UpcomingEventsAction =
   | GetUpcomingEventsSuccess
   | GetUpcomingEventsError
   | ResetUpcomingEvents;
-
-export const SortedGenders = ['Boys', 'Girls', 'Coed'];
-export const SortedLevels = [
-  'Varsity',
-  'Junior Varsity',
-  'Middle School',
-  'Freshman',
-  '7th Grade',
-  '8th Grade',
-];

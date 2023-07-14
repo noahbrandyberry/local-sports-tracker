@@ -40,8 +40,12 @@ export const SortedGenders = ['Boys', 'Girls', 'Coed'];
 export const SortedLevels = [
   'Varsity',
   'Junior Varsity',
-  'Middle School',
+  'B Squad',
   'Freshman',
+  'Sophomore',
+  'Middle School',
   '7th Grade',
   '8th Grade',
+  'Youth',
+  'Unified',
 ];

@@ -69,9 +69,8 @@ const TeamSchedule = ({
 
       if (index >= 0) {
         listRef.current?.scrollToIndex({
-          index: index,
+          index,
           animated: true,
-          viewOffset: -16,
         });
       }
     }
@@ -111,8 +110,8 @@ const TeamSchedule = ({
   ) => {
     const displayedEvents = data as Event[];
     const heights = displayedEvents.map((event) => {
-      let height = 104;
-      if (event.opponents[0]) {
+      let height = 108;
+      if (event.opponents[0] || event.opponent_name) {
         height += 24;
       }
       if (
@@ -158,6 +157,7 @@ const TeamSchedule = ({
           </View>
         </View>
         <FlatList
+          contentInset={{ bottom: 32 }}
           keyExtractor={(item) => item.id.toString()}
           style={styles.scrollContainer}
           data={events}
@@ -167,7 +167,11 @@ const TeamSchedule = ({
           }
           getItemLayout={calculateItemLayout}
           renderItem={({ item }) => (
-            <EventRow event={item} onPress={onSelectEvent} />
+            <EventRow
+              event={item}
+              onPress={onSelectEvent}
+              itemStyles={styles.eventRow}
+            />
           )}
         />
       </View>
@@ -190,7 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   scrollContainer: {
-    padding: 20,
+    paddingHorizontal: 20,
     paddingBottom: 0,
     flex: 1,
   },
@@ -216,6 +220,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
     marginBottom: 4,
+  },
+  eventRow: {
+    marginBottom: 10,
+    marginTop: 6,
   },
 });
 
