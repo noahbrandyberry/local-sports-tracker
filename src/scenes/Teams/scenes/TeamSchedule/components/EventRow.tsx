@@ -110,7 +110,9 @@ const EventRow = ({ event, onPress, itemStyles = {} }: EventRowProps) => {
       ) : teamResult ? (
         <Text style={styles.resultsText}>
           {ordinalize(teamResult.place)} Place
-          <Text style={styles.scoreText}> - {teamResult.points} Points</Text>
+          {teamResult.points && (
+            <Text style={styles.scoreText}> - {teamResult.points} Points</Text>
+          )}
         </Text>
       ) : null}
     </TouchableOpacity>

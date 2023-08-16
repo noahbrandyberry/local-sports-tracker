@@ -4,6 +4,7 @@ import { Text } from 'components';
 import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { selectSchools } from 'schools/services/selectors';
+import { ordinalize } from '../../../../../utils/ordinalize';
 
 interface TeamResultsProps {
   teamResults: TeamResult[];
@@ -33,19 +34,21 @@ export const TeamResults = ({ teamResults }: TeamResultsProps) => {
           <Text style={[styles.headerCell, styles.cell]}>Place</Text>
           {teamResults.map((result, index) => (
             <Text key={index} style={styles.cell}>
-              {result.place}
+              {ordinalize(result.place)}
             </Text>
           ))}
         </View>
 
-        <View style={styles.column}>
-          <Text style={[styles.headerCell, styles.cell]}>Points</Text>
-          {teamResults.map((result, index) => (
-            <Text key={index} style={styles.cell}>
-              {result.points}
-            </Text>
-          ))}
-        </View>
+        {teamResults.some((result) => result.points) ? (
+          <View style={styles.column}>
+            <Text style={[styles.headerCell, styles.cell]}>Points</Text>
+            {teamResults.map((result, index) => (
+              <Text key={index} style={styles.cell}>
+                {result.points}
+              </Text>
+            ))}
+          </View>
+        ) : null}
       </View>
     </View>
   );

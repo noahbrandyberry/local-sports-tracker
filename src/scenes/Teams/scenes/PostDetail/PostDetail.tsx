@@ -1,6 +1,12 @@
 import React from 'react';
 import { Text, InvalidDataError } from 'components';
-import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import {
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSelector } from 'react-redux';
@@ -17,6 +23,7 @@ import { selectTeamById } from '../../services/selectors';
 import ImageModal from 'react-native-image-modal';
 import isEmpty from 'lodash/isEmpty';
 import { selectSchoolById } from '../../../Schools/services/selectors';
+import RenderHtml from 'react-native-render-html';
 
 type PostDetailProps = NativeStackScreenProps<RootStackParamList, 'PostDetail'>;
 
@@ -27,6 +34,8 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id ?? 0));
   const event = useSelector(selectEventById(post?.event_id || 0));
+  const { width } = useWindowDimensions();
+  const contentWidth = width - 40;
 
   if (!post) {
     return <InvalidDataError />;
@@ -34,6 +43,13 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
 
   const recap = post.recap as RecapType;
   const boxscore = post.boxscore as BoxScoreType;
+  const date = post.submitted ?? post.created;
+
+  const meta = [
+    isEmpty(post.submitted_by) ? post.submitted_by : post.created_by,
+    date?.isValid() ? date.format('MMMM D') : null,
+    event ? ' ' : null,
+  ].filter((m) => m);
 
   return (
     <SafeAreaView
@@ -47,27 +63,20 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
 
         <Text style={styles.header}>{post.title}</Text>
         <Text style={styles.authorDate}>
-          {isEmpty(post.submitted_by) ? post.submitted_by : post.created_by} • 
-          {(post.submitted ? post.submitted : post.created).format('MMMM D')}
+          {meta.join(' • ')}
           {event ? (
-            <Text>
-              {' '}
-              • 
-              <Text
-                style={styles.viewEvent}
-                onPress={() =>
-                  navigation.navigate('EventDetail', {
-                    teamId,
-                    eventId: event.id,
-                    schoolId: school?.id ?? 0,
-                  })
-                }>
-                View Event
-              </Text>
+            <Text
+              style={styles.viewEvent}
+              onPress={() =>
+                navigation.navigate('EventDetail', {
+                  teamId,
+                  eventId: event.id,
+                  schoolId: school?.id ?? 0,
+                })
+              }>
+              View Event
             </Text>
-          ) : (
-            ''
-          )}
+          ) : null}
         </Text>
 
         {post.featured_image ? (
@@ -83,7 +92,12 @@ const SportDetail = ({ route, navigation }: PostDetailProps) => {
         <Result event={event} team={team} />
         <BoxScore boxscore={boxscore} />
         <TeamResults teamResults={event?.team_results ?? []} />
-        <Text>{recap?.Summary}</Text>
+        {recap?.Summary ? (
+          <RenderHtml
+            contentWidth={contentWidth}
+            source={{ html: recap?.Summary }}
+          />
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

@@ -6,7 +6,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
 import { useSelector } from 'react-redux';
 import {
@@ -28,11 +27,6 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { selectSchoolTeamsLoading } from 'store/selectors';
 import { selectEvents } from '../TeamSchedule/services/selectors';
 import EventRow from '../TeamSchedule/components/EventRow';
-
-type TeamDetailNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'TeamDetail'
->;
 
 type TeamHomeNavigationProp = BottomTabNavigationProp<
   TeamsNavigatorParams,
@@ -113,15 +107,6 @@ const TeamHome = ({
           <ScrollView
             style={styles.scrollContainer}
             contentInset={{ bottom: 20 }}>
-            {team.record ? (
-              <Text>
-                Overall Record:{' '}
-                {`${team.record.win} - ${team.record.loss}${
-                  team.record.tie ? `- ${team.record.tie}` : ''
-                }`}
-              </Text>
-            ) : null}
-
             {team.photo_url ? (
               <View style={styles.imageContainer}>
                 <View style={styles.imageLoadingContainer}>
@@ -135,6 +120,15 @@ const TeamHome = ({
                   }}
                 />
               </View>
+            ) : null}
+
+            {team.record ? (
+              <Text style={{ marginBottom: 16 }}>
+                Overall Record:{' '}
+                {`${team.record.win} - ${team.record.loss}${
+                  team.record.tie ? `- ${team.record.tie}` : ''
+                }`}
+              </Text>
             ) : null}
 
             {team.home_description ? (

@@ -18,10 +18,13 @@ const PostRow = ({ post, onPress }: PostRowProps) => (
       <FastImage source={{ uri: post.featured_image }} style={styles.image} />
     ) : null}
     <Text style={styles.name}>{post.title}</Text>
-    <Text>
-      By {isEmpty(post.submitted_by) ? post.submitted_by : post.created_by} on{' '}
-      {(post.submitted ? post.submitted : post.created).format('MMMM D')}
-    </Text>
+    {post.submitted_by ||
+      (post.created_by && (
+        <Text style={styles.meta}>
+          By {isEmpty(post.submitted_by) ? post.submitted_by : post.created_by}{' '}
+          on {(post.submitted ? post.submitted : post.created).format('MMMM D')}
+        </Text>
+      ))}
   </TouchableOpacity>
 );
 
@@ -37,7 +40,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    marginBottom: 12,
+    marginBottom: 24,
     padding: 15,
   },
   image: {
@@ -49,7 +52,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 20,
-    marginBottom: 10,
+  },
+  meta: {
+    marginTop: 10,
   },
 });
 
