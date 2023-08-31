@@ -16,6 +16,11 @@ type RootStackParamList = {
     eventId: string;
     openDirections?: boolean;
   };
+  PlayerDetail: {
+    schoolId: string;
+    teamId: string;
+    playerId: number;
+  };
   PostDetail: { postId: string; teamId: string };
   UpcomingEvents: { schoolId: string };
 };

@@ -5,6 +5,7 @@ import SelectSchool from 'schools/scenes/SelectSchool';
 import SchoolsList from 'schools/scenes/SchoolsList';
 import SchoolDetail from 'schools/scenes/SchoolDetail';
 import SportDetail from 'schools/scenes/SportDetail';
+import PlayerDetail from 'teams/scenes/PlayerDetail';
 import UpcomingEvents from 'schools/scenes/UpcomingEvents';
 import EventDetail from 'teams/scenes/EventDetail';
 import PostDetail from 'teams/scenes/PostDetail';
@@ -156,6 +157,7 @@ const App = () => {
           <Stack.Screen name="SportDetail" component={SportDetail} />
         </Stack.Group>
         <Stack.Group screenOptions={{ presentation: 'modal' }}>
+          <Stack.Screen name="PlayerDetail" component={PlayerDetail} />
           <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
           <Stack.Screen name="EventDetail" component={EventDetail} />
           <Stack.Screen name="PostDetail" component={PostDetail} />

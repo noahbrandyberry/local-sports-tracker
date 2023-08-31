@@ -1710,6 +1710,11 @@
     jest-diff "^26.0.0"
     pretty-format "^26.0.0"
 
+"@types/js-quantities@^1.6.3":
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/@types/js-quantities/-/js-quantities-1.6.3.tgz#b75175a6852ce7da5530e2bbdedf87c9d2c8e460"
+  integrity sha512-YwBhHz9Ad7GH/hvg8P9qoKoqG5+xYsM2AQpb96jCDS9HbIj3m24RPgoY2xKPUd5LYAIkaL26igRQQrETf4Gwxg==
+
 "@types/json-schema@^7.0.3", "@types/json-schema@^7.0.9":
   version "7.0.9"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.9.tgz#97edc9037ea0c38585320b28964dde3b39e4660d"
@@ -5696,6 +5701,11 @@ joi@^17.2.1:
     "@sideway/address" "^4.1.3"
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
+
+js-quantities@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/js-quantities/-/js-quantities-1.8.0.tgz#32d8c447796574c1ab359d5bba64ab9c7575a7fc"
+  integrity sha512-swDw9RJpXACAWR16vAKoSojAsP6NI7cZjjnjKqhOyZSdybRUdmPr071foD3fejUKSU2JMHz99hflWkRWvfLTpQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

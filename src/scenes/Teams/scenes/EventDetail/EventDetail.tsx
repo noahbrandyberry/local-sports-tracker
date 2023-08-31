@@ -32,11 +32,11 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
   const loading = useSelector(selectDataLoading);
   const eventsLoading = useSelector(selectEventsLoading);
   const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const school = useSelector(selectSchoolById(team?.school_id || ''));
   const event = useSelector(selectEventById(eventId));
   const opponent = event?.opponents[0];
   const opponentSchool = useSelector(
-    selectSchoolById(opponent?.school_id ?? 0),
+    selectSchoolById(opponent?.school_id ?? ''),
   );
 
   useEffect(() => {
@@ -122,7 +122,7 @@ const EventDetail = ({ route, navigation }: EventDetailProps) => {
     });
   };
 
-  const onSelectSchool = (schoolId: number) => {
+  const onSelectSchool = (schoolId: string) => {
     navigation.navigate('SchoolDetail', { schoolId });
   };
 

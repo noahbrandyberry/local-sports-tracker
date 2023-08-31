@@ -1,23 +1,32 @@
 import React from 'react';
 import { Text, InvalidDataError, LoadingScreen } from 'components';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { selectTeamById } from 'teams/services/selectors';
 import { useSelector } from 'react-redux';
-import { DefaultTheme } from '@react-navigation/native';
+import { DefaultTheme, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 import { selectSchoolTeamsLoading } from 'store/selectors';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
+import RootStackParamList from 'src/RootStackParams';
 
-type TeamRosterProps = NativeStackScreenProps<
-  TeamsNavigatorParams,
-  'TeamRoster'
+type TeamRostereNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'TeamDetail'
 >;
 
-const TeamRoster = ({ route }: TeamRosterProps) => {
+type TeamRosterRouteProp = RouteProp<TeamsNavigatorParams, 'TeamRoster'>;
+
+const TeamRoster = ({
+  route,
+  navigation,
+}: {
+  route: TeamRosterRouteProp;
+  navigation: TeamRostereNavigationProp;
+}) => {
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(team?.school_id || ''));
@@ -51,10 +60,16 @@ const TeamRoster = ({ route }: TeamRosterProps) => {
               <View style={styles.rosterContainer}>
                 {team.players.map((player) => (
                   <View style={styles.playerContainer} key={player.id}>
-                    <View style={[styles.player, { backgroundColor }]}>
-                      <Text style={[styles.playerYear, { color }]}>
-                        Year - {player.grad_year}
-                      </Text>
+                    <TouchableOpacity
+                      style={[styles.player, { backgroundColor }]}
+                      onPress={() =>
+                        navigation.navigate('PlayerDetail', {
+                          schoolId: school.id,
+                          teamId,
+                          playerId: player.id,
+                        })
+                      }>
+                      <View style={styles.spacer} />
 
                       <View style={styles.jerseyContainer}>
                         <FontAwesomeIcon
@@ -78,7 +93,7 @@ const TeamRoster = ({ route }: TeamRosterProps) => {
                       </Text>
 
                       <View style={styles.spacer} />
-                    </View>
+                    </TouchableOpacity>
                   </View>
                 ))}
               </View>
