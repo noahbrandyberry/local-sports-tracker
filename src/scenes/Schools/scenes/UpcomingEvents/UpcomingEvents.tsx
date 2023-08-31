@@ -488,7 +488,6 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
                             params: {
                               teamId: team.id,
                               schoolId,
-                              initialRouteName: 'TeamSchedule',
                             },
                           })
                         }

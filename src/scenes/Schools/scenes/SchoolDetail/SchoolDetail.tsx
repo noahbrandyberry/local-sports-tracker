@@ -34,6 +34,8 @@ import capitalize from 'lodash/capitalize';
 import { SportIcons } from 'src/enums/sportIcons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Carousel from 'react-native-snap-carousel';
+import { transformEvents } from 'teams/scenes/TeamSchedule/services/transform';
+import { fetchEvents } from 'teams/scenes/TeamSchedule/services/actions';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -82,6 +84,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   const recentEvents = useQuery<Event[]>({
     url: `schools/${schoolId}/recent_results.json`,
     params: { team_id: bookmarkedTeamIds },
+    transform: transformEvents,
     queryKey: [schoolId, 'recent_results', bookmarkedTeamIds],
     enabled: bookmarkedTeamIds.length > 0,
   });
@@ -157,6 +160,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                   : null;
               return (
                 <TouchableOpacity
+                  key={team.id}
                   onPress={() => onSelectTeam(team.id)}
                   style={[
                     {
@@ -283,6 +287,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                     opponent_name,
                     id,
                     home,
+                    start,
                   },
                 }) => {
                   const team = teams.find((t) => t.id === selected_team_id);
@@ -299,7 +304,16 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
 
                   return (
                     <View style={styles.recentEvent} key={id}>
-                      <View
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate({
+                            name: 'TeamDetail',
+                            params: {
+                              teamId: team.id,
+                              schoolId,
+                            },
+                          })
+                        }
                         style={{
                           backgroundColor: school.primary_color,
                           paddingHorizontal: 15,
@@ -324,15 +338,36 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                             color={getColorByBackground(school.primary_color)}
                           />
                         ) : null}
-                      </View>
-                      <Text style={styles.winText}>
-                        <Text style={styles.boldText}>
-                          {capitalize(result_status)}
-                        </Text>{' '}
-                        {home ? 'vs ' : 'at '}
-                        {opponent_name} ({home ? result.home : result.away} -{' '}
-                        {home ? result.away : result.home})
-                      </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.result}
+                        onPress={() => {
+                          const teamId = selected_team_id;
+                          dispatch(fetchEvents({ teamId, schoolId }));
+                          navigation.navigate('EventDetail', {
+                            teamId,
+                            eventId: id,
+                            schoolId,
+                          });
+                        }}>
+                        <Text style={styles.winText}>
+                          <Text style={styles.boldText}>
+                            {capitalize(result_status)}
+                          </Text>{' '}
+                          {home ? 'vs ' : 'at '}
+                          {opponent_name} ({home ? result.home : result.away} -{' '}
+                          {home ? result.away : result.home})
+                        </Text>
+                        <Text style={styles.dayText}>
+                          {start.calendar(null, {
+                            lastDay: '[Yesterday]',
+                            sameDay: '[Today]',
+                            nextDay: '[Tomorrow]',
+                            lastWeek: 'dddd',
+                            sameElse: 'L',
+                          })}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   );
                 }}
@@ -477,12 +512,19 @@ const styles = StyleSheet.create({
   recentEvent: {
     width: '100%',
   },
-  winText: {
-    paddingTop: 10,
-    paddingHorizontal: 15,
-  },
+  winText: {},
   boldText: {
     fontWeight: 'bold',
+  },
+  result: {
+    paddingTop: 10,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  dayText: {
+    paddingLeft: 15,
+    fontWeight: '500',
   },
 });
 

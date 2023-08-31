@@ -9,10 +9,11 @@ interface UseQueryOptions<TQueryFnData>
   extends UseBaseQueryOptions<TQueryFnData> {
   url: string;
   params?: unknown;
+  transform?: (data: TQueryFnData) => TQueryFnData;
 }
 
 export function useQuery<TQueryFnData>(options: UseQueryOptions<TQueryFnData>) {
-  const { params, url, ...rest } = options;
+  const { params, url, transform, ...rest } = options;
 
   return useBaseQuery<TQueryFnData>({
     queryFn: async ({ signal }) => {
@@ -21,6 +22,9 @@ export function useQuery<TQueryFnData>(options: UseQueryOptions<TQueryFnData>) {
         signal,
         baseURL: config.baseUrl,
       });
+      if (transform) {
+        return transform(response.data);
+      }
       return response.data;
     },
     ...rest,
