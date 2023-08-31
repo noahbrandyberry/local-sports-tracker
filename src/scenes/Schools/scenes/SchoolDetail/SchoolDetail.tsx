@@ -27,7 +27,6 @@ import uniqBy from 'lodash/uniqBy';
 import { Season } from 'teams/models/season';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
-import TeamRow from '../SportDetail/components/TeamRow';
 import { useBookmarkedTeams } from 'src/hooks/useBookmarkedTeams';
 import { useQuery } from 'src/hooks/useQuery';
 import { Event } from 'teams/models';
@@ -159,13 +158,19 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               return (
                 <TouchableOpacity
                   onPress={() => onSelectTeam(team.id)}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    padding: 20,
-                    borderBottomColor: 'lightgray',
-                    borderBottomWidth: 1,
-                  }}>
+                  style={[
+                    {
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      padding: 20,
+                      borderColor: 'lightgray',
+                    },
+                    index === 0
+                      ? {}
+                      : {
+                          borderTopWidth: 1,
+                        },
+                  ]}>
                   <Text
                     style={{
                       fontWeight: '500',
