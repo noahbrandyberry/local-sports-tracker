@@ -189,17 +189,21 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
           </View>
         ) : null}
 
-        <Button
-          onPress={goToUpcomingEvents}
-          textStyle={{
-            color: getColorByBackground(school.primary_color),
-          }}
-          style={{
-            backgroundColor: school.primary_color,
-            marginBottom: 24,
-          }}>
-          View Schedule
-        </Button>
+        {bookmarkedTeams.length > 0 ? (
+          <Button
+            onPress={goToUpcomingEvents}
+            textStyle={{
+              color: getColorByBackground(school.primary_color),
+            }}
+            style={{
+              backgroundColor: school.primary_color,
+              marginBottom: 24,
+            }}>
+            View Schedule
+          </Button>
+        ) : (
+          <Text style={styles.header}>Select a Sport Below</Text>
+        )}
 
         <View style={styles.sportsContainer}>
           <View style={styles.well}>
@@ -266,7 +270,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
           </View>
         </View>
       </ScrollView>
-      {showRecentEvents && (
+      {showRecentEvents ? (
         <SafeAreaView
           edges={['bottom']}
           style={styles.recentEventsBarContainer}>
@@ -375,7 +379,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
             )}
           </View>
         </SafeAreaView>
-      )}
+      ) : null}
     </SafeAreaView>
   );
 };
