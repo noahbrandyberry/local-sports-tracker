@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
 import {
   ScrollView,
@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { selectTeamById } from 'teams/services/selectors';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   DefaultTheme,
   NavigationProp,
@@ -29,9 +29,8 @@ import { selectSchoolTeamsLoading } from 'store/selectors';
 import { selectEvents } from '../TeamSchedule/services/selectors';
 import EventRow from '../TeamSchedule/components/EventRow';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { selectDeviceToken } from 'services/deviceToken/selectors';
-import { saveDeviceToken } from 'services/deviceToken/actions';
+import { TutorialStep } from 'src/components/TutorialStep';
+import { useBookmarkedTeams } from 'src/hooks/useBookmarkedTeams';
 
 type TeamHomeNavigationProp = BottomTabNavigationProp<
   TeamsNavigatorParams,
@@ -54,8 +53,10 @@ const TeamHome = ({
   const posts = useSelector(selectPosts);
   const loading = useSelector(selectSchoolTeamsLoading);
   const events = useSelector(selectEvents);
-  const deviceToken = useSelector(selectDeviceToken);
-  const dispatch = useDispatch();
+  const { bookmarkedTeams, storeBookmark } = useBookmarkedTeams();
+  const bookmarked = bookmarkedTeams.find(
+    (bookmarkedTeam) => bookmarkedTeam.id === teamId,
+  );
 
   const upcomingEvents = events.filter(
     (event) => !event.start.clone().add(2, 'hours').isBefore(),
@@ -63,45 +64,6 @@ const TeamHome = ({
 
   const { width } = useWindowDimensions();
   const contentWidth = width - 40;
-
-  const [bookmark, setBookmark] = useState(false);
-
-  const readBookmark = async () => {
-    const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
-    const bookmarkedTeams = JSON.parse(storedValue ?? '{}');
-    const isBookmarked = bookmarkedTeams[teamId] || false;
-    setBookmark(isBookmarked);
-  };
-
-  const storeBookmark = async (newValue: boolean) => {
-    const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
-    const bookmarkedTeams = JSON.parse(storedValue ?? '{}');
-    bookmarkedTeams[teamId] = newValue;
-
-    await AsyncStorage.setItem(
-      '@bookmarkedTeams',
-      JSON.stringify(bookmarkedTeams),
-    );
-    setBookmark(newValue);
-
-    if (newValue) {
-      if (deviceToken) {
-        dispatch(
-          saveDeviceToken({
-            device_token: deviceToken,
-            device_subscriptions_attributes: [
-              { subscribable_type: 'Team', subscribable_id: teamId },
-            ],
-          }),
-        );
-      }
-    }
-  };
-
-  useEffect(() => {
-    readBookmark();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (loading) {
     return <LoadingScreen />;
@@ -151,9 +113,11 @@ const TeamHome = ({
             {team.name}
           </Text>
           <View style={styles.divider}>
-            <TouchableOpacity onPress={() => storeBookmark(!bookmark)}>
+            <TouchableOpacity
+              onPress={() => storeBookmark(teamId, !bookmarked)}
+              hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
               <FontAwesomeIcon
-                icon={[bookmark ? 'fas' : 'far', 'bookmark']}
+                icon={[bookmarked ? 'fas' : 'far', 'bookmark']}
                 color={school.primary_color}
                 size={20}
               />
@@ -230,6 +194,11 @@ const TeamHome = ({
           </ScrollView>
         </View>
       </View>
+      <TutorialStep
+        name="Bookmark"
+        text="You can bookmark the teams you want to follow. They will show up on your home screen and you will receive relevant notifications."
+        position={{ right: 10, top: 140 }}
+      />
     </SafeAreaView>
   );
 };

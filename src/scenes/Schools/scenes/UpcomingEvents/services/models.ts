@@ -12,6 +12,7 @@ export interface FetchUpcomingEventsRequest {
   level_id?: number[];
   gender_id?: number[];
   sport_id?: number[];
+  team_id?: string[];
 }
 
 export interface GetUpcomingEvents {

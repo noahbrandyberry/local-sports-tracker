@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, MenuBar, InvalidDataError, Button } from 'components';
 import {
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
-  Linking,
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
@@ -13,7 +12,7 @@ import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectSchoolById } from 'schools/services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
-import { DefaultTheme, useFocusEffect } from '@react-navigation/native';
+import { DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchTeams, resetTeams } from 'teams/services/actions';
 import {
@@ -23,14 +22,12 @@ import {
   selectTeamsLoading,
 } from 'teams/services/selectors';
 import SportCell from './components/SportCell';
-import { formatAddress } from 'src/utils/formattedAddress';
-import FastImage from 'react-native-fast-image';
 import uniqBy from 'lodash/uniqBy';
 import { Season } from 'teams/models/season';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import TeamRow from '../SportDetail/components/TeamRow';
+import { useBookmarkedTeams } from 'src/hooks/useBookmarkedTeams';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -73,9 +70,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   const teams = useSelector(selectTeams);
   const seasons = useSelector(selectSeasons);
   const school = useSelector(selectSchoolById(schoolId));
-
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
-  const bookmarkedTeams = teams.filter((team) => bookmarks.includes(team.id));
+  const { bookmarkedTeams } = useBookmarkedTeams();
 
   const selectedTeams = teams.filter(
     (team) => team.season.id === selectedSeason?.id,
@@ -91,26 +86,10 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSeason]);
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log('useFocusEffect');
-      if (!school) navigation.replace('SelectSchool');
-
-      if (school) {
-        readBookmarks();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [school, teams]),
-  );
-
-  const readBookmarks = async () => {
-    const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
-    const bookmarkedObject = JSON.parse(storedValue ?? '{}');
-    const bookmarkedIds = Object.entries(bookmarkedObject)
-      .filter(([, value]) => value)
-      .map(([key]) => key);
-    setBookmarks(bookmarkedIds);
-  };
+  useEffect(() => {
+    if (!school) navigation.replace('SelectSchool');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [school]);
 
   const onSelectTeam = (teamId: string) => {
     navigation.navigate('TeamDetail', { teamId, schoolId });
