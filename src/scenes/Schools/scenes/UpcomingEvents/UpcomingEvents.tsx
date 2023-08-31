@@ -68,7 +68,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     (event) => event.start.format(format),
   );
   const firstDate = Object.entries(groupedEvents).filter(
-    (e) => e[1].length > 0,
+    (e) => e[1].length > 0 && moment(e[0]).isAfter(moment()),
   )[0]?.[0];
 
   const minDate = moment().subtract(8, 'months');
@@ -332,7 +332,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
             </Button>
           </View>
         ) : null}
-        {firstDate && (
+        {firstDate ? (
           <Agenda
             items={groupedEvents}
             selected={firstDate}
@@ -432,6 +432,10 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
               agendaTodayColor: calendarColor,
             }}
           />
+        ) : (
+          <Text style={styles.statusText}>
+            {eventsLoading ? 'Loading...' : 'No upcoming events found.'}
+          </Text>
         )}
       </View>
     </SafeAreaView>
@@ -530,6 +534,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
+  },
+  statusText: {
+    padding: 20,
+    textAlign: 'center',
   },
 });
 

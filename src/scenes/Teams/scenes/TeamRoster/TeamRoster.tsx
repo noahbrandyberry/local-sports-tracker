@@ -9,6 +9,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { selectSchoolById } from 'schools/services/selectors';
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 import { selectSchoolTeamsLoading } from 'store/selectors';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { getColorByBackground } from 'src/utils/getColorByBackground';
 
 type TeamRosterProps = NativeStackScreenProps<
   TeamsNavigatorParams,
@@ -28,6 +30,8 @@ const TeamRoster = ({ route }: TeamRosterProps) => {
   if (!team || !school) {
     return <InvalidDataError />;
   }
+  const backgroundColor = school.primary_color;
+  const color = getColorByBackground(school.primary_color);
 
   return (
     <SafeAreaView
@@ -43,7 +47,44 @@ const TeamRoster = ({ route }: TeamRosterProps) => {
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.well}>
             <Text style={styles.subHeader}>Roster</Text>
-            <Text>No results found.</Text>
+            {team.players.length > 0 ? (
+              <View style={styles.rosterContainer}>
+                {team.players.map((player) => (
+                  <View style={styles.playerContainer} key={player.id}>
+                    <View style={[styles.player, { backgroundColor }]}>
+                      <Text style={[styles.playerYear, { color }]}>
+                        Year - {player.grad_year}
+                      </Text>
+
+                      <View style={styles.jerseyContainer}>
+                        <FontAwesomeIcon
+                          icon={['fas', 'tshirt']}
+                          color={color}
+                          size={72}
+                        />
+                        <Text
+                          style={[
+                            styles.playerNumber,
+                            { color: backgroundColor },
+                          ]}>
+                          {player.jersey}
+                        </Text>
+                      </View>
+
+                      <View style={styles.spacer} />
+
+                      <Text style={[styles.playerName, { color }]}>
+                        {player.first_name} {player.last_name}
+                      </Text>
+
+                      <View style={styles.spacer} />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text>No results found.</Text>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -95,6 +136,52 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
     marginBottom: 4,
+  },
+  rosterContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -10,
+  },
+  playerContainer: {
+    width: '50%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    aspectRatio: 1,
+  },
+  player: {
+    alignItems: 'center',
+    padding: 10,
+    aspectRatio: 1,
+    flex: 1,
+    margin: 10,
+  },
+  playerYear: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  playerName: {
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  jerseyContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  playerNumber: {
+    position: 'absolute',
+    fontSize: 24,
+    lineHeight: 32,
+  },
+  spacer: {
+    flex: 1,
   },
 });
 

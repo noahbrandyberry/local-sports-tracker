@@ -19,6 +19,21 @@ export interface Team {
   sport: Sport;
   record?: Record;
   images?: Image[];
+  players: Player[];
+}
+
+export interface Player {
+  id: number;
+  first_name: string;
+  last_name: string;
+  grad_year: string;
+  jersey: string;
+  position: string;
+  height: string;
+  weight: string;
+  team_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Image {
