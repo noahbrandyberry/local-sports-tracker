@@ -31,6 +31,9 @@ import { fetchSchools } from 'schools/services/actions';
 import { NotificationActionResponse } from 'react-native-notifications/lib/dist/interfaces/NotificationActionResponse';
 import * as RootNavigation from './RootNavigation';
 import { upcomingEventCategory } from './notifications/categories';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+const queryClient = new QueryClient();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -136,35 +139,37 @@ const App = () => {
   };
 
   return (
-    <NavigationContainer ref={RootNavigation.navigationRef}>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          gestureEnabled: true,
-        }}>
-        <Stack.Group>
-          <Stack.Screen
-            name="SelectSchool"
-            component={SelectSchool}
-            options={{ animation: 'fade' }}
-          />
-          <Stack.Screen name="SchoolsList" component={SchoolsList} />
-          <Stack.Screen
-            name="SchoolDetail"
-            component={SchoolDetail}
-            options={{ animation: 'none' }}
-          />
-          <Stack.Screen name="SportDetail" component={SportDetail} />
-        </Stack.Group>
-        <Stack.Group screenOptions={{ presentation: 'modal' }}>
-          <Stack.Screen name="PlayerDetail" component={PlayerDetail} />
-          <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
-          <Stack.Screen name="EventDetail" component={EventDetail} />
-          <Stack.Screen name="PostDetail" component={PostDetail} />
-          <Stack.Screen name="UpcomingEvents" component={UpcomingEvents} />
-        </Stack.Group>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer ref={RootNavigation.navigationRef}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            gestureEnabled: true,
+          }}>
+          <Stack.Group>
+            <Stack.Screen
+              name="SelectSchool"
+              component={SelectSchool}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen name="SchoolsList" component={SchoolsList} />
+            <Stack.Screen
+              name="SchoolDetail"
+              component={SchoolDetail}
+              options={{ animation: 'none' }}
+            />
+            <Stack.Screen name="SportDetail" component={SportDetail} />
+          </Stack.Group>
+          <Stack.Group screenOptions={{ presentation: 'modal' }}>
+            <Stack.Screen name="PlayerDetail" component={PlayerDetail} />
+            <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
+            <Stack.Screen name="EventDetail" component={EventDetail} />
+            <Stack.Screen name="PostDetail" component={PostDetail} />
+            <Stack.Screen name="UpcomingEvents" component={UpcomingEvents} />
+          </Stack.Group>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 };
 

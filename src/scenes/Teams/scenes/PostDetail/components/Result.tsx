@@ -11,9 +11,9 @@ interface ResultProps {
 }
 
 export const Result = ({ event, team }: ResultProps) => {
-  const school = useSelector(selectSchoolById(team?.school_id ?? 0));
+  const school = useSelector(selectSchoolById(team?.school_id ?? ''));
   const opponentSchool = useSelector(
-    selectSchoolById(event?.opponents[0]?.school_id ?? 0),
+    selectSchoolById(event?.opponents[0]?.school_id ?? ''),
   );
 
   if (!event || !event.result || !team || !event.opponents[0]) return null;

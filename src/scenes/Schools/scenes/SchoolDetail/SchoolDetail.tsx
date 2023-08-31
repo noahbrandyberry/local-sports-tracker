@@ -7,6 +7,7 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -28,6 +29,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import TeamRow from '../SportDetail/components/TeamRow';
 import { useBookmarkedTeams } from 'src/hooks/useBookmarkedTeams';
+import { useQuery } from 'src/hooks/useQuery';
+import { Event } from 'teams/models';
+import capitalize from 'lodash/capitalize';
+import { SportIcons } from 'src/enums/sportIcons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import Carousel from 'react-native-snap-carousel';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -71,6 +78,15 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   const seasons = useSelector(selectSeasons);
   const school = useSelector(selectSchoolById(schoolId));
   const { bookmarkedTeams } = useBookmarkedTeams();
+  const bookmarkedTeamIds = bookmarkedTeams.map((team) => team.id);
+
+  const recentEvents = useQuery<Event[]>({
+    url: `schools/${schoolId}/recent_results.json`,
+    params: { team_id: bookmarkedTeamIds },
+    queryKey: [schoolId, 'recent_results', bookmarkedTeamIds],
+    enabled: bookmarkedTeamIds.length > 0,
+  });
+  const showRecentEvents = !recentEvents.isLoading && recentEvents.data?.length;
 
   const selectedTeams = teams.filter(
     (team) => team.season.id === selectedSeason?.id,
@@ -131,82 +147,36 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
         refreshControl={
           <RefreshControl refreshing={teamsLoading} onRefresh={getTeams} />
         }>
-        {/* <View style={styles.well}>
-          <View style={styles.infoContainer}>
-            <View style={styles.locationContainer}>
-              {school.location ? (
-                <Text style={styles.subHeader}>{school.location.name}</Text>
-              ) : null}
-              {school.location ? (
-                <Text>{formatAddress(school.location, '\n')}</Text>
-              ) : null}
-              {school.phone ? (
-                <Text onPress={() => Linking.openURL(`tel:${school.phone}`)}>
-                  Phone: {school.phone}
-                </Text>
-              ) : null}
-              {school.email ? (
-                <Text
-                  numberOfLines={1}
-                  onPress={() => Linking.openURL(`mailto:${school.email}`)}>
-                  Email: {school.email}
-                </Text>
-              ) : null}
-
-              <View style={styles.socialRow}>
-                {school.instagram_url && (
-                  <TouchableOpacity
-                    style={styles.socialIconContainer}
-                    onPress={() => Linking.openURL(school.instagram_url)}>
-                    <FontAwesomeIcon
-                      icon={['fab', 'instagram']}
-                      color={school.primary_color}
-                    />
-                  </TouchableOpacity>
-                )}
-                {school.twitter_url && (
-                  <TouchableOpacity
-                    style={styles.socialIconContainer}
-                    onPress={() => Linking.openURL(school.twitter_url)}>
-                    <FontAwesomeIcon
-                      icon={['fab', 'twitter']}
-                      color={school.primary_color}
-                    />
-                  </TouchableOpacity>
-                )}
-                {school.facebook_url && (
-                  <TouchableOpacity
-                    style={styles.socialIconContainer}
-                    onPress={() => Linking.openURL(school.facebook_url)}>
-                    <FontAwesomeIcon
-                      icon={['fab', 'facebook']}
-                      color={school.primary_color}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-
-            <FastImage
-              source={{ uri: school.logo_url }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-        </View> */}
-
         {bookmarkedTeams.length > 0 ? (
           <View style={[styles.well]}>
-            {bookmarkedTeams.map((team, index) => (
-              <TeamRow
-                team={team}
-                showSectionHeaders={false}
-                index={index}
-                key={team.id}
-                lastIndex={bookmarkedTeams.length - 1}
-                onPress={onSelectTeam}
-              />
-            ))}
+            {bookmarkedTeams.map((team, index) => {
+              const name: keyof typeof SportIcons | undefined =
+                team?.sport.name;
+              const icon =
+                team?.sport.name && team?.sport.name in SportIcons && name
+                  ? SportIcons[name]
+                  : null;
+              return (
+                <TouchableOpacity
+                  onPress={() => onSelectTeam(team.id)}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    padding: 20,
+                    borderBottomColor: 'lightgray',
+                    borderBottomWidth: 1,
+                  }}>
+                  <Text
+                    style={{
+                      fontWeight: '500',
+                      fontSize: 15,
+                    }}>
+                    {team.name}
+                  </Text>
+                  {icon ? <FontAwesomeIcon icon={icon} size={18} /> : null}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         ) : null}
 
@@ -287,6 +257,85 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
           </View>
         </View>
       </ScrollView>
+      {showRecentEvents && (
+        <SafeAreaView
+          edges={['bottom']}
+          style={styles.recentEventsBarContainer}>
+          <View style={styles.recentEventsBar}>
+            {recentEvents.data && (
+              <Carousel
+                sliderWidth={Dimensions.get('screen').width}
+                itemWidth={Dimensions.get('screen').width}
+                windowSize={21}
+                data={recentEvents.data}
+                autoplay
+                loop
+                renderItem={({
+                  item: {
+                    selected_team_id,
+                    result,
+                    result_status,
+                    opponent_name,
+                    id,
+                    home,
+                  },
+                }) => {
+                  const team = teams.find((t) => t.id === selected_team_id);
+                  const name: keyof typeof SportIcons | undefined =
+                    team?.sport.name;
+                  const icon =
+                    team?.sport.name && team?.sport.name in SportIcons && name
+                      ? SportIcons[name]
+                      : null;
+
+                  if (!team || !result) {
+                    return null;
+                  }
+
+                  return (
+                    <View style={styles.recentEvent} key={id}>
+                      <View
+                        style={{
+                          backgroundColor: school.primary_color,
+                          paddingHorizontal: 15,
+                          paddingVertical: 10,
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          borderBottomColor: getColorByBackground(
+                            school.primary_color,
+                          ),
+                          borderBottomWidth: 1,
+                        }}>
+                        <Text
+                          style={{
+                            color: getColorByBackground(school.primary_color),
+                            fontWeight: 'bold',
+                          }}>
+                          {team.name}
+                        </Text>
+                        {icon ? (
+                          <FontAwesomeIcon
+                            icon={icon}
+                            color={getColorByBackground(school.primary_color)}
+                          />
+                        ) : null}
+                      </View>
+                      <Text style={styles.winText}>
+                        <Text style={styles.boldText}>
+                          {capitalize(result_status)}
+                        </Text>{' '}
+                        {home ? 'vs ' : 'at '}
+                        {opponent_name} ({home ? result.home : result.away} -{' '}
+                        {home ? result.away : result.home})
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+            )}
+          </View>
+        </SafeAreaView>
+      )}
     </SafeAreaView>
   );
 };
@@ -405,6 +454,30 @@ const styles = StyleSheet.create({
   },
   socialIconContainer: {
     paddingHorizontal: 8,
+  },
+  recentEventsBarContainer: {
+    backgroundColor: 'white',
+    shadowColor: '#000000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: {
+      height: 0,
+      width: -3,
+    },
+    elevation: 10,
+  },
+  recentEventsBar: {
+    flexDirection: 'row',
+  },
+  recentEvent: {
+    width: '100%',
+  },
+  winText: {
+    paddingTop: 10,
+    paddingHorizontal: 15,
+  },
+  boldText: {
+    fontWeight: 'bold',
   },
 });
 
