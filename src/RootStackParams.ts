@@ -3,21 +3,21 @@ import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 type RootStackParamList = {
   SelectSchool: undefined;
   SchoolsList: undefined;
-  SchoolDetail: { schoolId: number };
-  SportDetail: { sportId: number; schoolId: number };
+  SchoolDetail: { schoolId: string };
+  SportDetail: { sportId: number; schoolId: string };
   TeamDetail: {
-    schoolId: number;
-    teamId: number;
+    schoolId: string;
+    teamId: string;
     initialRouteName?: keyof TeamsNavigatorParams;
   };
   EventDetail: {
-    schoolId: number;
-    teamId: number;
-    eventId: number;
+    schoolId: string;
+    teamId: string;
+    eventId: string;
     openDirections?: boolean;
   };
-  PostDetail: { postId: string; teamId: number };
-  UpcomingEvents: { schoolId: number };
+  PostDetail: { postId: string; teamId: string };
+  UpcomingEvents: { schoolId: string };
 };
 
 export default RootStackParamList;

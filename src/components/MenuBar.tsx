@@ -14,12 +14,14 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import RootStackParamList from 'src/RootStackParams';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { hexToRgb } from '@check-light-or-dark/utils';
+import FastImage from 'react-native-fast-image';
 
 interface MenuBarProps {
   backgroundColor: ColorValue;
   color: ColorValue;
   navigation: NativeStackNavigationProp<RootStackParamList, 'SchoolDetail'>;
   title: string;
+  imageUrl?: string;
 }
 
 interface MenuItemProps {
@@ -32,6 +34,7 @@ export const MenuBar = ({
   color,
   navigation,
   title,
+  imageUrl,
 }: MenuBarProps) => {
   const rgb = hexToRgb(backgroundColor.toString());
   backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.75)`;
@@ -56,17 +59,21 @@ export const MenuBar = ({
       <StatusBar
         barStyle={color === 'white' ? 'light-content' : 'dark-content'}
       />
+
       <TouchableOpacity
-        style={styles.spacer}
+        style={styles.menuButton}
         hitSlop={{ top: 15, bottom: 15, left: 15 }}
         onPress={() => setIsVisible(true)}>
-        <FontAwesomeIcon icon="bars" size={14} color={color.toString()} />
-        <Text style={[styles.menuBarText, { color }]}>MENU</Text>
+        <View style={styles.imageContainer}>
+          <FastImage
+            source={{ uri: imageUrl }}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </View>
       </TouchableOpacity>
 
       <Text style={[styles.title, { color }]}>{title}</Text>
-
-      <View style={styles.spacer} />
 
       <Modal
         visible={isVisible}
@@ -111,10 +118,10 @@ const styles = StyleSheet.create({
     padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  menuBarText: {
-    fontWeight: 'bold',
-    marginLeft: 5,
+  menuButton: {
+    marginHorizontal: 5,
   },
   title: {
     fontSize: 18,
@@ -122,6 +129,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     textTransform: 'uppercase',
+    marginHorizontal: 5,
   },
   spacer: {
     flex: 1,
@@ -156,5 +164,14 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginBottom: 10,
+  },
+  imageContainer: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    padding: 5,
+  },
+  image: {
+    width: 25,
+    height: 25,
   },
 });

@@ -16,7 +16,7 @@ type TeamMediaProps = NativeStackScreenProps<TeamsNavigatorParams, 'TeamMedia'>;
 const TeamMedia = ({ route }: TeamMediaProps) => {
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const school = useSelector(selectSchoolById(team?.school_id || ''));
   const loading = useSelector(selectSchoolTeamsLoading);
 
   if (loading) {
@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 12,
     paddingHorizontal: 20,
   },

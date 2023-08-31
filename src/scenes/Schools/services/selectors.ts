@@ -40,7 +40,7 @@ export const selectSchoolsWithDistance = createSelector(
                 getDistance(currentLocation, school.location),
                 'mi',
               )
-            : null,
+            : undefined,
         }))
       : schools,
 );
@@ -51,7 +51,7 @@ export const selectNearestSchools = createSelector(
     [...schools].sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0)),
 );
 
-export const selectSchoolById = (id: number) =>
+export const selectSchoolById = (id: string) =>
   createSelector(selectSchools, (schools) =>
     schools.find((school) => school.id === id),
   );

@@ -24,7 +24,7 @@ export const selectDeviceTokenError = createSelector(
   (deviceTokenData) => deviceTokenData.error,
 );
 
-export const selectDeviceSubscriptionBySchoolId = (id: number) =>
+export const selectDeviceSubscriptionBySchoolId = (id: string) =>
   createSelector(
     selectDevice,
     (deviceToken) =>
@@ -35,7 +35,7 @@ export const selectDeviceSubscriptionBySchoolId = (id: number) =>
       )?.id,
   );
 
-export const selectDeviceSubscriptionByTeamId = (id: number) =>
+export const selectDeviceSubscriptionByTeamId = (id: string) =>
   createSelector(
     selectDevice,
     (deviceToken) =>

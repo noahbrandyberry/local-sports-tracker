@@ -8,7 +8,7 @@ export enum TeamActionTypes {
 }
 
 export interface FetchTeamsRequest {
-  schoolId: number;
+  schoolId: string;
 }
 
 export interface GetTeams {

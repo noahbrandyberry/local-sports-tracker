@@ -1,9 +1,9 @@
 type TeamsNavigatorParams = {
-  TeamSchedule: { teamId: number; schoolId: number };
-  TeamRoster: { teamId: number; schoolId: number };
-  TeamHome: { teamId: number; schoolId: number };
-  TeamMedia: { teamId: number; schoolId: number };
-  TeamNotify: { teamId: number; schoolId: number };
+  TeamSchedule: { teamId: string; schoolId: string };
+  TeamRoster: { teamId: string; schoolId: string };
+  TeamHome: { teamId: string; schoolId: string };
+  TeamMedia: { teamId: string; schoolId: string };
+  TeamNotify: { teamId: string; schoolId: string };
 };
 
 export default TeamsNavigatorParams;

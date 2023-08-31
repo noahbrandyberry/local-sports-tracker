@@ -17,6 +17,7 @@ import { EmitterSubscription } from 'react-native';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
+import { far } from '@fortawesome/free-regular-svg-icons';
 import { saveDeviceToken } from './services/deviceToken/actions';
 import {
   Notification,
@@ -34,6 +35,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 library.add(fas);
 library.add(fab);
+library.add(far);
 
 const App = () => {
   const dispatch = useDispatch();

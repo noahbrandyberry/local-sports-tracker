@@ -27,7 +27,7 @@ type TeamNotifyProps = NativeStackScreenProps<
 const TeamDonate = ({ route }: TeamNotifyProps) => {
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const school = useSelector(selectSchoolById(team?.school_id || ''));
   const loading = useSelector(selectSchoolTeamsLoading);
 
   const deviceToken = useSelector(selectDeviceToken);
@@ -35,7 +35,7 @@ const TeamDonate = ({ route }: TeamNotifyProps) => {
     selectDeviceSubscriptionByTeamId(teamId),
   );
   const schoolSubscription = useSelector(
-    selectDeviceSubscriptionBySchoolId(school?.id ?? 0),
+    selectDeviceSubscriptionBySchoolId(school?.id ?? ''),
   );
   const [deviceSubscribed, setDeviceSubscribed] = useState(
     !!teamSubscription || !!schoolSubscription,
@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 12,
     paddingHorizontal: 20,
   },

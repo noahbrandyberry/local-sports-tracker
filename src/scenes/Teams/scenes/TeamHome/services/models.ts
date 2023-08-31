@@ -8,8 +8,8 @@ export enum PostActionTypes {
 }
 
 export interface FetchPostsRequest {
-  schoolId: number;
-  teamId: number;
+  schoolId: string;
+  teamId: string;
 }
 
 export interface GetPosts {

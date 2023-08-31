@@ -14,8 +14,8 @@ export interface Post {
   boxscore: BoxScore | string;
   website_only: boolean;
   featured_image: string;
-  event_id: number;
-  team_id: number;
+  event_id: string;
+  team_id: string;
 }
 
 export interface BoxScore {
@@ -25,7 +25,7 @@ export interface BoxScore {
 
 export interface Score {
   team_name: string;
-  team_id: number;
+  team_id: string;
   scores: number[];
 }
 

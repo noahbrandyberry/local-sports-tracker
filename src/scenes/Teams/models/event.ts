@@ -3,7 +3,7 @@ import { Location } from 'schools/models';
 import { Team } from '.';
 
 export interface Event {
-  id: number;
+  id: string;
   name: string;
   event_type: string;
   start: Moment;
@@ -24,7 +24,7 @@ export interface Event {
   result?: Result;
   result_status?: ResultStatus;
   opponent_name: string;
-  selected_team_id: number;
+  selected_team_id: string;
 }
 
 export interface Result {
@@ -34,12 +34,12 @@ export interface Result {
 
 export interface TeamResult {
   id: number;
-  team_id: number;
+  team_id: string;
   name: string;
   place: number;
   points: number;
-  event_id: number;
-  school_id: number;
+  event_id: string;
+  school_id: string;
 }
 
 export enum ResultStatus {

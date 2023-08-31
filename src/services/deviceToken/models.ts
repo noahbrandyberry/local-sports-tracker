@@ -35,7 +35,7 @@ export interface DeviceToken {
 
 export interface DeviceSubscription {
   id?: number;
-  subscribable_id?: number;
+  subscribable_id?: string;
   subscribable_type?: string;
 }
 

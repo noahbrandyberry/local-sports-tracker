@@ -1,7 +1,7 @@
 import { Location } from 'schools/models';
 
 export interface School {
-  id: number;
+  id: string;
   name: string;
   mascot: string;
   is_vnn: boolean;

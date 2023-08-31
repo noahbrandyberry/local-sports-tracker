@@ -8,8 +8,8 @@ export enum EventActionTypes {
 }
 
 export interface FetchEventsRequest {
-  schoolId: number;
-  teamId: number;
+  schoolId: string;
+  teamId: string;
 }
 
 export interface GetEvents {

@@ -1,7 +1,7 @@
 import { Year, Level, Season, Program, Gender, Sport } from '.';
 
 export interface Team {
-  id: number;
+  id: string;
   name: string;
   label: string;
   photo_url: string;
@@ -10,7 +10,7 @@ export interface Team {
   created_at: string;
   updated_at: string;
   url: string;
-  school_id: number;
+  school_id: string;
   level?: Level;
   season: Season;
   year: Year;

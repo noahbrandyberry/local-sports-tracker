@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, InvalidDataError, Button, LoadingScreen } from 'components';
 import {
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
 import { selectTeamById } from 'teams/services/selectors';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   DefaultTheme,
   NavigationProp,
@@ -27,6 +28,10 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { selectSchoolTeamsLoading } from 'store/selectors';
 import { selectEvents } from '../TeamSchedule/services/selectors';
 import EventRow from '../TeamSchedule/components/EventRow';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { selectDeviceToken } from 'services/deviceToken/selectors';
+import { saveDeviceToken } from 'services/deviceToken/actions';
 
 type TeamHomeNavigationProp = BottomTabNavigationProp<
   TeamsNavigatorParams,
@@ -45,16 +50,58 @@ const TeamHome = ({
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const school = useSelector(selectSchoolById(team?.school_id || ''));
   const posts = useSelector(selectPosts);
   const loading = useSelector(selectSchoolTeamsLoading);
   const events = useSelector(selectEvents);
+  const deviceToken = useSelector(selectDeviceToken);
+  const dispatch = useDispatch();
+
   const upcomingEvents = events.filter(
     (event) => !event.start.clone().add(2, 'hours').isBefore(),
   );
 
   const { width } = useWindowDimensions();
   const contentWidth = width - 40;
+
+  const [bookmark, setBookmark] = useState(false);
+
+  const readBookmark = async () => {
+    const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
+    const bookmarkedTeams = JSON.parse(storedValue ?? '{}');
+    const isBookmarked = bookmarkedTeams[teamId] || false;
+    setBookmark(isBookmarked);
+  };
+
+  const storeBookmark = async (newValue: boolean) => {
+    const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
+    const bookmarkedTeams = JSON.parse(storedValue ?? '{}');
+    bookmarkedTeams[teamId] = newValue;
+
+    await AsyncStorage.setItem(
+      '@bookmarkedTeams',
+      JSON.stringify(bookmarkedTeams),
+    );
+    setBookmark(newValue);
+
+    if (newValue) {
+      if (deviceToken) {
+        dispatch(
+          saveDeviceToken({
+            device_token: deviceToken,
+            device_subscriptions_attributes: [
+              { subscribable_type: 'Team', subscribable_id: teamId },
+            ],
+          }),
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    readBookmark();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return <LoadingScreen />;
@@ -72,7 +119,7 @@ const TeamHome = ({
     navigation.navigate('TeamSchedule', { teamId, schoolId: school.id });
   };
 
-  const onSelectEvent = (eventId: number) => {
+  const onSelectEvent = (eventId: string) => {
     const event = events.find((e) => e.id === eventId);
     if (event?.start.clone().add(2, 'hours').isBefore()) {
       const post = posts.find((p) => p.event_id === eventId);
@@ -99,9 +146,20 @@ const TeamHome = ({
       edges={['left', 'right']}>
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <Text style={styles.header} numberOfLines={1}>
-          {team.name}
-        </Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header} numberOfLines={1}>
+            {team.name}
+          </Text>
+          <View style={styles.divider}>
+            <TouchableOpacity onPress={() => storeBookmark(!bookmark)}>
+              <FontAwesomeIcon
+                icon={[bookmark ? 'fas' : 'far', 'bookmark']}
+                color={school.primary_color}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <View style={styles.contentContainer}>
           <ScrollView
@@ -218,9 +276,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 12,
+    flex: 1,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  divider: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingLeft: 10,
   },
   subHeader: {
     fontWeight: '500',

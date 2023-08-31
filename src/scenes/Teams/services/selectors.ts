@@ -42,5 +42,5 @@ export const selectTeamsBySportId = (sportId: number) =>
     teams.filter((team) => team.sport.id === sportId),
   );
 
-export const selectTeamById = (id: number) =>
+export const selectTeamById = (id: string) =>
   createSelector(selectTeams, (teams) => teams.find((team) => team.id === id));

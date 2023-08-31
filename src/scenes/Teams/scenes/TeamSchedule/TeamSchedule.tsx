@@ -42,7 +42,7 @@ const TeamSchedule = ({
   const loading = useSelector(selectSchoolTeamsLoading);
   const scheduleLoading = useSelector(selectEventsLoading);
   const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || 0));
+  const school = useSelector(selectSchoolById(team?.school_id || ''));
   const events = useSelector(selectEvents);
   const posts = useSelector(selectPosts);
 
@@ -84,7 +84,7 @@ const TeamSchedule = ({
     return <InvalidDataError />;
   }
 
-  const onSelectEvent = (eventId: number) => {
+  const onSelectEvent = (eventId: string) => {
     const event = events.find((e) => e.id === eventId);
     if (event?.start.clone().add(2, 'hours').isBefore()) {
       const post = posts.find((p) => p.event_id === eventId);
@@ -202,7 +202,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: 'bold',
-    textAlign: 'center',
     flex: 1,
   },
   headerContainer: {

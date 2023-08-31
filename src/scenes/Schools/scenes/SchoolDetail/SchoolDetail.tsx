@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, MenuBar, InvalidDataError, Button } from 'components';
 import {
   RefreshControl,
@@ -7,15 +7,13 @@ import {
   View,
   Linking,
   ActivityIndicator,
-  Switch,
   ScrollView,
-  Alert,
 } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { selectSchoolById } from 'schools/services/selectors';
 import { useDispatch, useSelector } from 'react-redux';
-import { DefaultTheme } from '@react-navigation/native';
+import { DefaultTheme, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchTeams, resetTeams } from 'teams/services/actions';
 import {
@@ -31,13 +29,8 @@ import uniqBy from 'lodash/uniqBy';
 import { Season } from 'teams/models/season';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
-import {
-  selectDeviceSubscriptionBySchoolId,
-  selectDeviceToken,
-  selectTeamDeviceSubscriptions,
-} from 'services/deviceToken/selectors';
-import { saveDeviceToken } from 'services/deviceToken/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import TeamRow from '../SportDetail/components/TeamRow';
 
 type SchoolDetailProps = NativeStackScreenProps<
   RootStackParamList,
@@ -76,27 +69,16 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     undefined,
   );
 
-  const deviceToken = useSelector(selectDeviceToken);
-  const schoolSubscription = useSelector(
-    selectDeviceSubscriptionBySchoolId(schoolId),
-  );
-  const [deviceSubscribed, setDeviceSubscribed] = useState(
-    !!schoolSubscription,
-  );
-
   const teamsLoading = useSelector(selectTeamsLoading);
   const teams = useSelector(selectTeams);
   const seasons = useSelector(selectSeasons);
   const school = useSelector(selectSchoolById(schoolId));
+
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const bookmarkedTeams = teams.filter((team) => bookmarks.includes(team.id));
+
   const selectedTeams = teams.filter(
     (team) => team.season.id === selectedSeason?.id,
-  );
-
-  const subscribedTeamDevices = useSelector(selectTeamDeviceSubscriptions);
-  const subscribedTeams = teams.filter((team) =>
-    subscribedTeamDevices.find(
-      (deviceSubscription) => deviceSubscription.subscribable_id === team.id,
-    ),
   );
 
   const sports = uniqBy(
@@ -109,14 +91,30 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSeason]);
 
-  useEffect(() => {
-    setDeviceSubscribed(!!schoolSubscription);
-  }, [schoolSubscription]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('useFocusEffect');
+      if (!school) navigation.replace('SelectSchool');
 
-  useEffect(() => {
-    if (!school) navigation.replace('SelectSchool');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [school]);
+      if (school) {
+        readBookmarks();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [school, teams]),
+  );
+
+  const readBookmarks = async () => {
+    const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
+    const bookmarkedObject = JSON.parse(storedValue ?? '{}');
+    const bookmarkedIds = Object.entries(bookmarkedObject)
+      .filter(([, value]) => value)
+      .map(([key]) => key);
+    setBookmarks(bookmarkedIds);
+  };
+
+  const onSelectTeam = (teamId: string) => {
+    navigation.navigate('TeamDetail', { teamId, schoolId });
+  };
 
   if (!school) {
     return <InvalidDataError />;
@@ -132,33 +130,10 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
     navigation.navigate('UpcomingEvents', { schoolId });
   };
 
-  const onChangeDeviceSubscription = (flag: boolean) => {
-    setDeviceSubscribed(flag);
-
-    if (deviceToken) {
-      if (flag) {
-        dispatch(
-          saveDeviceToken({
-            device_token: deviceToken,
-            device_subscriptions_attributes: [
-              { subscribable_type: 'School', subscribable_id: schoolId },
-            ],
-          }),
-        );
-      } else {
-        if (schoolSubscription) {
-          dispatch(
-            saveDeviceToken({
-              device_token: deviceToken,
-              device_subscriptions_attributes: [
-                { id: schoolSubscription, _destroy: true },
-              ],
-            }),
-          );
-        }
-      }
-    }
-  };
+  let title = school.name.replace(' High School', '');
+  if (title.length < 20) {
+    title += ` ${school.mascot}`;
+  }
 
   return (
     <SafeAreaView
@@ -168,7 +143,8 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
         backgroundColor={school.primary_color}
         color={getColorByBackground(school.primary_color)}
         navigation={navigation}
-        title={`Go ${school.mascot}!`}
+        title={title}
+        imageUrl={school.logo_url}
       />
       <ScrollView
         style={styles.container}
@@ -176,7 +152,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
         refreshControl={
           <RefreshControl refreshing={teamsLoading} onRefresh={getTeams} />
         }>
-        <View style={styles.well}>
+        {/* <View style={styles.well}>
           <View style={styles.infoContainer}>
             <View style={styles.locationContainer}>
               {school.location ? (
@@ -238,54 +214,22 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
               resizeMode="contain"
             />
           </View>
-        </View>
+        </View> */}
 
-        <View style={[styles.well, styles.notificationsContainer]}>
-          <Text style={styles.subHeader}>Notifications</Text>
-          <View style={styles.notificationsRow}>
-            <Text style={styles.notificationRowText}>
-              Subscribe to Push Notifications
-            </Text>
-            <Switch
-              onValueChange={(value) => {
-                if (value) {
-                  Alert.alert(
-                    `Subscribe to push notifications for all events?`,
-                    'If you only want to receive push notifications for a single team, you can do so under Team > Notify',
-                    [
-                      {
-                        text: 'No',
-                        style: 'destructive',
-                      },
-                      {
-                        text: 'Yes',
-                        style: 'default',
-                        onPress: () => onChangeDeviceSubscription(value),
-                      },
-                    ],
-                  );
-                } else {
-                  onChangeDeviceSubscription(value);
-                }
-              }}
-              style={styles.boxShadow}
-              trackColor={{
-                true: school.primary_color,
-                false: school.primary_color,
-              }}
-              thumbColor={getColorByBackground(school.primary_color)}
-              value={deviceSubscribed}
-            />
+        {bookmarkedTeams.length > 0 ? (
+          <View style={[styles.well]}>
+            {bookmarkedTeams.map((team, index) => (
+              <TeamRow
+                team={team}
+                showSectionHeaders={false}
+                index={index}
+                key={team.id}
+                lastIndex={bookmarkedTeams.length - 1}
+                onPress={onSelectTeam}
+              />
+            ))}
           </View>
-          {deviceSubscribed || subscribedTeams.length === 0 ? null : (
-            <Text>
-              <Text style={styles.alreadySubscribed}>
-                Teams Subscribed:{'\n'}
-              </Text>
-              {subscribedTeams.map((team) => team.name).join('\n')}
-            </Text>
-          )}
-        </View>
+        ) : null}
 
         <Button
           onPress={goToUpcomingEvents}
@@ -468,16 +412,8 @@ const styles = StyleSheet.create({
   loadingContainer: {
     padding: 12,
   },
-  notificationsContainer: {
+  bookmarkedContainer: {
     padding: 20,
-  },
-  notificationsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  notificationRowText: {
-    fontWeight: 'bold',
   },
   alreadySubscribed: {
     fontSize: 15,

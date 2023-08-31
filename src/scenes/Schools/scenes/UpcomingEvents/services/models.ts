@@ -8,7 +8,7 @@ export enum UpcomingEventActionTypes {
 }
 
 export interface FetchUpcomingEventsRequest {
-  schoolId: number;
+  schoolId: string;
   level_id?: number[];
   gender_id?: number[];
   sport_id?: number[];

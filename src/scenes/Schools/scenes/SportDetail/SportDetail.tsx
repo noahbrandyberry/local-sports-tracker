@@ -41,7 +41,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
     navigation.goBack();
   };
 
-  const onSelectTeam = (teamId: number) => {
+  const onSelectTeam = (teamId: string) => {
     navigation.navigate('TeamDetail', { teamId, schoolId });
   };
 

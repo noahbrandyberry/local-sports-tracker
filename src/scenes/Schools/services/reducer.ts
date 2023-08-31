@@ -3,7 +3,7 @@ import { SchoolActionTypes, SchoolsAction } from './models';
 
 export interface SchoolsState {
   schools: School[];
-  defaultSchool: number | null;
+  defaultSchool: string | null;
   loading: boolean;
   error: Error | null;
 }

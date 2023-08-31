@@ -49,7 +49,7 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSchoolId]);
 
-  const onSelectSchool = (schoolId: number) => {
+  const onSelectSchool = (schoolId: string) => {
     navigation.navigate('SchoolDetail', {
       schoolId,
     });
