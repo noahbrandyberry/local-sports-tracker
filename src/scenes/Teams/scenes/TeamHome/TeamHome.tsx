@@ -49,11 +49,12 @@ const TeamHome = ({
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>();
   const { teamId } = route.params;
   const team = useSelector(selectTeamById(teamId));
-  const school = useSelector(selectSchoolById(team?.school_id || ''));
+  const schoolId = team?.school_id || '';
+  const school = useSelector(selectSchoolById(schoolId));
   const posts = useSelector(selectPosts);
   const loading = useSelector(selectSchoolTeamsLoading);
   const events = useSelector(selectEvents);
-  const { bookmarkedTeams, storeBookmark } = useBookmarkedTeams();
+  const { bookmarkedTeams, storeBookmark } = useBookmarkedTeams(schoolId);
   const bookmarked = bookmarkedTeams.find(
     (bookmarkedTeam) => bookmarkedTeam.id === teamId,
   );

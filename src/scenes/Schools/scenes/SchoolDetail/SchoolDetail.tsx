@@ -78,7 +78,7 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   const teams = useSelector(selectTeams);
   const seasons = useSelector(selectSeasons);
   const school = useSelector(selectSchoolById(schoolId));
-  const { bookmarkedTeams } = useBookmarkedTeams();
+  const { bookmarkedTeams } = useBookmarkedTeams(schoolId);
   const bookmarkedTeamIds = bookmarkedTeams.map((team) => team.id);
 
   const recentEvents = useQuery<Event[]>({
@@ -224,10 +224,12 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                           style={[
                             styles.seasonButton,
                             {
+                              borderWidth: 1,
+                              borderColor: school.primary_color,
                               backgroundColor:
                                 season.id === selectedSeason?.id
-                                  ? school.secondary_color
-                                  : school.primary_color,
+                                  ? school.primary_color
+                                  : getColorByBackground(school.primary_color),
                             },
                           ]}>
                           <Text
@@ -236,12 +238,8 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
                               {
                                 color:
                                   season.id === selectedSeason?.id
-                                    ? getColorByBackground(
-                                        school.secondary_color,
-                                      )
-                                    : getColorByBackground(
-                                        school.primary_color,
-                                      ),
+                                    ? getColorByBackground(school.primary_color)
+                                    : school.primary_color,
                               },
                             ]}>
                             {season.name}

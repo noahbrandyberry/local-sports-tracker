@@ -64,7 +64,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     'name',
   );
   const school = useSelector(selectSchoolById(schoolId));
-  const { bookmarkedTeams, bookmarksLoading } = useBookmarkedTeams();
+  const { bookmarkedTeams, bookmarksLoading } = useBookmarkedTeams(schoolId);
   const calendarColor =
     school && getColorByBackground(school.primary_color) === 'white'
       ? school?.primary_color

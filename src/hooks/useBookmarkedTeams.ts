@@ -6,13 +6,15 @@ import { saveDeviceToken } from 'services/deviceToken/actions';
 import { selectDeviceToken } from 'services/deviceToken/selectors';
 import { selectTeams } from 'teams/services/selectors';
 
-export const useBookmarkedTeams = () => {
+export const useBookmarkedTeams = (schoolId: string) => {
   const teams = useSelector(selectTeams);
   const deviceToken = useSelector(selectDeviceToken);
   const dispatch = useDispatch();
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [bookmarksLoading, setBookmarksLoading] = useState(true);
-  const bookmarkedTeams = teams.filter((team) => bookmarks.includes(team.id));
+  const bookmarkedTeams = teams.filter(
+    (team) => bookmarks.includes(team.id) && team.school_id === schoolId,
+  );
 
   const readBookmarks = async () => {
     const storedValue = await AsyncStorage.getItem('@bookmarkedTeams');
