@@ -81,7 +81,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     'day',
   );
   const firstDate = Object.entries(groupedEvents).filter(
-    (e) => e[1].length > 0 && moment(e[0]).isAfter(moment()),
+    (e) => e[1].length > 0 && !moment(e[0]).isBefore(moment(), 'day'),
   )[0]?.[0];
 
   const minDate = moment().subtract(8, 'months');

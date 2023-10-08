@@ -149,7 +149,7 @@ const TeamHome = ({
               <Text style={{ marginBottom: 16 }}>
                 Overall Record:{' '}
                 {`${team.record.win} - ${team.record.loss}${
-                  team.record.tie ? `- ${team.record.tie}` : ''
+                  team.record.tie ? ` - ${team.record.tie}` : ''
                 }`}
               </Text>
             ) : null}
