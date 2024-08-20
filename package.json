@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern \"e2e/**/*\""
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern \"e2e/**/*\"",
+    "codepush": "appcenter codepush release-react -a noahbrandyberry-gmail.com/School-Sports-Tracker -d Production"
   },
   "dependencies": {
     "@check-light-or-dark/utils": "^1.0.1",
@@ -105,6 +106,5 @@
     "transformIgnorePatterns": [
       "node_modules/(?!(@react-native|react-native|react-native-(.*)|@react-native-community/(.*))+)"
     ]
-  },
-  "packageManager": "yarn@1.22.11"
+  }
 }

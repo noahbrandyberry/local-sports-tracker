@@ -206,11 +206,15 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   const subscribeToCalendar = async () => {
     Linking.openURL(
       `${config.baseUrl}/schools/${schoolId}/upcoming_events.ics?${qs.stringify(
-        {
-          level_id: levels,
-          gender_id: genders,
-          sport_id: sports,
-        },
+        customFilters
+          ? {
+              level_id: levels,
+              gender_id: genders,
+              sport_id: sports,
+            }
+          : {
+              team_id: bookmarkedTeams.map((team) => team.id),
+            },
         { arrayFormat: 'brackets' },
       )}`,
     );
@@ -452,8 +456,12 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
               )}
             </View>
             <Agenda
-              onDayPress={({ dateString }) => setSelectedDate(dateString)}
-              onDayChange={({ dateString }) => setSelectedDate(dateString)}
+              onDayPress={({ dateString }: { dateString: string }) =>
+                setSelectedDate(dateString)
+              }
+              onDayChange={({ dateString }: { dateString: string }) =>
+                setSelectedDate(dateString)
+              }
               items={groupedEvents}
               selected={firstDate}
               renderItem={(event: unknown) => {
