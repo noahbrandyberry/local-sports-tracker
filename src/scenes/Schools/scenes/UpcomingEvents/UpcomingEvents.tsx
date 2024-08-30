@@ -19,7 +19,7 @@ import { Event, Sport } from 'teams/models';
 import EventRow from 'teams/scenes/TeamSchedule/components/EventRow';
 import { fetchEvents } from 'teams/scenes/TeamSchedule/services/actions';
 import { selectTeams } from 'teams/services/selectors';
-import { selectSchoolById } from '../../services/selectors';
+import { selectSchoolById, selectSchools } from '../../services/selectors';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { SportIcons } from 'src/enums/sportIcons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -32,6 +32,8 @@ import config from 'src/config/config';
 import qs from 'qs';
 import uniqBy from 'lodash/uniqBy';
 import { useBookmarkedTeams } from 'src/hooks/useBookmarkedTeams';
+import { getIntermediateColor } from '../../../../utils/getIntermediateColor';
+import { fetchTeams } from 'teams/services/actions';
 
 interface EventWithDay extends Event {
   day: string;
@@ -44,7 +46,7 @@ type UpcomingEventsProps = NativeStackScreenProps<
 >;
 
 const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
-  const { schoolId } = route.params;
+  const { schoolId } = route.params ?? {};
   const dispatch = useDispatch();
   const eventsLoading = useSelector(selectUpcomingEventsLoading);
   const [filter, setFilter] = useState<string>();
@@ -59,12 +61,20 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   const endMonth = day.clone().endOf('week');
   const events = useSelector(selectUpcomingEvents);
   const teams = useSelector(selectTeams);
+  const allSchools = useSelector(selectSchools);
   const availableSports = uniqBy(
     teams.map((team) => team.sport),
     'name',
   );
-  const school = useSelector(selectSchoolById(schoolId));
+  const schoolFromStore = useSelector(selectSchoolById(schoolId ?? ''));
   const { bookmarkedTeams, bookmarksLoading } = useBookmarkedTeams(schoolId);
+  const schoolColors = bookmarkedTeams
+    .map((t) => allSchools.find((s) => s.id === t.school_id)?.primary_color)
+    .filter((c): c is string => !!c);
+  const school = schoolId
+    ? schoolFromStore
+    : { primary_color: getIntermediateColor(...schoolColors) };
+
   const calendarColor =
     school && getColorByBackground(school.primary_color) === 'white'
       ? school?.primary_color
@@ -230,12 +240,17 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     const event = events.find((e) => e.id === eventId);
     if (event) {
       const teamId = event.selected_team_id;
-      dispatch(fetchEvents({ teamId, schoolId: schoolId }));
-      navigation.navigate('EventDetail', {
-        teamId,
-        eventId,
-        schoolId,
-      });
+      const s =
+        bookmarkedTeams.find((t) => t.id === teamId)?.school_id ?? schoolId;
+      if (s) {
+        dispatch(fetchTeams({ schoolId: s }));
+        dispatch(fetchEvents({ teamId, schoolId: s }));
+        navigation.navigate('EventDetail', {
+          teamId,
+          eventId,
+          schoolId: s,
+        });
+      }
     }
   };
 
@@ -253,110 +268,114 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
 
       <View style={styles.container}>
         <View style={styles.modalDragBar} />
-        <View style={styles.filtersLabelContainer}>
-          <View style={styles.customSwitchContainer}>
-            <Switch
-              disabled={eventsLoading}
-              value={customFilters}
-              style={styles.customSwitch}
-              trackColor={{
-                true: school.primary_color,
-                false: school.primary_color,
-              }}
-              thumbColor={getColorByBackground(school.primary_color)}
-              onValueChange={setCustomFilters}
-            />
-            {!customFilters && (
-              <Text style={styles.customSwitchText}>Enable Filters</Text>
-            )}
-          </View>
 
-          <View style={styles.divider} />
-          {customFilters && (
-            <>
-              <TouchableOpacity
-                onPress={() =>
-                  setFilter(filter === 'level' ? undefined : 'level')
-                }
-                style={[
-                  styles.filterLabel,
-                  { backgroundColor: school?.primary_color },
-                ]}>
-                <Text style={{ color }}>
-                  {levels ? 'Levels' : 'All Levels'}
-                </Text>
-                {levels ? (
-                  <View style={[styles.badge, { backgroundColor: color }]}>
-                    <Text
-                      style={[
-                        styles.badgeText,
-                        { color: school?.primary_color },
-                      ]}>
-                      {levels.length}
-                    </Text>
-                  </View>
-                ) : null}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  setFilter(filter === 'gender' ? undefined : 'gender')
-                }
-                style={[
-                  styles.filterLabel,
-                  { backgroundColor: school?.primary_color },
-                ]}>
-                <Text style={{ color }}>
-                  {genders ? 'Genders' : 'All Genders'}
-                </Text>
-                {genders ? (
-                  <View style={[styles.badge, { backgroundColor: color }]}>
-                    <Text
-                      style={[
-                        styles.badgeText,
-                        { color: school?.primary_color },
-                      ]}>
-                      {genders.length}
-                    </Text>
-                  </View>
-                ) : null}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  setFilter(filter === 'sport' ? undefined : 'sport')
-                }
-                style={[
-                  styles.filterLabel,
-                  { backgroundColor: school?.primary_color },
-                ]}>
-                <Text style={{ color }}>
-                  {sports ? 'Sports' : 'All Sports'}
-                </Text>
-                {sports ? (
-                  <View style={[styles.badge, { backgroundColor: color }]}>
-                    <Text
-                      style={[
-                        styles.badgeText,
-                        { color: school?.primary_color },
-                      ]}>
-                      {sports.length}
-                    </Text>
-                  </View>
-                ) : null}
-              </TouchableOpacity>
-            </>
-          )}
-
-          <View style={styles.divider} />
-          <View>
-            <TouchableOpacity onPress={subscribeToCalendar}>
-              <FontAwesomeIcon
-                icon="calendar-plus"
-                color={school.primary_color}
-                size={20}
+        <TouchableOpacity
+          onPress={subscribeToCalendar}
+          style={{ position: 'absolute', right: 15, top: 5 }}>
+          <FontAwesomeIcon
+            icon="calendar-plus"
+            color={school.primary_color}
+            size={20}
+          />
+        </TouchableOpacity>
+        {schoolId && (
+          <View style={styles.filtersLabelContainer}>
+            <View style={styles.customSwitchContainer}>
+              <Switch
+                disabled={eventsLoading}
+                value={customFilters}
+                style={styles.customSwitch}
+                trackColor={{
+                  true: school.primary_color,
+                  false: school.primary_color,
+                }}
+                thumbColor={getColorByBackground(school.primary_color)}
+                onValueChange={setCustomFilters}
               />
-            </TouchableOpacity>
+              {!customFilters && (
+                <Text style={styles.customSwitchText}>Enable Filters</Text>
+              )}
+            </View>
+
+            <View style={styles.divider} />
+            {customFilters && (
+              <>
+                <TouchableOpacity
+                  onPress={() =>
+                    setFilter(filter === 'level' ? undefined : 'level')
+                  }
+                  style={[
+                    styles.filterLabel,
+                    { backgroundColor: school?.primary_color },
+                  ]}>
+                  <Text style={{ color }}>
+                    {levels ? 'Levels' : 'All Levels'}
+                  </Text>
+                  {levels ? (
+                    <View style={[styles.badge, { backgroundColor: color }]}>
+                      <Text
+                        style={[
+                          styles.badgeText,
+                          { color: school?.primary_color },
+                        ]}>
+                        {levels.length}
+                      </Text>
+                    </View>
+                  ) : null}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    setFilter(filter === 'gender' ? undefined : 'gender')
+                  }
+                  style={[
+                    styles.filterLabel,
+                    { backgroundColor: school?.primary_color },
+                  ]}>
+                  <Text style={{ color }}>
+                    {genders ? 'Genders' : 'All Genders'}
+                  </Text>
+                  {genders ? (
+                    <View style={[styles.badge, { backgroundColor: color }]}>
+                      <Text
+                        style={[
+                          styles.badgeText,
+                          { color: school?.primary_color },
+                        ]}>
+                        {genders.length}
+                      </Text>
+                    </View>
+                  ) : null}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    setFilter(filter === 'sport' ? undefined : 'sport')
+                  }
+                  style={[
+                    styles.filterLabel,
+                    { backgroundColor: school?.primary_color },
+                  ]}>
+                  <Text style={{ color }}>
+                    {sports ? 'Sports' : 'All Sports'}
+                  </Text>
+                  {sports ? (
+                    <View style={[styles.badge, { backgroundColor: color }]}>
+                      <Text
+                        style={[
+                          styles.badgeText,
+                          { color: school?.primary_color },
+                        ]}>
+                        {sports.length}
+                      </Text>
+                    </View>
+                  ) : null}
+                </TouchableOpacity>
+              </>
+            )}
+
+            <View style={styles.divider} />
+            <View style={{ width: 30 }} />
           </View>
-        </View>
+        )}
         {filter ? (
           <View style={styles.filterContainer}>
             <View style={styles.filters}>
@@ -467,6 +486,8 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
               renderItem={(event: unknown) => {
                 const e = event as Event;
                 const team = teams.find((t) => t.id === e.selected_team_id);
+                const eventSchool =
+                  allSchools.find((s) => s.id === team?.school_id) ?? school;
                 const name: keyof typeof SportIcons | undefined =
                   team?.sport.name;
                 const icon =
@@ -495,24 +516,26 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
                             name: 'TeamDetail',
                             params: {
                               teamId: team.id,
-                              schoolId,
+                              schoolId: team.school_id,
                             },
                           })
                         }
                         style={{
-                          backgroundColor: school.primary_color,
+                          backgroundColor: eventSchool.primary_color,
                           paddingHorizontal: 15,
                           paddingVertical: 10,
                           flexDirection: 'row',
                           justifyContent: 'space-between',
                           borderBottomColor: getColorByBackground(
-                            school.primary_color,
+                            eventSchool.primary_color,
                           ),
                           borderBottomWidth: 1,
                         }}>
                         <Text
                           style={{
-                            color: getColorByBackground(school.primary_color),
+                            color: getColorByBackground(
+                              eventSchool.primary_color,
+                            ),
                             fontWeight: 'bold',
                           }}>
                           {team.name}
@@ -520,7 +543,9 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
                         {icon ? (
                           <FontAwesomeIcon
                             icon={icon}
-                            color={getColorByBackground(school.primary_color)}
+                            color={getColorByBackground(
+                              eventSchool.primary_color,
+                            )}
                           />
                         ) : null}
                       </TouchableOpacity>
@@ -578,7 +603,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   modalDragBar: {
-    marginBottom: 20,
     alignSelf: 'center',
     width: 36,
     backgroundColor: 'gray',
@@ -595,6 +619,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   filtersLabelContainer: {
+    marginTop: 20,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',

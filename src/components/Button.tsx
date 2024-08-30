@@ -9,21 +9,29 @@ import { Text } from './Text';
 
 interface ButtonProps extends TouchableOpacityProps {
   textStyle?: TextStyle;
+  leftAccessory?: React.ReactNode;
+  rightAccessory?: React.ReactNode;
 }
 
 export const Button = ({
   style,
   textStyle,
   children,
+  leftAccessory,
+  rightAccessory,
   ...props
 }: ButtonProps) => (
   <TouchableOpacity style={[styles.button, style]} {...props}>
+    {leftAccessory}
     <Text style={[styles.text, textStyle]}>{children}</Text>
+    {rightAccessory}
   </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
   button: {
+    alignItems: 'center',
+    flexDirection: 'row',
     backgroundColor: 'black',
     padding: 16,
     borderRadius: 5,

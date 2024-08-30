@@ -58,7 +58,7 @@ const EventRow = ({ event, onPress, itemStyles = {} }: EventRowProps) => {
   return (
     <TouchableOpacity
       style={[styles.rowContainer, pastStyles, currentStyles, itemStyles]}
-      onPress={() => onPress(event.id)}>
+      onPress={() => onPress(event.id, event)}>
       <View style={styles.nameContainer}>
         <Text style={styles.name} numberOfLines={1}>
           {name}

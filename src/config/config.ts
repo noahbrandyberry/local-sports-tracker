@@ -1,5 +1,5 @@
 const config = {
-  baseUrl: __DEV__
+  baseUrl: false
     ? 'http://localhost:3000/api/v1'
     : 'https://www.myschoolsports.us/api/v1',
 };

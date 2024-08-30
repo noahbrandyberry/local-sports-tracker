@@ -1,174 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
+import { SafeAreaView, StatusBar, View } from 'react-native';
 import {
-  ActivityIndicator,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
-import {
-  selectDefaultSchool,
-  selectNearestSchools,
-  selectSchoolsLoading,
-  selectSchoolsWithDistance,
-} from 'schools/services/selectors';
-import SchoolRow from './components/SchoolRow';
-import { Text, TextField } from 'components';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import RootStackParamList from 'src/RootStackParams';
-import {
-  selectCurrentLocationError,
-  selectCurrentLocationLoading,
-} from 'services/location/selectors';
-import { School } from 'schools/models';
-import { usePrevious } from 'src/utils/usePrevious';
+import { SchoolStep } from './steps/SchoolStep';
+import { SportStep } from './steps/SportStep';
+import { TeamStep } from './steps/TeamStep';
+import { useTailwind } from 'tailwind-rn';
+import { useBookmarkedTeams } from 'src/hooks/useBookmarkedTeams';
+import { uniq } from 'lodash';
+import { SelectSchoolNavigatorParams } from './SelectSchoolParams';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 type SelectSchoolProps = NativeStackScreenProps<
   RootStackParamList,
   'SchoolDetail'
 >;
 
+const SelectSchoolNavigator =
+  createNativeStackNavigator<SelectSchoolNavigatorParams>();
+
 const SelectSchool = ({ navigation }: SelectSchoolProps) => {
-  const schools = useSelector(selectSchoolsWithDistance);
-  const loading = useSelector(selectSchoolsLoading);
-  const nearestSchools = useSelector(selectNearestSchools).slice(0, 15);
-  const currentLocationLoading = useSelector(selectCurrentLocationLoading);
-  const currentLocationError = useSelector(selectCurrentLocationError);
-  const defaultSchool = useSelector(selectDefaultSchool);
-  const defaultSchoolId = defaultSchool?.id;
-  const previousLoading = usePrevious(loading);
-
-  useEffect(() => {
-    if (previousLoading && !loading && defaultSchoolId) {
-      navigation.replace('SchoolDetail', { schoolId: defaultSchoolId });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultSchoolId]);
-
-  const onSelectSchool = (schoolId: string) => {
-    navigation.navigate('SchoolDetail', {
-      schoolId,
-    });
-  };
-
-  const [searchText, setSearchText] = useState('');
-
-  const schoolResults = schools.filter((school) =>
-    school.name.includes(searchText),
-  );
-
-  if (loading)
-    return (
-      <View style={styles.loadingScreen}>
-        <ActivityIndicator />
-      </View>
-    );
+  const tw = useTailwind();
+  const { bookmarkedTeams } = useBookmarkedTeams();
+  const bookmarkedSchoolIds = uniq(bookmarkedTeams.map((t) => t.school_id));
 
   return (
-    <SafeAreaView style={styles.evenHeight}>
+    <SafeAreaView style={tw('flex-1')}>
       <StatusBar barStyle="dark-content" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.evenHeight}>
-        <View style={styles.container}>
-          {currentLocationLoading || !currentLocationError ? (
-            <View style={styles.evenHeight}>
-              <Text style={styles.header}>Select Your School</Text>
 
-              <View style={styles.well}>
-                <FlatList
-                  data={nearestSchools}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item, index }) => (
-                    <SchoolRow
-                      school={item as School}
-                      index={index}
-                      onPress={onSelectSchool}
-                    />
-                  )}
-                />
-              </View>
-            </View>
-          ) : null}
-          <View style={styles.evenHeight}>
-            <Text style={styles.header}>
-              {currentLocationLoading || !currentLocationError
-                ? 'Or Search For One'
-                : 'Search for Your School'}
-            </Text>
-            <TextField
-              icon="search"
-              placeholder="Search"
-              onChangeText={setSearchText}
-              value={searchText}
-            />
-
-            {searchText ? (
-              <View style={[styles.well, styles.searchResults]}>
-                <FlatList
-                  data={schoolResults}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item, index }) => (
-                    <SchoolRow
-                      school={item}
-                      index={index}
-                      onPress={onSelectSchool}
-                    />
-                  )}
-                />
-              </View>
-            ) : null}
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+      <SelectSchoolNavigator.Navigator
+        screenOptions={({ navigation: { goBack } }) => ({
+          headerLeft: ({ canGoBack }) =>
+            canGoBack ? (
+              <TouchableOpacity onPress={() => goBack()}>
+                <FontAwesomeIcon icon="angle-left" size={20} />
+              </TouchableOpacity>
+            ) : (
+              <View />
+            ),
+          headerRight: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <FontAwesomeIcon icon="times" size={20} />
+            </TouchableOpacity>
+          ),
+        })}>
+        <SelectSchoolNavigator.Screen
+          name="School"
+          component={SchoolStep}
+          initialParams={{ bookmarked: bookmarkedSchoolIds }}
+          options={{ title: 'Select School' }}
+        />
+        <SelectSchoolNavigator.Screen
+          name="Sport"
+          component={SportStep}
+          options={{ title: 'Select Sport' }}
+        />
+        <SelectSchoolNavigator.Screen
+          name="Team"
+          component={TeamStep}
+          options={{ title: 'Select Team' }}
+        />
+      </SelectSchoolNavigator.Navigator>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-  },
-  evenHeight: {
-    flex: 1,
-  },
-  well: {
-    backgroundColor: 'white',
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    marginBottom: 24,
-    flex: 1,
-  },
-  header: {
-    fontSize: 24,
-    lineHeight: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    marginBottom: 16,
-  },
-  searchResults: {
-    flex: 0,
-    marginTop: 16,
-  },
-  loadingScreen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
-});
-
 export default SelectSchool;

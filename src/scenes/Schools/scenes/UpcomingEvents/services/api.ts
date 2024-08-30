@@ -6,6 +6,11 @@ export const constructApiRequest = ({
   schoolId,
   ...params
 }: FetchUpcomingEventsRequest) =>
-  axios.get(`${config.baseUrl}/schools/${schoolId}/upcoming_events.json`, {
-    params,
-  });
+  axios.get(
+    schoolId
+      ? `${config.baseUrl}/schools/${schoolId}/upcoming_events.json`
+      : `${config.baseUrl}/upcoming_events.json`,
+    {
+      params,
+    },
+  );

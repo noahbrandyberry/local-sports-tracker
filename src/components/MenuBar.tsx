@@ -63,7 +63,7 @@ export const MenuBar = ({
       <TouchableOpacity
         style={styles.menuButton}
         hitSlop={{ top: 15, bottom: 15, left: 15 }}
-        onPress={() => setIsVisible(true)}>
+        onPress={() => goToScreen('Home')}>
         <View style={styles.imageContainer}>
           <FastImage
             source={{ uri: imageUrl }}

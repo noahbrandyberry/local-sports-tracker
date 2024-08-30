@@ -1,14 +1,16 @@
 import { School } from 'schools/models';
 import React from 'react';
 import { Text } from 'components';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 interface SchoolRowProps {
   school: School;
   index: number;
   onPress: CallableFunction;
   showDistance?: boolean;
+  bookmarked?: boolean;
 }
 
 const SchoolRow = ({
@@ -16,6 +18,7 @@ const SchoolRow = ({
   index,
   onPress,
   showDistance = true,
+  bookmarked = false,
 }: SchoolRowProps) => {
   let distance = school.distance ?? 0;
   if (distance < 1) {
@@ -24,6 +27,16 @@ const SchoolRow = ({
     distance = Math.round((distance + Number.EPSILON) * 10) / 10;
   } else {
     distance = Math.round((distance + Number.EPSILON) * 1) / 1;
+  }
+
+  const attributes = [];
+
+  if (showDistance) {
+    attributes.push(`${distance} mile${distance === 1 ? '' : 's'} away`);
+  }
+
+  if (school.mascot) {
+    attributes.push(school.mascot);
   }
 
   return (
@@ -35,10 +48,11 @@ const SchoolRow = ({
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={styles.name}>{school.name}</Text>
-      {showDistance ? (
-        <Text style={styles.distance}>{distance} miles</Text>
-      ) : null}
+      <View style={{ flex: 1 }}>
+        <Text style={styles.name}>{school.name}</Text>
+        <Text style={styles.distance}>{attributes.join(' • ')}</Text>
+      </View>
+      {bookmarked && <FontAwesomeIcon icon={['fas', 'bookmark']} />}
     </TouchableOpacity>
   );
 };
@@ -46,8 +60,8 @@ const SchoolRow = ({
 const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
-    padding: 20,
-    paddingHorizontal: 16,
+    paddingTop: 18,
+    padding: 16,
     alignItems: 'center',
   },
   rowContainerBorder: {

@@ -35,7 +35,7 @@ const SportCell = ({
 
 const styles = StyleSheet.create({
   cellContainer: {
-    width: '50%',
+    width: '33.3%',
     flexDirection: 'row',
     shadowColor: '#000',
     shadowOffset: {
@@ -49,15 +49,17 @@ const styles = StyleSheet.create({
   cell: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 10,
     aspectRatio: 1,
     flex: 1,
     margin: 10,
   },
   name: {
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 10,
+    lineHeight: 16,
   },
 });
 

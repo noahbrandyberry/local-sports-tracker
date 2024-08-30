@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, InvalidDataError } from 'components';
+import { Text, InvalidDataError, LoadingScreen } from 'components';
 import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import RootStackParamList from 'src/RootStackParams';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ import Qty from 'js-quantities';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { selectSchoolById } from 'schools/services/selectors';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
+import { selectSchoolTeamsLoading } from 'store/selectors';
 
 interface PlayerAttributeProps {
   player: Player;
@@ -75,6 +76,12 @@ const PlayerDetail = ({ route }: PlayerDetailProps) => {
   const team = useSelector(selectTeamById(teamId));
   const school = useSelector(selectSchoolById(schoolId));
   const player = team?.players.find((p) => p.id === playerId);
+
+  const loading = useSelector(selectSchoolTeamsLoading);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (!school || !team || !player) {
     return <InvalidDataError />;

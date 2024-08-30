@@ -1,9 +1,11 @@
 import { Team } from 'teams/models';
 import React from 'react';
 import { Text } from 'components';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 interface TeamRowProps {
+  bookmarked?: boolean;
   team: Team;
   index: number;
   lastIndex: number;
@@ -12,6 +14,7 @@ interface TeamRowProps {
 }
 
 const TeamRow = ({
+  bookmarked,
   team,
   index,
   lastIndex,
@@ -35,11 +38,17 @@ const TeamRow = ({
         index === 0 && !showSectionHeaders ? styles.firstRow : {},
         index < lastIndex ? styles.rowContainerBorder : styles.lastRow,
       ]}
+      disabled={bookmarked}
       onPress={() => onPress(team.id)}>
-      <Text style={styles.name}>{name}</Text>
-      {!team.hide_gender && team.gender ? (
-        <Text style={styles.gender}>{team.gender.name}</Text>
-      ) : null}
+      <Text style={[styles.name, bookmarked && { opacity: 0.5 }]}>{name}</Text>
+      <View style={{ flexDirection: 'row' }}>
+        {!team.hide_gender && team.gender ? (
+          <Text style={styles.gender}>{team.gender.name}</Text>
+        ) : null}
+        {bookmarked && (
+          <FontAwesomeIcon icon="bookmark" style={{ marginLeft: 10 }} />
+        )}
+      </View>
     </TouchableOpacity>
   );
 };

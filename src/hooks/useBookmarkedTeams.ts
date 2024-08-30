@@ -1,19 +1,45 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveDeviceToken } from 'services/deviceToken/actions';
 import { selectDeviceToken } from 'services/deviceToken/selectors';
 import { selectTeams } from 'teams/services/selectors';
+import { useQuery } from './useQuery';
+import { transformTeams } from 'teams/services/transform';
+import { Team } from 'teams/models';
 
-export const useBookmarkedTeams = (schoolId: string) => {
-  const teams = useSelector(selectTeams);
+export const useBookmarkedTeams = (schoolId?: string) => {
+  const teamsFromSelector = useSelector(selectTeams);
   const deviceToken = useSelector(selectDeviceToken);
   const dispatch = useDispatch();
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [bookmarksLoading, setBookmarksLoading] = useState(true);
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  const { isLoading, data: teamsFromQuery } = useQuery<Team[]>({
+    url: `teams.json`,
+    params: { team_id: bookmarks },
+    transform: transformTeams,
+    queryKey: ['bookmarked_teams', bookmarks],
+    enabled: bookmarks.length > 0 && !schoolId,
+    staleTime: Infinity,
+  });
+
+  const teams = (schoolId ? teamsFromSelector : teamsFromQuery) ?? [];
+
   const bookmarkedTeams = teams.filter(
-    (team) => bookmarks.includes(team.id) && team.school_id === schoolId,
+    (team) =>
+      bookmarks.includes(team.id) &&
+      (schoolId ? team.school_id === schoolId : true),
   );
 
   const readBookmarks = async () => {
@@ -22,8 +48,10 @@ export const useBookmarkedTeams = (schoolId: string) => {
     const bookmarkedIds = Object.entries(bookmarkedObject)
       .filter(([, value]) => value)
       .map(([key]) => key);
-    setBookmarks(bookmarkedIds);
-    setBookmarksLoading(false);
+    if (isMounted.current) {
+      setBookmarks(bookmarkedIds);
+      setBookmarksLoading(false);
+    }
 
     return bookmarkedObject;
   };
@@ -35,12 +63,12 @@ export const useBookmarkedTeams = (schoolId: string) => {
     }, [teams]),
   );
 
-  const bookmarkTeam = (teamId: string) => {
-    storeBookmark(teamId, true);
+  const bookmarkTeam = async (teamId: string) => {
+    await storeBookmark(teamId, true);
   };
 
-  const unbookmarkTeam = (teamId: string) => {
-    storeBookmark(teamId, false);
+  const unbookmarkTeam = async (teamId: string) => {
+    await storeBookmark(teamId, false);
   };
 
   const storeBookmark = async (teamId: string, newValue: boolean) => {
@@ -68,6 +96,7 @@ export const useBookmarkedTeams = (schoolId: string) => {
     bookmarkTeam,
     unbookmarkTeam,
     storeBookmark,
-    bookmarksLoading,
+    bookmarksLoading:
+      bookmarksLoading || (bookmarks.length > 0 && !schoolId && isLoading),
   };
 };

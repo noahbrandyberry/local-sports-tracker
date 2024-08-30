@@ -12,6 +12,7 @@ import { selectSchoolTeamsLoading } from 'store/selectors';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import RootStackParamList from 'src/RootStackParams';
+import { sortBy } from 'lodash';
 
 type TeamRostereNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -58,7 +59,9 @@ const TeamRoster = ({
             <Text style={styles.subHeader}>Roster</Text>
             {team.players.length > 0 ? (
               <View style={styles.rosterContainer}>
-                {team.players.map((player) => (
+                {sortBy(team.players, (p) =>
+                  isNaN(Number(p.jersey)) ? 0 : Number(p.jersey),
+                ).map((player) => (
                   <View style={styles.playerContainer} key={player.id}>
                     <TouchableOpacity
                       style={[styles.player, { backgroundColor }]}

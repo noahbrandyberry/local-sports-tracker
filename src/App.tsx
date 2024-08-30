@@ -2,7 +2,6 @@ import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import SelectSchool from 'schools/scenes/SelectSchool';
-import SchoolsList from 'schools/scenes/SchoolsList';
 import SchoolDetail from 'schools/scenes/SchoolDetail';
 import SportDetail from 'schools/scenes/SportDetail';
 import PlayerDetail from 'teams/scenes/PlayerDetail';
@@ -32,6 +31,24 @@ import { NotificationActionResponse } from 'react-native-notifications/lib/dist/
 import * as RootNavigation from './RootNavigation';
 import { upcomingEventCategory } from './notifications/categories';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { Home } from './scenes/Home/Home';
+import { TailwindProvider } from 'tailwind-rn';
+import utilities from '../tailwind.json';
+
+const tailwindExtensions = {
+  shadow: {
+    style: {
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+  },
+};
 
 const queryClient = new QueryClient();
 
@@ -139,37 +156,31 @@ const App = () => {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer ref={RootNavigation.navigationRef}>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            gestureEnabled: true,
-          }}>
-          <Stack.Group>
-            <Stack.Screen
-              name="SelectSchool"
-              component={SelectSchool}
-              options={{ animation: 'fade' }}
-            />
-            <Stack.Screen name="SchoolsList" component={SchoolsList} />
-            <Stack.Screen
-              name="SchoolDetail"
-              component={SchoolDetail}
-              options={{ animation: 'none' }}
-            />
-            <Stack.Screen name="SportDetail" component={SportDetail} />
-          </Stack.Group>
-          <Stack.Group screenOptions={{ presentation: 'modal' }}>
-            <Stack.Screen name="PlayerDetail" component={PlayerDetail} />
-            <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
-            <Stack.Screen name="EventDetail" component={EventDetail} />
-            <Stack.Screen name="PostDetail" component={PostDetail} />
-            <Stack.Screen name="UpcomingEvents" component={UpcomingEvents} />
-          </Stack.Group>
-        </Stack.Navigator>
-      </NavigationContainer>
-    </QueryClientProvider>
+    <TailwindProvider utilities={{ ...utilities, ...tailwindExtensions }}>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer ref={RootNavigation.navigationRef}>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              gestureEnabled: true,
+            }}>
+            <Stack.Group>
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="SchoolDetail" component={SchoolDetail} />
+              <Stack.Screen name="SportDetail" component={SportDetail} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="SelectSchool" component={SelectSchool} />
+              <Stack.Screen name="PlayerDetail" component={PlayerDetail} />
+              <Stack.Screen name="TeamDetail" component={TeamsNavigator} />
+              <Stack.Screen name="EventDetail" component={EventDetail} />
+              <Stack.Screen name="PostDetail" component={PostDetail} />
+              <Stack.Screen name="UpcomingEvents" component={UpcomingEvents} />
+            </Stack.Group>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </QueryClientProvider>
+    </TailwindProvider>
   );
 };
 

@@ -1,6 +1,7 @@
 import TeamsNavigatorParams from 'teams/TeamsNavigatorParams';
 
 type RootStackParamList = {
+  Home: undefined;
   SelectSchool: undefined;
   SchoolsList: undefined;
   SchoolDetail: { schoolId: string };
@@ -22,7 +23,7 @@ type RootStackParamList = {
     playerId: number;
   };
   PostDetail: { postId: string; teamId: string };
-  UpcomingEvents: { schoolId: string };
+  UpcomingEvents: { schoolId: string } | undefined;
 };
 
 export default RootStackParamList;
