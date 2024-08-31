@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -41,6 +42,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
     .filter((c): c is string => !!c);
   const backgroundColor = getIntermediateColor(...schoolColors);
   const color = getColorByBackground(backgroundColor);
+  const year = bookmarkedTeams?.[0]?.year;
 
   const { data: recentEvents } = useQuery<Event[]>({
     url: `recent_results.json`,
@@ -98,6 +100,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
 
   return (
     <SafeAreaView style={tw('flex-1')} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView
         style={tw('flex-1')}
         behavior={Platform.OS === 'ios' ? 'padding' : 'position'}>
@@ -172,6 +175,20 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                   const school = allSchools.find(
                     (s) => s.id === player.school_id,
                   );
+                  let graduate = '';
+                  const graduateIn =
+                    Number(player.grad_year) -
+                    Number(year?.name?.split('/')?.[1]);
+
+                  if (graduateIn === 0) {
+                    graduate = 'Senior';
+                  } else if (graduateIn === 1) {
+                    graduate = 'Junior';
+                  } else if (graduateIn === 2) {
+                    graduate = 'Sophomore';
+                  } else if (graduateIn >= 3) {
+                    graduate = 'Freshman';
+                  }
                   return (
                     <TouchableOpacity
                       onPress={() => {
@@ -185,7 +202,8 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                       }}
                       key={player.id}
                       style={[
-                        index === 0 && tw('bg-gray-100'),
+                        index === 0 && tw('bg-gray-100 rounded-t'),
+                        index === filteredPlayers.length - 1 && tw('rounded-b'),
                         tw(
                           'flex-row items-center py-2 px-3 border-b border-b-gray-300',
                         ),
@@ -207,9 +225,9 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                         <Text style={tw('font-medium')}>
                           {player.first_name} {player.last_name}
                         </Text>
-                        <Text style={tw('text-gray-600')}>
-                          {player.grad_year}
-                        </Text>
+                        {graduate && (
+                          <Text style={tw('text-gray-600')}>{graduate}</Text>
+                        )}
                       </View>
 
                       {school && (

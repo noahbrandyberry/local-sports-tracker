@@ -1,14 +1,14 @@
 import React from 'react';
 import {
   StyleSheet,
-  TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native';
 import { Text } from './Text';
+import { Style } from 'tailwind-rn';
 
 interface ButtonProps extends TouchableOpacityProps {
-  textStyle?: TextStyle;
+  textStyle?: Style | Style[];
   leftAccessory?: React.ReactNode;
   rightAccessory?: React.ReactNode;
 }
