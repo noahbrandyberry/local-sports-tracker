@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { Linking, StatusBar, StyleSheet, Switch, View } from 'react-native';
+import {
+  Linking,
+  StatusBar,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Button, LoadingScreen, Text } from 'components';
 import { Agenda } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +30,6 @@ import { selectSchoolById, selectSchools } from '../../services/selectors';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
 import { SportIcons } from 'src/enums/sportIcons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Level } from '../../../Teams/enums/level';
 import { typedKeys } from 'src/utils/typedKeys';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -144,7 +150,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
     const filters = await AsyncStorage.getItem('@filters');
     const parsedFilters = filters ? JSON.parse(filters) : {};
 
-    if (parsedFilters.custom) {
+    if (schoolId && parsedFilters.custom) {
       dispatch(
         fetchUpcomingEvents({
           schoolId,
@@ -188,7 +194,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   }, [firstDate]);
 
   const onFilter = () => {
-    if (customFilters) {
+    if (schoolId && customFilters) {
       dispatch(
         fetchUpcomingEvents({
           schoolId,
@@ -216,7 +222,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
   const subscribeToCalendar = async () => {
     Linking.openURL(
       `${config.baseUrl}/schools/${schoolId}/upcoming_events.ics?${qs.stringify(
-        customFilters
+        schoolId && customFilters
           ? {
               level_id: levels,
               gender_id: genders,
@@ -271,7 +277,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
 
         <TouchableOpacity
           onPress={subscribeToCalendar}
-          style={{ position: 'absolute', right: 15, top: 5 }}>
+          style={{ position: 'absolute', right: 15, top: 25, zIndex: 100 }}>
           <FontAwesomeIcon
             icon="calendar-plus"
             color={school.primary_color}
@@ -485,7 +491,9 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
               selected={firstDate}
               renderItem={(event: unknown) => {
                 const e = event as Event;
-                const team = teams.find((t) => t.id === e.selected_team_id);
+                const team = (schoolId ? teams : bookmarkedTeams).find(
+                  (t) => t.id === e.selected_team_id,
+                );
                 const eventSchool =
                   allSchools.find((s) => s.id === team?.school_id) ?? school;
                 const name: keyof typeof SportIcons | undefined =
@@ -601,6 +609,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: DefaultTheme.colors.background,
     paddingVertical: 20,
+    position: 'relative',
   },
   modalDragBar: {
     alignSelf: 'center',
@@ -619,7 +628,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   filtersLabelContainer: {
-    marginTop: 20,
+    marginTop: 10,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',

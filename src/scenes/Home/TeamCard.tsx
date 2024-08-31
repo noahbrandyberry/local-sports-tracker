@@ -93,7 +93,7 @@ export const TeamCard: React.FC<{
             </>
           ) : (
             <>
-              <Text>
+              <Text style={tw('flex-1')} numberOfLines={1}>
                 <Text style={tw('font-bold')}>
                   {team.game.start.format('h:mm a')}
                 </Text>{' '}

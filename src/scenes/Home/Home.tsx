@@ -129,6 +129,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
           </View>
         ) : (
           <ScrollView
+            keyboardShouldPersistTaps="handled"
             style={tw('flex-1')}
             contentContainerStyle={[
               { backgroundColor: DefaultTheme.colors.background },
@@ -255,12 +256,15 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
 
                 <Button
                   onPress={() => navigation.navigate('SelectSchool')}
-                  style={tw('px-2 py-1.5')}
-                  textStyle={tw('text-xs font-bold uppercase')}
+                  style={[tw('px-2 py-1.5'), { backgroundColor: color }]}
+                  textStyle={[
+                    tw('text-xs font-bold uppercase'),
+                    { color: backgroundColor },
+                  ]}
                   rightAccessory={
                     <FontAwesomeIcon
                       icon="plus"
-                      color="white"
+                      color={backgroundColor}
                       size={10}
                       style={tw('ml-2')}
                     />
