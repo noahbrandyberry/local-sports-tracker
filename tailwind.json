@@ -21,6 +21,18 @@
 			"marginRight": -20
 		}
 	},
+	"-my-2": {
+		"style": {
+			"marginTop": -8,
+			"marginBottom": -8
+		}
+	},
+	"-my-6": {
+		"style": {
+			"marginTop": -24,
+			"marginBottom": -24
+		}
+	},
 	"mb-4": {
 		"style": {
 			"marginBottom": 16

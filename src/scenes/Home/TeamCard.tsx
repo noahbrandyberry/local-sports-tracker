@@ -74,12 +74,12 @@ export const TeamCard: React.FC<{
                 <Text style={tw('font-bold')}>
                   {capitalize(team.game.result_status)}
                 </Text>{' '}
-                {team.game.home ? 'vs ' : 'at '}
-                {team.game.opponent_name} (
+                (
                 {team.game.home ? team.game.result.home : team.game.result.away}{' '}
                 -{' '}
                 {team.game.home ? team.game.result.away : team.game.result.home}
-                )
+                ) {team.game.home ? 'vs ' : 'at '}
+                {team.game.opponent_name}
               </Text>
               <Text style={tw('pl-4 font-medium')}>
                 {team.game.start.calendar(null, {

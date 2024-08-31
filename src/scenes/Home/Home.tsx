@@ -131,7 +131,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
               { backgroundColor: DefaultTheme.colors.background },
               tw('p-5'),
             ]}>
-            <View style={tw('flex-row items-center justify-center')}>
+            <View style={tw('flex-row items-center justify-center mb-4')}>
               <FastImage
                 source={require('../../../assets/images/Logo.png')}
                 style={tw('h-8 w-8 rounded mr-3')}
@@ -141,48 +141,6 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                 School Sports Tracker
               </Text>
             </View>
-            <View style={tw('bg-white rounded shadow my-4')}>
-              <View
-                style={[
-                  { backgroundColor },
-                  tw('flex-row items-center px-4 py-3 rounded-t'),
-                ]}>
-                <Text style={[tw('text-xl font-bold flex-1'), { color }]}>
-                  Bookmarked Teams
-                </Text>
-
-                <Button
-                  onPress={() => navigation.navigate('SelectSchool')}
-                  style={tw('px-2 py-1.5')}
-                  textStyle={tw('text-xs font-bold uppercase')}
-                  rightAccessory={
-                    <FontAwesomeIcon
-                      icon="plus"
-                      color="white"
-                      size={10}
-                      style={tw('ml-2')}
-                    />
-                  }>
-                  Add Team
-                </Button>
-              </View>
-              {teams.map((team, index) => (
-                <TeamCard
-                  team={team}
-                  style={
-                    index === teams.length - 1 ? tw('border-b-0') : undefined
-                  }
-                  key={team.id}
-                />
-              ))}
-            </View>
-
-            <Button
-              onPress={goToUpcomingEvents}
-              style={[tw('justify-center mb-4'), { backgroundColor }]}
-              textStyle={[tw('font-bold'), { color }]}>
-              View Full Schedule
-            </Button>
 
             <TextField
               icon="search"
@@ -193,6 +151,12 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
               onSubmitEditing={() => {
                 const player = filteredPlayers[0];
                 if (player) {
+                  dispatch(
+                    fetchTeams({
+                      schoolId: player.school_id,
+                    }),
+                  );
+
                   navigation.navigate('PlayerDetail', {
                     schoolId: player.school_id,
                     teamId: player.team_id,
@@ -203,7 +167,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
             />
 
             {searchText ? (
-              <View style={tw('bg-white rounded shadow my-4')}>
+              <View style={tw('bg-white rounded shadow mt-4')}>
                 {filteredPlayers.map((player, index) => {
                   const school = allSchools.find(
                     (s) => s.id === player.school_id,
@@ -260,6 +224,49 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                 })}
               </View>
             ) : null}
+
+            <View style={tw('bg-white rounded shadow my-4')}>
+              <View
+                style={[
+                  { backgroundColor },
+                  tw('flex-row items-center px-4 py-3 rounded-t'),
+                ]}>
+                <Text style={[tw('text-xl font-bold flex-1'), { color }]}>
+                  Bookmarked Teams
+                </Text>
+
+                <Button
+                  onPress={() => navigation.navigate('SelectSchool')}
+                  style={tw('px-2 py-1.5')}
+                  textStyle={tw('text-xs font-bold uppercase')}
+                  rightAccessory={
+                    <FontAwesomeIcon
+                      icon="plus"
+                      color="white"
+                      size={10}
+                      style={tw('ml-2')}
+                    />
+                  }>
+                  Add Team
+                </Button>
+              </View>
+              {teams.map((team, index) => (
+                <TeamCard
+                  team={team}
+                  style={
+                    index === teams.length - 1 ? tw('border-b-0') : undefined
+                  }
+                  key={team.id}
+                />
+              ))}
+            </View>
+
+            <Button
+              onPress={goToUpcomingEvents}
+              style={[tw('justify-center mb-4'), { backgroundColor }]}
+              textStyle={[tw('font-bold'), { color }]}>
+              View Full Schedule
+            </Button>
           </ScrollView>
         )}
       </KeyboardAvoidingView>
