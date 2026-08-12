@@ -507,6 +507,7 @@
 				DEVELOPMENT_TEAM = JA4TDX57C8;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LocalSportsTracker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -536,6 +537,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JA4TDX57C8;
 				INFOPLIST_FILE = LocalSportsTracker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

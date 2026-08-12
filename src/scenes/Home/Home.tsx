@@ -251,7 +251,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                   tw('flex-row items-center px-4 py-3 rounded-t'),
                 ]}>
                 <Text style={[tw('text-xl font-bold flex-1'), { color }]}>
-                  Bookmarked Teams
+                  Your Teams
                 </Text>
 
                 <Button
@@ -263,7 +263,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                   ]}
                   rightAccessory={
                     <FontAwesomeIcon
-                      icon="plus"
+                      icon="bookmark"
                       color={backgroundColor}
                       size={10}
                       style={tw('ml-2')}

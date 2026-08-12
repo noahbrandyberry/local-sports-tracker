@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, View } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
@@ -36,14 +36,12 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
         screenOptions={({ navigation: { goBack } }) => ({
           headerLeft: ({ canGoBack }) =>
             canGoBack ? (
-              <TouchableOpacity onPress={() => goBack()}>
+              <TouchableOpacity onPress={() => goBack()} style={styles.container}>
                 <FontAwesomeIcon icon="angle-left" size={20} />
               </TouchableOpacity>
-            ) : (
-              <View />
-            ),
+            ) : null,
           headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.container}>
               <FontAwesomeIcon icon="times" size={20} />
             </TouchableOpacity>
           ),
@@ -68,4 +66,9 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {width: 36, height: 36, justifyContent: 'center', alignItems: 'center'}
+});
+
 export default SelectSchool;
