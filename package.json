@@ -8,7 +8,7 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern \"e2e/**/*\"",
-    "codepush": "NODE_OPTIONS=--openssl-legacy-provider revopush release-react \"School Sports Tracker\" ios -d Production",
+    "codepush": "NODE_OPTIONS=--openssl-legacy-provider revopush release-react \"School Sports Tracker\" ios -d Production --mandatory",
     "build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
     "dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\""
   },

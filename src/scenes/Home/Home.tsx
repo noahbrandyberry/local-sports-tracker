@@ -251,7 +251,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                   tw('flex-row items-center px-4 py-3 rounded-t'),
                 ]}>
                 <Text style={[tw('text-xl font-bold flex-1'), { color }]}>
-                  Your Teams
+                  Bookmarked Teams
                 </Text>
 
                 <Button
