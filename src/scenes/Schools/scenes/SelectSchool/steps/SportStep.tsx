@@ -2,7 +2,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from 'components';
 import uniqBy from 'lodash/uniqBy';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import SportCell from 'schools/scenes/SchoolDetail/components/SportCell';
 import { getColorByBackground } from 'src/utils/getColorByBackground';
@@ -63,15 +63,15 @@ export const SportStep: React.FC<{
 
   return (
     <View style={tw('flex-1')}>
-      <View style={tw('flex-1 px-2.5 py-5')}>
+      <View style={tw('flex-1')}>
         {teamsLoading ? (
           <ActivityIndicator size={'large'} />
         ) : (
-          <>
+          <ScrollView style={tw('px-2.5')} contentContainerStyle={tw('py-5')}>
             {sports.length > 0 ? (
               <View style={tw('flex-1')}>
                 {seasons.length > 1 && (
-                  <View style={tw('flex-row px-2.5 justify-between')}>
+                  <View style={tw('flex-row px-2.5 pb-3 justify-between')}>
                     {seasons.map((season) => (
                       <TouchableOpacity
                         key={season.id}
@@ -103,7 +103,7 @@ export const SportStep: React.FC<{
                     ))}
                   </View>
                 )}
-                <View style={tw('flex-row flex-wrap justify-center pt-3')}>
+                <View style={tw('flex-row flex-wrap justify-center')}>
                   {sports.map((sport) => (
                     <SportCell
                       key={sport.id.toString()}
@@ -117,7 +117,7 @@ export const SportStep: React.FC<{
             ) : (
               <Text>No {seasonName} sports found.</Text>
             )}
-          </>
+          </ScrollView>
         )}
       </View>
     </View>

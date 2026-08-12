@@ -60,7 +60,7 @@ const SportDetail = ({ route, navigation }: SportDetailProps) => {
   return (
     <SafeAreaView
       style={{ backgroundColor: school.primary_color, flex: 1 }}
-      edges={['top', 'left', 'right']}>
+      edges={['left', 'right']}>
       <StatusBar
         barStyle={color === 'white' ? 'light-content' : 'dark-content'}
       />

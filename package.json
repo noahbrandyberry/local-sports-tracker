@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "start": "react-native start",
+    "ios": "NODE_OPTIONS=--openssl-legacy-provider react-native run-ios",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern \"e2e/**/*\"",
     "codepush": "NODE_OPTIONS=--openssl-legacy-provider revopush release-react \"School Sports Tracker\" ios -d Production --mandatory",

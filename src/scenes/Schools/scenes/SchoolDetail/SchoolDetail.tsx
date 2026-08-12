@@ -128,14 +128,14 @@ const SchoolDetail = ({ route, navigation }: SchoolDetailProps) => {
   };
 
   let title = school.name.replace(' High School', '');
-  if (title.length < 20) {
+  if (title.length < 20 && school.mascot) {
     title += ` ${school.mascot}`;
   }
 
   return (
     <SafeAreaView
       style={{ backgroundColor: school.primary_color, flex: 1 }}
-      edges={['top', 'left', 'right']}>
+      edges={['left', 'right']}>
       <MenuBar
         backgroundColor={school.primary_color}
         color={getColorByBackground(school.primary_color)}

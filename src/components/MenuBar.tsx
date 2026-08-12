@@ -24,11 +24,6 @@ interface MenuBarProps {
   imageUrl?: string;
 }
 
-interface MenuItemProps {
-  screenId: keyof RootStackParamList;
-  label: string;
-}
-
 export const MenuBar = ({
   backgroundColor,
   color,
@@ -38,19 +33,8 @@ export const MenuBar = ({
 }: MenuBarProps) => {
   const rgb = hexToRgb(backgroundColor.toString());
   backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.75)`;
-  const [isVisible, setIsVisible] = useState(false);
-  const menuItems: MenuItemProps[] = [
-    { screenId: 'SelectSchool', label: 'Change School' },
-    // {
-    //   screenId: 'PushNotificationsSubscriptions',
-    //   label: 'Push Notification Subscriptions',
-    // },
-    // { screenId: 'CalendarSubscriptions', label: 'Calendar Subscriptions' },
-    // { screenId: 'Settings', label: 'Settings' },
-  ];
 
   const goToScreen = (screenId: keyof RootStackParamList) => {
-    setIsVisible(false);
     navigation.navigate(screenId);
   };
 
@@ -60,10 +44,9 @@ export const MenuBar = ({
         barStyle={color === 'white' ? 'light-content' : 'dark-content'}
       />
 
-      <TouchableOpacity
+      <View
         style={styles.menuButton}
-        hitSlop={{ top: 15, bottom: 15, left: 15 }}
-        onPress={() => goToScreen('Home')}>
+      >
         <View style={styles.imageContainer}>
           <FastImage
             source={{ uri: imageUrl }}
@@ -71,44 +54,9 @@ export const MenuBar = ({
             resizeMode="contain"
           />
         </View>
-      </TouchableOpacity>
+      </View>
 
       <Text style={[styles.title, { color }]}>{title}</Text>
-
-      <Modal
-        visible={isVisible}
-        transparent
-        animationType="slide"
-        onDismiss={() => setIsVisible(false)}>
-        <SafeAreaView style={styles.menuContainer}>
-          {isVisible ? <StatusBar barStyle="light-content" /> : null}
-          <View style={styles.menuHeader}>
-            <Text style={styles.menuHeaderText}>Menu</Text>
-
-            <TouchableOpacity
-              onPress={() => setIsVisible(false)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <FontAwesomeIcon icon="times" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-
-          <FlatList
-            data={menuItems}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[styles.menuItem, { backgroundColor }]}
-                onPress={() => goToScreen(item.screenId)}>
-                <Text style={[styles.menuItemText, { color }]}>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            )}
-            ItemSeparatorComponent={() => (
-              <View style={[styles.divider, { backgroundColor: color }]} />
-            )}
-          />
-        </SafeAreaView>
-      </Modal>
     </View>
   );
 };

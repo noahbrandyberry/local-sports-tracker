@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import SchoolsList from 'schools/scenes/SchoolsList/SchoolsList';
 import SelectSchool from 'schools/scenes/SelectSchool';
 import SchoolDetail from 'schools/scenes/SchoolDetail';
 import SportDetail from 'schools/scenes/SportDetail';
@@ -166,8 +167,6 @@ const App = () => {
             }}>
             <Stack.Group>
               <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="SchoolDetail" component={SchoolDetail} />
-              <Stack.Screen name="SportDetail" component={SportDetail} />
             </Stack.Group>
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
               <Stack.Screen name="SelectSchool" component={SelectSchool} />
@@ -176,6 +175,9 @@ const App = () => {
               <Stack.Screen name="EventDetail" component={EventDetail} />
               <Stack.Screen name="PostDetail" component={PostDetail} />
               <Stack.Screen name="UpcomingEvents" component={UpcomingEvents} />
+              <Stack.Screen name="SchoolsList" component={SchoolsList} />
+              <Stack.Screen name="SchoolDetail" component={SchoolDetail} />
+              <Stack.Screen name="SportDetail" component={SportDetail} />
             </Stack.Group>
           </Stack.Navigator>
         </NavigationContainer>

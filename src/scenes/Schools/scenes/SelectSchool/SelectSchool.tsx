@@ -45,6 +45,7 @@ const SelectSchool = ({ navigation }: SelectSchoolProps) => {
               <FontAwesomeIcon icon="times" size={20} />
             </TouchableOpacity>
           ),
+          contentStyle: tw('mt-4'),
         })}>
         <SelectSchoolNavigator.Screen
           name="School"

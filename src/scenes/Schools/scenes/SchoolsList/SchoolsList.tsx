@@ -4,11 +4,18 @@ import { useSelector } from 'react-redux';
 import { FlatList } from 'react-native';
 import { fetchSchools } from 'schools/services/actions';
 import SchoolRow from './components/SchoolRow';
-import { selectValidSchools } from 'schools/services/selectors';
+import { selectNearestSchools, selectValidSchools } from 'schools/services/selectors';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import RootStackParamList from 'src/RootStackParams';
 
-const Schools = () => {
+type SchoolsListProps = NativeStackScreenProps<
+  RootStackParamList,
+  'SchoolsList'
+>;
+
+const Schools = ({ navigation }: SchoolsListProps) => {
   const dispatch = useDispatch();
-  const schools = useSelector(selectValidSchools);
+  const schools = useSelector(selectNearestSchools).slice(0, 15);
 
   useEffect(() => {
     dispatch(fetchSchools());
@@ -18,7 +25,7 @@ const Schools = () => {
   return (
     <FlatList
       data={schools}
-      renderItem={({ item }) => <SchoolRow school={item} />}
+      renderItem={({ item, index }) => <SchoolRow index={index} showDistance school={item} onPress={() => navigation.navigate('SchoolDetail', { schoolId: item.id })} />}
       keyExtractor={(item) => item.id.toString()}
     />
   );

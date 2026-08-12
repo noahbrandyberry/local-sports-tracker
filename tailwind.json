@@ -15,6 +15,11 @@
 			"marginBottom": 16
 		}
 	},
+	"mb-3": {
+		"style": {
+			"marginBottom": 12
+		}
+	},
 	"mb-4": {
 		"style": {
 			"marginBottom": 16
@@ -148,22 +153,16 @@
 			"borderBottomLeftRadius": 8
 		}
 	},
-	"rounded-t": {
-		"style": {
-			"borderTopLeftRadius": 4,
-			"borderTopRightRadius": 4
-		}
-	},
-	"rounded-t-none": {
-		"style": {
-			"borderTopLeftRadius": 0,
-			"borderTopRightRadius": 0
-		}
-	},
 	"rounded-b": {
 		"style": {
 			"borderBottomRightRadius": 4,
 			"borderBottomLeftRadius": 4
+		}
+	},
+	"rounded-t": {
+		"style": {
+			"borderTopLeftRadius": 4,
+			"borderTopRightRadius": 4
 		}
 	},
 	"border-b": {
@@ -262,14 +261,14 @@
 			"paddingBottom": 20
 		}
 	},
+	"pb-3": {
+		"style": {
+			"paddingBottom": 12
+		}
+	},
 	"pl-4": {
 		"style": {
 			"paddingLeft": 16
-		}
-	},
-	"pt-3": {
-		"style": {
-			"paddingTop": 12
 		}
 	},
 	"text-center": {

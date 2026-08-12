@@ -90,6 +90,10 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
     navigation.navigate('UpcomingEvents');
   };
 
+  const goToSchools = () => {
+    navigation.navigate('SchoolsList');
+  };
+
   if (bookmarksLoading) {
     return (
       <View style={tw('flex-1 justify-center items-center')}>
@@ -285,9 +289,16 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
 
             <Button
               onPress={goToUpcomingEvents}
-              style={[tw('justify-center mb-4'), { backgroundColor }]}
+              style={[tw('justify-center mb-3'), { backgroundColor }]}
               textStyle={[tw('font-bold'), { color }]}>
-              View Full Schedule
+              Full Schedule
+            </Button>
+
+            <Button
+              onPress={goToSchools}
+              style={[tw('justify-center mb-3'), { backgroundColor: 'transparent', shadowOpacity: 0 }]}
+              textStyle={[tw('font-bold'), { color: backgroundColor }]}>
+              View Other Teams
             </Button>
           </ScrollView>
         )}

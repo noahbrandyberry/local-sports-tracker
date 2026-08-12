@@ -195,11 +195,13 @@ const TeamHome = ({
           </ScrollView>
         </View>
       </View>
-      <TutorialStep
-        name="Bookmark"
-        text="You can bookmark the teams you want to follow. They will show up on your home screen and you will receive relevant notifications."
-        position={{ right: 10, top: 140 }}
-      />
+      {bookmarkedTeams.length === 0 && (
+        <TutorialStep
+          name="Bookmark"
+          text="You can bookmark the teams you want to follow. They will show up on your home screen and you will receive relevant notifications."
+          position={{ right: 10, top: 140 }}
+        />
+      )}
     </SafeAreaView>
   );
 };
