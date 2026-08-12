@@ -221,7 +221,7 @@ const UpcomingEvents = ({ navigation, route }: UpcomingEventsProps) => {
 
   const subscribeToCalendar = async () => {
     Linking.openURL(
-      `${config.baseUrl}/schools/${schoolId}/upcoming_events.ics?${qs.stringify(
+      `${config.baseUrl}/${schoolId ? `schools/${schoolId}/` : ''}upcoming_events.ics?${qs.stringify(
         schoolId && customFilters
           ? {
               level_id: levels,

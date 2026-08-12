@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import App from './App';
 import { store } from 'store/store';
-import CodePush from 'react-native-code-push';
+import CodePush from "@revopush/react-native-code-push";
 
 const CodePushOptions = {
   checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,

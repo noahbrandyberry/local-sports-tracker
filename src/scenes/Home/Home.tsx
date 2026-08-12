@@ -187,7 +187,7 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                     graduate = 'Junior';
                   } else if (graduateIn === 2) {
                     graduate = 'Sophomore';
-                  } else if (graduateIn >= 3) {
+                  } else if (graduateIn === 3) {
                     graduate = 'Freshman';
                   }
                   return (
@@ -226,9 +226,9 @@ export const Home = ({ navigation }: SchoolDetailProps) => {
                         <Text style={tw('font-medium')}>
                           {player.first_name} {player.last_name}
                         </Text>
-                        {graduate && (
+                        {graduate ? (
                           <Text style={tw('text-gray-600')}>{graduate}</Text>
-                        )}
+                        ) : null}
                       </View>
 
                       {school && (
